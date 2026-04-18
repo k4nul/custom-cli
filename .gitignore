@@ -1,0 +1,12 @@
+build/
+out/
+.vs/
+.idea/
+cmake-build-*/
+CMakeUserPresets.json
+Testing/
+config/local.json
+config/*.local.json
+*.user
+*.suo
+

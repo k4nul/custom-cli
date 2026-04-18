@@ -1,0 +1,622 @@
+{
+  "version": "1.0",
+  "current_state": {
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is now initialized locally on branch main, origin points at the custom-cli remote, and the management docs continue to validate cleanly.",
+    "repo_shape": [
+      "The CLI starter source tree is organized as a neutral reusable template.",
+      "Management records are schema-backed under docs/management/.",
+      "Legacy migration notes now use generic descriptions instead of carrying forward organization-specific names.",
+      "The CLI starter delivery repository is D:/git/CLI, even though the broader D:/git workspace still contains other unrelated projects.",
+      "The hosted verification entrypoint for the standalone repository is D:/git/CLI/.github/workflows/ci.yml.",
+      "Current policy allows local edits, local validation, and explicitly requested git workflows from D:/git/CLI while keeping the parent D:/git repository untouched."
+    ],
+    "source_of_truth": [
+      "docs/management/*.yaml",
+      "docs/management/schema/*.json",
+      "tests/validate_management_docs.py"
+    ]
+  },
+  "done": [
+    {
+      "id": "starter-restructure",
+      "title": "Legacy product-specific code was replaced with a reusable CLI starter layout."
+    },
+    {
+      "id": "management-schema",
+      "title": "Operational rules and state were moved into schema-backed management files."
+    },
+    {
+      "id": "validation-script",
+      "title": "A stock-Python validation script for management docs was added."
+    },
+    {
+      "id": "legacy-trace-policy",
+      "title": "2026-04-17: Remaining legacy-branded references were removed from migration docs and project policy paused git until a follow-up direction was recorded."
+    },
+    {
+      "id": "direction-decision",
+      "title": "2026-04-17: Accepted D12 to keep the CLI starter local-first inside D:/git and to keep git workflows paused."
+    },
+    {
+      "id": "standalone-cli-repo-bootstrap",
+      "title": "2026-04-18: Accepted D13, initialized D:/git/CLI as a standalone Git repository on main, connected origin to https://github.com/k4nul/custom-cli.git, added D:/git/CLI/.github/workflows/ci.yml, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "legacy-trace-doc-pass",
+      "title": "2026-04-17: docs/migration-from-legacy.md now describes the removed shared utility layer without naming the legacy identifier."
+    },
+    {
+      "id": "third-party-doc-pass",
+      "title": "2026-04-17: Reviewed third_party/README.md, found no legacy organization-specific traces, and pointed dependency update logging at docs/management/."
+    },
+    {
+      "id": "readme-doc-pass",
+      "title": "2026-04-17: Reviewed README.md, rewrote the introductory description with neutral starter wording, and found no remaining legacy organization-specific traces there."
+    },
+    {
+      "id": "project-overview-doc-pass",
+      "title": "2026-04-17: Reviewed docs/project-overview.md and confirmed it stays free of legacy organization-specific traces."
+    },
+    {
+      "id": "architecture-doc-pass",
+      "title": "2026-04-17: Reviewed docs/architecture.md, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "decisions-doc-pass",
+      "title": "2026-04-17: Reviewed docs/decisions.md, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "handoff-doc-pass",
+      "title": "2026-04-17: Reviewed docs/handoff.md, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "roadmap-doc-pass",
+      "title": "2026-04-17: Reviewed docs/roadmap.md, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cmake-metadata-pass",
+      "title": "2026-04-17: Reviewed CMakeLists.txt, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "project-config-template-pass",
+      "title": "2026-04-17: Reviewed cmake/project_config.hpp.in, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-config-json-pass",
+      "title": "2026-04-17: Reviewed config/cli-starter.json, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-config-header-pass",
+      "title": "2026-04-17: Reviewed include/starter/core/config.hpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-exit-code-header-pass",
+      "title": "2026-04-17: Reviewed include/starter/core/exit_code.hpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-project-info-header-pass",
+      "title": "2026-04-17: Reviewed include/starter/core/project_info.hpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-tokenize-header-pass",
+      "title": "2026-04-17: Reviewed include/starter/core/tokenize.hpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-application-header-pass",
+      "title": "2026-04-17: Reviewed include/starter/app/application.hpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-registrars-header-pass",
+      "title": "2026-04-17: Reviewed include/starter/commands/registrars.hpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-main-entrypoint-pass",
+      "title": "2026-04-17: Reviewed src/main.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-application-implementation-pass",
+      "title": "2026-04-17: Reviewed src/app/application.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-command-registration-pass",
+      "title": "2026-04-17: Reviewed src/commands/register_commands.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-about-command-pass",
+      "title": "2026-04-17: Reviewed src/commands/about_command.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-config-command-pass",
+      "title": "2026-04-17: Reviewed src/commands/config_command.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-doctor-command-pass",
+      "title": "2026-04-17: Reviewed src/commands/doctor_command.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-echo-command-pass",
+      "title": "2026-04-17: Reviewed src/commands/echo_command.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-hello-command-pass",
+      "title": "2026-04-17: Reviewed src/commands/hello_command.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-config-implementation-pass",
+      "title": "2026-04-17: Reviewed src/core/config.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-project-info-implementation-pass",
+      "title": "2026-04-17: Reviewed src/core/project_info.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-tokenize-implementation-pass",
+      "title": "2026-04-17: Reviewed src/core/tokenize.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-config-tests-pass",
+      "title": "2026-04-17: Reviewed tests/config_tests.cpp, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-validator-script-pass",
+      "title": "2026-04-17: Reviewed tests/validate_management_docs.py, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-phase-schema-pass",
+      "title": "2026-04-17: Reviewed docs/management/schema/phase.schema.json, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-plan-schema-pass",
+      "title": "2026-04-17: Reviewed docs/management/schema/plan.schema.json, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-agent-policy-schema-pass",
+      "title": "2026-04-17: Reviewed docs/management/schema/agent-policy.schema.json, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-verification-schema-pass",
+      "title": "2026-04-17: Reviewed docs/management/schema/verification.schema.json, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-handoff-schema-pass",
+      "title": "2026-04-17: Reviewed docs/management/schema/handoff.schema.json, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-decision-schema-pass",
+      "title": "2026-04-17: Reviewed docs/management/schema/decision.schema.json, confirmed it stays free of legacy organization-specific traces, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-phases-pass",
+      "title": "2026-04-17: Reviewed docs/management/phases.yaml, confirmed it stays free of legacy organization-specific traces, queued docs/management/decisions.yaml as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-decisions-pass",
+      "title": "2026-04-17: Reviewed docs/management/decisions.yaml, confirmed it stays free of legacy organization-specific traces, queued docs/management/plan.yaml as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-plan-pass",
+      "title": "2026-04-17: Reviewed docs/management/plan.yaml, confirmed it stays free of legacy organization-specific traces, queued docs/management/agent-policy.yaml as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-agent-policy-pass",
+      "title": "2026-04-17: Reviewed docs/management/agent-policy.yaml, confirmed it stays free of legacy organization-specific traces, queued docs/management/verification.yaml as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "management-verification-pass",
+      "title": "2026-04-17: Reviewed docs/management/verification.yaml, confirmed it stays free of legacy organization-specific traces, and queued docs/management/handoff.yaml as the next cleanup candidate."
+    },
+    {
+      "id": "management-handoff-pass",
+      "title": "2026-04-17: Reviewed docs/management/handoff.yaml, confirmed it stays free of legacy organization-specific traces, queued AGENTS.md as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "agents-map-pass",
+      "title": "2026-04-17: Reviewed AGENTS.md, confirmed it stays free of legacy organization-specific traces, queued D:/git/.github/workflows/cli-starter-ci.yml as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "root-cli-workflow-pass",
+      "title": "2026-04-17: Reviewed D:/git/.github/workflows/cli-starter-ci.yml, confirmed it stays free of legacy organization-specific traces, queued D:/git/CLI/.gitignore as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "starter-gitignore-pass",
+      "title": "2026-04-17T20:21:56.5969971+09:00: Reviewed D:/git/CLI/.gitignore, confirmed it stays free of legacy organization-specific traces, queued D:/git/CLI/third_party/licenses/CLI11-LICENSE.txt as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-license-pass",
+      "title": "2026-04-17T20:31:47.1057668+09:00: Reviewed D:/git/CLI/third_party/licenses/CLI11-LICENSE.txt, confirmed the repository-carried third-party license text stays free of legacy organization-specific starter traces, queued D:/git/CLI/third_party/licenses/doctest-LICENSE.txt as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "doctest-license-pass",
+      "title": "2026-04-17T20:41:37.9688429+09:00: Reviewed D:/git/CLI/third_party/licenses/doctest-LICENSE.txt, confirmed the repository-carried third-party license text stays free of legacy organization-specific starter traces, queued D:/git/CLI/third_party/licenses/nlohmann-json-LICENSE.txt as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "nlohmann-json-license-pass",
+      "title": "2026-04-17T20:51:34.9451173+09:00: Reviewed D:/git/CLI/third_party/licenses/nlohmann-json-LICENSE.txt, confirmed the repository-carried third-party license text stays free of legacy organization-specific starter traces, queued D:/git/CLI/third_party/nlohmann/json.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "nlohmann-json-header-pass",
+      "title": "2026-04-17T21:02:15.7950771+09:00: Reviewed D:/git/CLI/third_party/nlohmann/json.hpp, confirmed the vendored upstream header stays free of legacy organization-specific starter traces, treated its `legacy` and `cppcoreguidelines` matches as upstream compatibility or lint labels rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/doctest/doctest.h as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "doctest-header-pass",
+      "title": "2026-04-17T21:11:33.6773594+09:00: Reviewed D:/git/CLI/third_party/doctest/doctest.h, confirmed the vendored upstream test header stays free of legacy organization-specific starter traces, treated its `cppcoreguidelines` and `internal` matches as upstream lint labels or implementation markers rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/CLI.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-umbrella-header-pass",
+      "title": "2026-04-17T21:21:36.7789323+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/CLI.hpp, confirmed the vendored upstream umbrella header stays free of legacy organization-specific starter traces, found no flagged legacy keywords in the file, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/App.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-app-header-pass",
+      "title": "2026-04-17T21:31:47.5236533+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/App.hpp, confirmed the vendored upstream app header stays free of legacy organization-specific starter traces, treated its `Internal` helper labels as generic upstream implementation markers rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/Argv.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-argv-header-pass",
+      "title": "2026-04-17T21:41:26.7388829+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Argv.hpp, confirmed the vendored upstream argv helper header stays free of legacy organization-specific starter traces, found no flagged legacy keywords in the file, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/Config.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-config-header-pass",
+      "title": "2026-04-17T21:51:48.8256489+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Config.hpp, confirmed the vendored upstream config header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati and contributor copyright attributions as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/ConfigFwd.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-config-fwd-header-pass",
+      "title": "2026-04-17T22:01:39.7100556+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/ConfigFwd.hpp, confirmed the vendored upstream config-forward header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati and contributor copyright attributions as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/Encoding.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-encoding-header-pass",
+      "title": "2026-04-17T22:11:51.1072536+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Encoding.hpp, confirmed the vendored upstream encoding header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati and contributor copyright attributions as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/Error.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-error-header-pass",
+      "title": "2026-04-17T22:21:35.4924633+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Error.hpp, confirmed the vendored upstream error header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati and contributor copyright attributions as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/ExtraValidators.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-extra-validators-header-pass",
+      "title": "2026-04-17T22:31:35.7596897+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/ExtraValidators.hpp, confirmed the vendored upstream extra-validator header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati and contributor copyright attributions as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/Formatter.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-formatter-header-pass",
+      "title": "2026-04-17T22:41:45.7298123+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Formatter.hpp, confirmed the vendored upstream formatter header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati and contributor copyright attributions as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/FormatterFwd.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-formatter-fwd-header-pass",
+      "title": "2026-04-17T22:51:35.2589220+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/FormatterFwd.hpp, confirmed the vendored upstream formatter-forward header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati and contributor copyright attributions as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/Macros.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-macros-header-pass",
+      "title": "2026-04-17T23:01:53.9963355+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Macros.hpp, confirmed the vendored upstream macros header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati and contributor copyright attributions as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/Option.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-option-header-pass",
+      "title": "2026-04-17T23:12:02.3067997+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Option.hpp, confirmed the vendored upstream option header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati and contributor copyright attributions as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/Split.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-split-header-pass",
+      "title": "2026-04-17T23:21:51.2888792+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Split.hpp, confirmed the vendored upstream split helper header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/StringTools.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-string-tools-header-pass",
+      "title": "2026-04-17T23:31:34.7573824+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/StringTools.hpp, confirmed the vendored upstream string helper header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/Timer.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-timer-header-pass",
+      "title": "2026-04-17T23:41:39.5800232+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Timer.hpp, confirmed the vendored upstream timer header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/TypeTools.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-type-tools-header-pass",
+      "title": "2026-04-17T23:51:59.4706344+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/TypeTools.hpp, confirmed the vendored upstream type-tools header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/Validators.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-validators-header-pass",
+      "title": "2026-04-18T00:01:31.7068753+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Validators.hpp, confirmed the vendored upstream validators header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution as third-party provenance rather than starter branding, left the header unchanged, queued D:/git/CLI/third_party/cli11/CLI/impl/Validators_inl.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-validators-inl-pass",
+      "title": "2026-04-18T00:11:38.3068777+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/impl/Validators_inl.hpp, confirmed the vendored upstream validator implementation header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution as third-party provenance rather than starter branding, left the file unchanged, queued D:/git/CLI/third_party/cli11/CLI/impl/StringTools_inl.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-string-tools-inl-pass",
+      "title": "2026-04-18T00:21:38.9993900+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/impl/StringTools_inl.hpp, confirmed the vendored upstream string-tools implementation header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution as third-party provenance rather than starter branding, left the file unchanged, queued D:/git/CLI/third_party/cli11/CLI/impl/Split_inl.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-split-inl-pass",
+      "title": "2026-04-18T00:31:45.2127267+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/impl/Split_inl.hpp, confirmed the vendored upstream split implementation header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution plus CLI11 implementation markers as third-party provenance or upstream structure rather than starter branding, left the file unchanged, queued D:/git/CLI/third_party/cli11/CLI/impl/Option_inl.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-option-inl-pass",
+      "title": "2026-04-18T00:41:36.6484560+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/impl/Option_inl.hpp, confirmed the vendored upstream option implementation header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution as third-party provenance rather than starter branding, left the file unchanged, queued D:/git/CLI/third_party/cli11/CLI/impl/Formatter_inl.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-formatter-inl-pass",
+      "title": "2026-04-18T00:51:48.8738582+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/impl/Formatter_inl.hpp, confirmed the vendored upstream formatter implementation header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution plus CLI11 implementation markers as third-party provenance or upstream structure rather than starter branding, left the file unchanged, queued D:/git/CLI/third_party/cli11/CLI/impl/ExtraValidators_inl.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-extra-validators-inl-pass",
+      "title": "2026-04-18T01:02:11.7169455+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/impl/ExtraValidators_inl.hpp, confirmed the vendored upstream extra-validator implementation header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution plus generic filesystem `path` wording as third-party provenance or validator behavior rather than starter branding, left the file unchanged, queued D:/git/CLI/third_party/cli11/CLI/impl/Encoding_inl.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-encoding-inl-pass",
+      "title": "2026-04-18T01:12:56.6660480+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/impl/Encoding_inl.hpp, confirmed the vendored upstream encoding implementation header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution plus generic filesystem `path` usage as third-party provenance or platform handling rather than starter branding, left the file unchanged, queued D:/git/CLI/third_party/cli11/CLI/impl/Argv_inl.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-argv-inl-pass",
+      "title": "2026-04-18T01:22:05.8415393+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/impl/Argv_inl.hpp, confirmed the vendored upstream argv implementation header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution as third-party provenance rather than starter branding, left the file unchanged, queued D:/git/CLI/third_party/cli11/CLI/impl/App_inl.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-app-inl-pass",
+      "title": "2026-04-18T01:31:44.4379065+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/impl/App_inl.hpp, confirmed the vendored upstream app implementation header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution plus CLI11 implementation markers as third-party provenance or upstream structure rather than starter branding, left the file unchanged, queued D:/git/CLI/third_party/cli11/CLI/impl/Config_inl.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-config-inl-pass",
+      "title": "2026-04-18T12:47:27.2733500+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/impl/Config_inl.hpp, confirmed the vendored upstream config implementation header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution plus CLI11 config markers as third-party provenance or upstream structure rather than starter branding, left the file unchanged, queued D:/git/CLI/third_party/cli11/CLI/Version.hpp as the next cleanup candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "cli11-version-header-pass",
+      "title": "2026-04-18T13:08:00+09:00: Reviewed D:/git/CLI/third_party/cli11/CLI/Version.hpp, confirmed the vendored upstream version header stays free of legacy organization-specific starter traces, treated its upstream University of Cincinnati copyright attribution plus version macros as third-party provenance or package metadata rather than starter branding, confirmed there is no companion D:/git/CLI/third_party/cli11/CLI/impl/Version_inl.hpp, and exhausted the current repository-owned cleanup queue inside D:/git/CLI."
+    },
+    {
+      "id": "local-build-artifact-cleanup-pass",
+      "title": "2026-04-18T13:08:00.1727814+09:00: Reviewed D:/git/CLI/build-local-nmake/generated/starter/project_config.hpp, D:/git/CLI/build-local-nmake/CMakeCache.txt, D:/git/CLI/build-local-vs2026/CMakeCache.txt, D:/git/CLI/build-local-vs2026-devshell/CMakeCache.txt, and D:/git/CLI/build-local-nmake/CMakeFiles/CMakeConfigureLog.yaml, confirmed those local generated header and configure/cache artifacts only reflect neutral starter naming or toolchain metadata, left all five files unchanged, and found no newly queued repository-owned cleanup candidate inside D:/git/CLI."
+    },
+    {
+      "id": "local-build-script-log-pass",
+      "title": "2026-04-18T13:17:43.4001522+09:00: Reviewed D:/git/CLI/build-local-nmake/Makefile, D:/git/CLI/build-local-nmake/DartConfiguration.tcl, D:/git/CLI/build-local-nmake/CTestTestfile.cmake, D:/git/CLI/build-local-nmake/cmake_install.cmake, and D:/git/CLI/build-local-nmake/Testing/Temporary/LastTest.log, confirmed those generated build/test files only contain neutral starter naming, local machine metadata, or successful doctest output, left all five files unchanged, and queued the remaining check-cache plus CMakeSystem local support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-cmake-support-pass",
+      "title": "2026-04-18T13:27:14.3674418+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/cmake.check_cache, D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CMakeSystem.cmake, D:/git/CLI/build-local-vs2026/CMakeFiles/cmake.check_cache, D:/git/CLI/build-local-vs2026/CMakeFiles/4.3.1/CMakeSystem.cmake, and D:/git/CLI/build-local-vs2026-devshell/CMakeFiles/cmake.check_cache, confirmed those generated dependency-check and system-description files only contain neutral CMake boilerplate plus local Windows toolchain metadata, left all five files unchanged, queued D:/git/CLI/build-local-vs2026-devshell/CMakeFiles/4.3.1/CMakeSystem.cmake as the next remaining local artifact candidate, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "local-vs-probe-artifact-pass",
+      "title": "2026-04-18T13:37:31.7805345+09:00: Reviewed D:/git/CLI/build-local-vs2026-devshell/CMakeFiles/4.3.1/CMakeSystem.cmake, D:/git/CLI/build-local-vs2026/CMakeFiles/4.3.1/VCTargetsPath.vcxproj, D:/git/CLI/build-local-vs2026/CMakeFiles/4.3.1/VCTargetsPath.txt, D:/git/CLI/build-local-vs2026/CMakeFiles/4.3.1/CompilerIdCXX/CompilerIdCXX.vcxproj, and D:/git/CLI/build-local-vs2026/CMakeFiles/4.3.1/CompilerIdCXX/CMakeCXXCompilerId.cpp, confirmed those generated system, MSBuild, and compiler-identification artifacts only contain neutral toolchain metadata or upstream CMake probe logic, left all five files unchanged, queued the remaining build-local-vs2026 CompilerIdCXX debug/tlog support files plus VCTargetsPath recipe metadata as the next cleanup candidates, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "local-vs-probe-tlog-pass",
+      "title": "2026-04-18T13:47:32.7957909+09:00: Reviewed D:/git/CLI/build-local-vs2026/CMakeFiles/4.3.1/VCTargetsPath/x64/Debug/VCTargetsPath.recipe, D:/git/CLI/build-local-vs2026/CMakeFiles/4.3.1/VCTargetsPath/x64/Debug/VCTargetsPath.tlog/VCTargetsPath.lastbuildstate, D:/git/CLI/build-local-vs2026/CMakeFiles/4.3.1/CompilerIdCXX/Debug/CompilerIdCXX.tlog/CL.command.1.tlog, D:/git/CLI/build-local-vs2026/CMakeFiles/4.3.1/CompilerIdCXX/Debug/CompilerIdCXX.tlog/CompilerIdCXX.lastbuildstate, and D:/git/CLI/build-local-vs2026/CMakeFiles/4.3.1/CompilerIdCXX/Debug/CompilerIdCXX.tlog/unsuccessfulbuild, confirmed those generated probe byproducts only contain neutral build paths, toolchain metadata, or an empty unsuccessful-build marker, noted that CL.read.1.tlog and CL.write.1.tlog are absent from the current generated tree, exhausted the local artifact queue under build-local-vs2026/CMakeFiles/4.3.1, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "local-nmake-support-pass",
+      "title": "2026-04-18T13:57:20.6424488+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/TargetDirectories.txt, D:/git/CLI/build-local-nmake/CMakeFiles/CTestScript.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/CMakeDirectoryInformation.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/CMakeRuleHashes.txt, and D:/git/CLI/build-local-nmake/CMakeFiles/Makefile2, confirmed those generated NMake support files only contain neutral build directories, local machine metadata, or CMake-generated build rules, left all five files unchanged, queued D:/git/CLI/build-local-nmake/CMakeFiles/Makefile.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/InstallScripts.json, D:/git/CLI/build-local-nmake/CMakeFiles/progress.marks, D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CMakeRCCompiler.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CMakeCXXCompiler.cmake as the next local artifact candidates, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "local-nmake-compiler-metadata-pass",
+      "title": "2026-04-18T14:07:06.0332712+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/Makefile.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/InstallScripts.json, D:/git/CLI/build-local-nmake/CMakeFiles/progress.marks, D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CMakeRCCompiler.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CMakeCXXCompiler.cmake, confirmed those generated NMake dependency, install, progress, and compiler-description files only contain neutral CMake boilerplate plus local Windows toolchain metadata, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CMakeDetermineCompilerABI_CXX.bin, D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CompilerIdCXX/CMakeCXXCompilerId.cpp, D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CompilerIdCXX/CMakeCXXCompilerId.exe, D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CompilerIdCXX/CMakeCXXCompilerId.obj, and D:/git/CLI/build-local-nmake/CMakeFiles/ShowIncludes/foo.h as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-compiler-probe-pass",
+      "title": "2026-04-18T14:17:39.4153221+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CMakeDetermineCompilerABI_CXX.bin, D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CompilerIdCXX/CMakeCXXCompilerId.cpp, D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CompilerIdCXX/CMakeCXXCompilerId.exe, D:/git/CLI/build-local-nmake/CMakeFiles/4.3.1/CompilerIdCXX/CMakeCXXCompilerId.obj, and D:/git/CLI/build-local-nmake/CMakeFiles/ShowIncludes/foo.h, confirmed those generated probe artifacts only contain neutral upstream CMake compiler-detection logic, standard PE/COFF object or executable structure, or an empty generated header, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ShowIncludes/main.c, D:/git/CLI/build-local-nmake/CMakeFiles/ShowIncludes/main.obj, D:/git/CLI/build-local-nmake/cli-starter.exe, D:/git/CLI/build-local-nmake/cli-starter.ilk, and D:/git/CLI/build-local-nmake/cli-starter.pdb as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-runtime-artifact-pass",
+      "title": "2026-04-18T14:27:39.3303005+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ShowIncludes/main.c, D:/git/CLI/build-local-nmake/CMakeFiles/ShowIncludes/main.obj, D:/git/CLI/build-local-nmake/cli-starter.exe, D:/git/CLI/build-local-nmake/cli-starter.ilk, and D:/git/CLI/build-local-nmake/cli-starter.pdb, confirmed those generated source, object, executable, linker, and debug artifacts only contain neutral starter symbols, local build paths, toolchain metadata, or standard debug records, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/starter_core.lib, D:/git/CLI/build-local-nmake/starter_tests.exe, D:/git/CLI/build-local-nmake/starter_tests.ilk, D:/git/CLI/build-local-nmake/starter_tests.pdb, and D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/build.make as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-test-binary-pass",
+      "title": "2026-04-18T14:37:24.7379283+09:00: Reviewed D:/git/CLI/build-local-nmake/starter_core.lib, D:/git/CLI/build-local-nmake/starter_tests.exe, D:/git/CLI/build-local-nmake/starter_tests.ilk, D:/git/CLI/build-local-nmake/starter_tests.pdb, and D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/build.make, confirmed those generated library, test-binary, linker, debug, and target-rule artifacts only contain neutral starter symbols, doctest metadata, local build paths, or standard MSVC/CMake records, treated observed doctest internal-error strings and absolute toolchain/include paths as upstream framework or compiler provenance rather than starter branding, left all five files unchanged, and queued the starter_core/starter_tests target-support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-target-support-pass",
+      "title": "2026-04-18T14:47:26.8988769+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/flags.make, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/objects1.rsp, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/build.make, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/flags.make, confirmed those generated starter-target support files only contain neutral starter target names, local source/build paths, or standard CMake/MSVC metadata, treated the garbled `/showIncludes` filter text as generator or locale output rather than starter branding, left all five files unchanged, and queued the next starter_core dependency-support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-clean-dependency-pass",
+      "title": "2026-04-18T14:57:08.4512596+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/cmake_clean_target.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/compiler_depend.internal, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/compiler_depend.make, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/compiler_depend.ts, confirmed those generated cleanup and dependency-support files only contain neutral CMake cleanup rules, local source/build paths, or standard MSVC include metadata, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/compiler_depend.internal, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/compiler_depend.ts, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/depend.make as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-starter-tests-dependency-pass",
+      "title": "2026-04-18T15:07:12.6318980+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/compiler_depend.internal, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/compiler_depend.ts, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/depend.make, confirmed those generated test-target cleanup and dependency-support files only contain neutral CMake cleanup rules, local source/build paths, standard MSVC include metadata, or placeholder dependency markers, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/embed.manifest, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/intermediate.manifest, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/manifest.rc, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/manifest.res as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-starter-tests-manifest-pass",
+      "title": "2026-04-18T15:17:15.4837844+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/embed.manifest, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/intermediate.manifest, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/manifest.rc, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/manifest.res, confirmed those generated dependency and manifest-support files only contain neutral CMake dependency metadata, standard Windows requested-execution-level manifests, or compiled manifest resources, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/flags.make, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/objects1.rsp, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/progress.make, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/tests/config_tests.cpp.obj as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-starter-tests-build-support-pass",
+      "title": "2026-04-18T15:27:11.8263836+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/flags.make, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/objects1.rsp, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/progress.make, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/tests/config_tests.cpp.obj, confirmed those generated NMake target rules, compile flags, object response/progress metadata, and compiled test object data only contain neutral starter paths, MSVC/CMake toolchain metadata, or doctest/debug symbols, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/vc140.pdb plus D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/tests/config_tests.cpp.obj.d as the next remaining starter_tests cleanup candidates before expanding beyond that directory."
+    },
+    {
+      "id": "local-nmake-starter-tests-pdb-and-cli-starter-deps-pass",
+      "title": "2026-04-18T15:40:22.3522585+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/vc140.pdb, D:/git/CLI/build-local-nmake/CMakeFiles/starter_tests.dir/tests/config_tests.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/compiler_depend.internal, and D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/compiler_depend.make, confirmed those generated PDB, dependency, cleanup, and compiler-trace artifacts only contain neutral starter symbols, local source/build paths, doctest metadata, or standard MSVC/CMake records, treated the observed `internal`, `legacy`, and absolute toolchain/include path strings as upstream compiler/debug metadata rather than starter branding, left all five files unchanged, exhausted the starter_tests directory, and queued the next cli-starter dependency and manifest support files."
+    },
+    {
+      "id": "local-nmake-cli-starter-dependency-and-manifest-pass",
+      "title": "2026-04-18T15:50:22.5953416+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/embed.manifest, and D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/flags.make, confirmed those generated timestamp, dependency, manifest, and compile-flags files only contain neutral CMake, Windows manifest, local include-path, or MSVC toolchain metadata, left all five files unchanged, and queued the remaining cli-starter manifest and response/progress support files."
+    },
+    {
+      "id": "local-nmake-cli-starter-manifest-and-progress-pass",
+      "title": "2026-04-18T16:00:29.9690998+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/intermediate.manifest, D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/manifest.rc, D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/manifest.res, D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/objects1.rsp, and D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/progress.make, confirmed those generated files only contain standard Windows manifest metadata, a compiled manifest resource, or neutral CMake response/progress markers, left all five files unchanged, and queued the remaining cli-starter object and PDB byproducts."
+    },
+    {
+      "id": "local-nmake-cli-starter-tail-and-starter-core-pdb-pass",
+      "title": "2026-04-18T16:10:48.3292005+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/src/main.cpp.obj, D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/src/main.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/cli-starter.dir/vc140.pdb, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/starter_core.pdb, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/app/application.cpp.obj, confirmed those generated object and PDB artifacts only contain neutral starter symbols, local source/build paths, standard MSVC debug records, or toolchain metadata, treated the observed `legacy` substring in `threadpoollegacyapiset.h` as upstream Windows SDK provenance rather than starter branding, left all five files unchanged, and queued the next starter_core dependency and object byproducts."
+    },
+    {
+      "id": "local-nmake-starter-core-command-artifact-pass",
+      "title": "2026-04-18T16:21:00+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/app/application.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/about_command.cpp.obj, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/about_command.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/config_command.cpp.obj, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/config_command.cpp.obj.d, confirmed those generated dependency and object artifacts only contain neutral starter symbols, local source/build paths, standard MSVC debug records, or toolchain metadata, treated the observed `legacy` substring in `threadpoollegacyapiset.h` as upstream Windows SDK provenance rather than starter branding, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/doctor_command.cpp.obj, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/doctor_command.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/echo_command.cpp.obj, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/echo_command.cpp.obj.d, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/hello_command.cpp.obj as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-starter-core-command-tail-pass",
+      "title": "2026-04-18T16:30:28.7326101+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/doctor_command.cpp.obj, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/doctor_command.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/echo_command.cpp.obj, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/echo_command.cpp.obj.d, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/hello_command.cpp.obj, confirmed those generated object and dependency artifacts only contain neutral starter command symbols, local source/build paths, standard MSVC debug records, or toolchain metadata, treated the observed `legacy` substring in `threadpoollegacyapiset.h` as upstream Windows SDK provenance rather than starter branding, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/hello_command.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/config.cpp.obj, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/config.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/project_info.cpp.obj, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/project_info.cpp.obj.d as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-starter-core-core-artifact-pass",
+      "title": "2026-04-18T16:40:15.0675124+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/hello_command.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/config.cpp.obj, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/config.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/project_info.cpp.obj, and D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/project_info.cpp.obj.d, confirmed those generated dependency and object artifacts only contain neutral starter symbols, local source/build paths, standard MSVC debug records, bundled nlohmann/CLI11 references, or Windows/MSVC toolchain metadata, treated the observed `legacy` substring in `threadpoollegacyapiset.h` as upstream Windows SDK provenance rather than starter branding, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/tokenize.cpp.obj plus D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/tokenize.cpp.obj.d as the next remaining starter_core cleanup candidates before expanding beyond that directory."
+    },
+    {
+      "id": "local-nmake-starter-core-tail-and-continuous-build-pass",
+      "title": "2026-04-18T16:50:51.7905849+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/register_commands.cpp.obj, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/commands/register_commands.cpp.obj.d, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/tokenize.cpp.obj, D:/git/CLI/build-local-nmake/CMakeFiles/starter_core.dir/src/core/tokenize.cpp.obj.d, and D:/git/CLI/build-local-nmake/CMakeFiles/Continuous.dir/build.make, confirmed those generated object, dependency, and NMake script artifacts only contain neutral starter symbols, local source/build paths, standard MSVC debug records, bundled CLI11 references, or standard CMake/CTest metadata, treated the observed `threadpoollegacyapiset.h` path as upstream Windows SDK provenance rather than starter branding, left all five files unchanged, exhausted starter_core.dir, and queued the remaining Continuous.dir support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-dir-support-pass",
+      "title": "2026-04-18T17:00:06.1415908+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/Continuous.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/Continuous.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/Continuous.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/Continuous.dir/DependInfo.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/Continuous.dir/progress.make, confirmed those generated cleanup, dependency, timestamp, and progress-support files only contain neutral CMake/CTest metadata or empty placeholders, left all five files unchanged, exhausted Continuous.dir, and queued the first ContinuousCoverage.dir support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-coverage-support-pass",
+      "title": "2026-04-18T17:10:28.2180502+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/compiler_depend.ts, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/DependInfo.cmake, confirmed those generated build, cleanup, dependency, timestamp, and target-info files only contain neutral CMake/CTest metadata, local build paths, or empty placeholders, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/progress.make plus the first ContinuousMemCheck.dir support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-coverage-tail-and-memcheck-head-pass",
+      "title": "2026-04-18T17:20:21.0337662+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/compiler_depend.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/compiler_depend.ts, confirmed those generated progress, build, cleanup, dependency, and timestamp-support files only contain empty placeholders, neutral CMake/CTest rules, local build paths, or standard generated metadata, left all five files unchanged, exhausted ContinuousCoverage.dir, and queued the remaining ContinuousMemCheck.dir tail plus the first ContinuousSubmit.dir support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-memcheck-tail-and-submit-head-pass",
+      "title": "2026-04-18T17:30:08.0716862+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/cmake_clean.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/compiler_depend.make, confirmed those generated dependency, progress, build, cleanup, and placeholder dependency files only contain neutral CMake/CTest metadata, empty placeholders, or local build paths, left all five files unchanged, exhausted ContinuousMemCheck.dir, and queued the remaining ContinuousSubmit.dir tail plus the first ContinuousTest.dir support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-test-tail-and-dart-config-pass",
+      "title": "2026-04-18T17:50:36.2900890+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/progress.make, and D:/git/CLI/build-local-nmake/DartConfiguration.tcl, confirmed those generated dependency, timestamp, target-info, progress, and dashboard-configuration files only contain neutral CMake/CTest metadata, empty placeholders, local build paths, host/toolchain records, or standard generated defaults, left all five files unchanged, corrected the queued DartConfiguration.tcl path to the build-local-nmake root, exhausted ContinuousTest.dir, and queued the next top-level generated files plus the generated project config header as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-top-level-and-generated-config-pass",
+      "title": "2026-04-18T18:00:08.1016665+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeCache.txt, D:/git/CLI/build-local-nmake/cmake_install.cmake, D:/git/CLI/build-local-nmake/CTestTestfile.cmake, D:/git/CLI/build-local-nmake/Makefile, and D:/git/CLI/build-local-nmake/generated/starter/project_config.hpp, confirmed those generated cache, install, testfile, build-rule, and generated config-header outputs only contain neutral starter names, local build paths, standard CMake/NMake/MSVC metadata, or generated project constants, treated the machine-specific SITE value and install prefix as local generator state rather than starter branding, left all five files unchanged, exhausted the queued top-level NMake outputs, and queued D:/git/CLI/build-local-nmake/Testing/Temporary/CTestCostData.txt as the next cleanup candidate."
+    },
+    {
+      "id": "local-nmake-ctest-temporary-and-cli-starter-binary-pass",
+      "title": "2026-04-18T18:10:47.4245690+09:00: Reviewed D:/git/CLI/build-local-nmake/Testing/Temporary/CTestCostData.txt, D:/git/CLI/build-local-nmake/Testing/Temporary/LastTest.log, D:/git/CLI/build-local-nmake/cli-starter.exe, D:/git/CLI/build-local-nmake/cli-starter.ilk, and D:/git/CLI/build-local-nmake/cli-starter.pdb, confirmed the temporary CTest outputs only contain neutral starter test names, local build paths, doctest success output, or locale-rendered timestamps, and confirmed the generated executable, incremental-link, and debug-symbol artifacts only contain neutral starter symbols, local source/build paths, bundled CLI11 or nlohmann identifiers, or standard MSVC debug metadata, treated the mojibake-rendered Korea Standard Time text and debug-path strings as local toolchain output rather than starter branding, left all five files unchanged, noted that D:/git/CLI/build-local-nmake/Testing/TAG is absent, and queued D:/git/CLI/build-local-nmake/starter_core.lib, D:/git/CLI/build-local-nmake/starter_tests.exe, D:/git/CLI/build-local-nmake/starter_tests.ilk, D:/git/CLI/build-local-nmake/starter_tests.pdb, and D:/git/CLI/build-local-nmake/CMakeFiles/cmake.check_cache as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-starter-tests-binaries-and-check-cache-pass",
+      "title": "2026-04-18T18:20:22.2748644+09:00: Reviewed D:/git/CLI/build-local-nmake/starter_core.lib, D:/git/CLI/build-local-nmake/starter_tests.exe, D:/git/CLI/build-local-nmake/starter_tests.ilk, D:/git/CLI/build-local-nmake/starter_tests.pdb, and D:/git/CLI/build-local-nmake/CMakeFiles/cmake.check_cache, confirmed the library, test binary, incremental-link, and debug-symbol artifacts only contain neutral starter symbols, local source/build paths, doctest strings, standard MSVC debug metadata, or toolchain provenance, treated the observed `internal` labels and absolute Visual Studio paths as generated toolchain output rather than starter branding, confirmed `cmake.check_cache` contains no flagged legacy-oriented text, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/CTestScript.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/InstallScripts.json, D:/git/CLI/build-local-nmake/CMakeFiles/TargetDirectories.txt, D:/git/CLI/build-local-nmake/CMakeFiles/CMakeDirectoryInformation.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/Makefile.cmake as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-top-level-cmake-support-pass",
+      "title": "2026-04-18T18:30:07.7451348+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/CTestScript.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/InstallScripts.json, D:/git/CLI/build-local-nmake/CMakeFiles/TargetDirectories.txt, D:/git/CLI/build-local-nmake/CMakeFiles/CMakeDirectoryInformation.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/Makefile.cmake, confirmed those generated CTest script, install-script manifest, target-directory list, directory-info, and top-level dependency files only contain neutral CMake/CTest metadata, local build paths, generator defaults, or standard toolchain module references, treated the machine-specific `CTEST_SITE` value and the empty git-update fields as local generator state rather than starter branding, left all five files unchanged, exhausted the queued top-level CMake support files, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/compiler_depend.ts, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/DependInfo.cmake as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-build-head-pass",
+      "title": "2026-04-18T18:45:10.8425497+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/compiler_depend.ts, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/DependInfo.cmake, confirmed those generated dashboard-build, cleanup, dependency, timestamp, and target-info files only contain neutral CMake/CTest metadata, local build paths, or empty placeholders, left all five files unchanged, exhausted the first ContinuousBuild.dir batch, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/compiler_depend.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/compiler_depend.ts as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-build-tail-and-configure-head-pass",
+      "title": "2026-04-18T18:55:18.6753889+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/compiler_depend.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/compiler_depend.ts, confirmed the empty progress marker plus the generated build, cleanup, dependency, and timestamp files only contain neutral CMake/CTest metadata, local build paths, or empty placeholders, left all five files unchanged, exhausted ContinuousBuild.dir, and queued the remaining ContinuousConfigure.dir tail plus the first ContinuousCoverage.dir support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-configure-tail-and-coverage-head-pass",
+      "title": "2026-04-18T19:05:14.0124366+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/cmake_clean.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/compiler_depend.make, confirmed those generated dependency, progress, build, cleanup, and placeholder dependency files only contain neutral CMake/CTest metadata, local build paths, standard NMake rules, or empty placeholders, left all five files unchanged, exhausted the queued ContinuousConfigure tail plus the first ContinuousCoverage support files, and queued the remaining ContinuousCoverage.dir tail plus the first ContinuousMemCheck.dir support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-coverage-tail-and-memcheck-head-pass-2",
+      "title": "2026-04-18T19:15:25.3308585+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/build.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/cmake_clean.cmake, confirmed those generated timestamp, dependency, progress, build, and cleanup files only contain neutral CMake/CTest metadata, local build paths, standard NMake rules, or empty placeholders, left all five files unchanged, exhausted the remaining ContinuousCoverage.dir tail plus the first ContinuousMemCheck support files, and queued the remaining ContinuousMemCheck.dir support files plus D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/build.make as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-memcheck-tail-and-submit-build-pass-2",
+      "title": "2026-04-18T19:27:16.1997693+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/progress.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/build.make, confirmed those generated dependency, timestamp, dependency-info, progress, and NMake build-rule files only contain neutral CMake/CTest metadata, empty placeholders, standard NMake rules, or local build paths, left all five files unchanged, exhausted the remaining ContinuousMemCheck.dir support files plus the first ContinuousSubmit build file, and queued the remaining ContinuousSubmit.dir support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-submit-tail-pass",
+      "title": "2026-04-18T19:37:13.3701943+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/DependInfo.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/progress.make, confirmed those generated cleanup, dependency, timestamp, dependency-info, and progress files only contain neutral CMake/CTest metadata, empty placeholders, or local build paths, left all five files unchanged, exhausted ContinuousSubmit.dir, and queued the first ContinuousTest.dir support files as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-test-head-pass-2",
+      "title": "2026-04-18T19:47:11.1502062+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/compiler_depend.ts, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/DependInfo.cmake, confirmed those generated build, cleanup, dependency, timestamp, and dependency-info files only contain neutral CMake/CTest metadata, empty placeholders, standard NMake rules, or local build paths, left all five files unchanged, and queued the remaining ContinuousTest tail plus the next top-level generated artifacts as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-test-tail-and-top-level-generated-head-pass",
+      "title": "2026-04-18T19:57:18.0559967+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/progress.make, D:/git/CLI/build-local-nmake/DartConfiguration.tcl, D:/git/CLI/build-local-nmake/CMakeCache.txt, D:/git/CLI/build-local-nmake/cmake_install.cmake, and D:/git/CLI/build-local-nmake/CTestTestfile.cmake, confirmed the empty progress marker plus the generated dashboard configuration, cache, install script, and testfile only contain neutral CMake/CTest metadata, local build paths, standard toolchain records, or generated starter defaults, treated the machine-specific SITE value and install prefix as local generator state rather than starter branding, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/Makefile, D:/git/CLI/build-local-nmake/generated/starter/project_config.hpp, D:/git/CLI/build-local-nmake/Testing/Temporary/CTestCostData.txt, D:/git/CLI/build-local-nmake/Testing/Temporary/LastTest.log, and D:/git/CLI/build-local-nmake/cli-starter.exe as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-top-level-generated-and-runtime-batch-pass-2",
+      "title": "2026-04-18T20:07:28.6609570+09:00: Reviewed D:/git/CLI/build-local-nmake/Makefile, D:/git/CLI/build-local-nmake/generated/starter/project_config.hpp, D:/git/CLI/build-local-nmake/Testing/Temporary/CTestCostData.txt, D:/git/CLI/build-local-nmake/Testing/Temporary/LastTest.log, and D:/git/CLI/build-local-nmake/cli-starter.exe, confirmed those generated build, header, CTest, log, and executable artifacts only contain neutral starter names, local build paths, doctest success output, generated CMake metadata, or standard MSVC debug references, treated the mojibake-rendered Korea Standard Time text and embedded PDB path as local toolchain output rather than starter branding, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/cli-starter.ilk, D:/git/CLI/build-local-nmake/cli-starter.pdb, D:/git/CLI/build-local-nmake/starter_core.lib, D:/git/CLI/build-local-nmake/starter_tests.exe, and D:/git/CLI/build-local-nmake/starter_tests.ilk as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-runtime-binaries-and-debug-artifacts-pass-3",
+      "title": "2026-04-18T20:20:29.6315910+09:00: Reviewed D:/git/CLI/build-local-nmake/cli-starter.ilk, D:/git/CLI/build-local-nmake/cli-starter.pdb, D:/git/CLI/build-local-nmake/starter_core.lib, D:/git/CLI/build-local-nmake/starter_tests.exe, and D:/git/CLI/build-local-nmake/starter_tests.ilk, confirmed those generated incremental-link, debug-symbol, library, and test-executable artifacts only contain neutral starter symbols, doctest strings, bundled CLI11 or nlohmann identifiers, local source/build paths, Visual Studio include paths, or standard MSVC toolchain metadata, treated the observed `internal` labels, `BrandNames.h` toolchain path, and absolute Windows or CI build paths as upstream or local toolchain provenance rather than starter branding, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/starter_tests.pdb, D:/git/CLI/build-local-nmake/CMakeFiles/cmake.check_cache, D:/git/CLI/build-local-nmake/CMakeFiles/CTestScript.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/InstallScripts.json, and D:/git/CLI/build-local-nmake/CMakeFiles/TargetDirectories.txt as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-starter-tests-pdb-and-top-level-cmake-support-pass",
+      "title": "2026-04-18T20:30:14.9519478+09:00: Reviewed D:/git/CLI/build-local-nmake/starter_tests.pdb, D:/git/CLI/build-local-nmake/CMakeFiles/cmake.check_cache, D:/git/CLI/build-local-nmake/CMakeFiles/CTestScript.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/InstallScripts.json, and D:/git/CLI/build-local-nmake/CMakeFiles/TargetDirectories.txt, confirmed the generated PDB plus adjacent CMake support files only contain neutral starter symbols, local source/build paths, standard CMake or CTest boilerplate, install-script references, target-directory lists, or MSVC toolchain metadata, treated the observed local temp paths, host name, compiler-internal labels, and absolute Windows include paths as local debug or generator provenance rather than starter branding, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/CMakeDirectoryInformation.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/Makefile.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/cmake_clean.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/compiler_depend.make as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-directory-info-and-continuous-build-head-pass-2",
+      "title": "2026-04-18T20:40:16.5834472+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/CMakeDirectoryInformation.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/Makefile.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/cmake_clean.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/compiler_depend.make, confirmed those generated directory-info, dependency-manifest, dashboard-build, cleanup, and placeholder dependency files only contain neutral CMake or CTest metadata, local source/build paths, standard CMake module references, standard NMake rules, or empty placeholders, treated the observed `Internal` module paths in Makefile.cmake as upstream CMake module names rather than starter branding, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/build.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/cmake_clean.cmake as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-build-tail-and-configure-build-clean-pass-2",
+      "title": "2026-04-18T20:50:13.8415903+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousBuild.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/build.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/cmake_clean.cmake, confirmed those generated timestamp, dependency-info, progress, build-rule, and cleanup files only contain neutral CMake or CTest metadata, local source/build paths, standard NMake rules, build-generator provenance, or empty placeholders, left all five files unchanged, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/progress.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/build.make as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-configure-tail-and-coverage-build-pass-2",
+      "title": "2026-04-18T21:00:48.7666193+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousConfigure.dir/progress.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/build.make, confirmed those generated dependency, timestamp, dependency-info, progress, and build-rule files only contain neutral CMake or CTest metadata, local source/build paths, standard NMake rules, build-generator provenance, or empty placeholders, treated the embedded local CMake and ctest tool paths plus source and build directories in build.make as generator provenance rather than starter branding, left all five files unchanged, exhausted the remaining ContinuousConfigure support files, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/DependInfo.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/progress.make as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-coverage-tail-pass-3",
+      "title": "2026-04-18T21:10:43.6276080+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/DependInfo.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousCoverage.dir/progress.make, confirmed those generated cleanup, dependency, timestamp, dependency-info, and progress files only contain neutral CMake or CTest metadata, empty placeholders, or local build-state markers, left all five files unchanged, exhausted ContinuousCoverage.dir, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/compiler_depend.ts, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/DependInfo.cmake as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-memcheck-head-pass-3",
+      "title": "2026-04-18T21:20:49.293766+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/compiler_depend.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/compiler_depend.ts, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/DependInfo.cmake, confirmed those generated build-rule, cleanup, dependency, timestamp, and dependency-info files only contain neutral CMake or CTest metadata, standard NMake rules, local source/build paths, ctest invocation details, or empty placeholders, treated the embedded local CMake and ctest tool paths plus source/build directories in build.make as generator provenance rather than starter branding, left all five files unchanged, exhausted that queued ContinuousMemCheck head batch, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/compiler_depend.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/compiler_depend.ts as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-memcheck-tail-and-submit-head-pass-4",
+      "title": "2026-04-18T21:30:52.6940284+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousMemCheck.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/cmake_clean.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/compiler_depend.make, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/compiler_depend.ts, confirmed the empty progress marker plus the generated build-rule, cleanup, dependency, and timestamp files only contain neutral CMake/CTest metadata, local build paths, standard NMake rules, ctest submit invocation details, or empty placeholders, treated the embedded local CMake and ctest tool paths plus source/build directories in build.make as generator provenance rather than starter branding, left all five files unchanged, exhausted the remaining ContinuousMemCheck tail plus the first ContinuousSubmit head files, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/cmake_clean.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/compiler_depend.make as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-submit-tail-and-test-head-pass-5",
+      "title": "2026-04-18T21:40:40.8939597+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousSubmit.dir/progress.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/build.make, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/cmake_clean.cmake, and D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/compiler_depend.make, confirmed those generated dependency-info, progress, build-rule, cleanup, and placeholder dependency files only contain neutral CMake/CTest metadata, empty placeholders, local build paths, or standard NMake rules, treated the embedded local CMake and ctest tool paths plus source/build directories in ContinuousTest.dir/build.make as generator provenance rather than starter branding, left all five files unchanged, exhausted the remaining ContinuousSubmit support files plus the first ContinuousTest head files, and queued D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/progress.make, D:/git/CLI/build-local-nmake/DartConfiguration.tcl, and D:/git/CLI/build-local-nmake/CMakeCache.txt as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-continuous-test-tail-and-dashboard-cache-pass-6",
+      "title": "2026-04-18T21:50:44.2049913+09:00: Reviewed D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/compiler_depend.ts, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/DependInfo.cmake, D:/git/CLI/build-local-nmake/CMakeFiles/ContinuousTest.dir/progress.make, D:/git/CLI/build-local-nmake/DartConfiguration.tcl, and D:/git/CLI/build-local-nmake/CMakeCache.txt, confirmed those generated timestamp, dependency-info, empty progress marker, dashboard configuration, and cache files only contain neutral CMake/CTest metadata, empty placeholders, local source or build paths, host/toolchain records, or standard generated starter defaults, treated the machine-specific SITE value, install prefix, and local compiler paths as generator provenance rather than starter branding, left all five files unchanged, exhausted ContinuousTest.dir again plus the queued top-level dashboard/cache artifacts, and queued D:/git/CLI/build-local-nmake/cmake_install.cmake, D:/git/CLI/build-local-nmake/CTestTestfile.cmake, D:/git/CLI/build-local-nmake/Makefile, D:/git/CLI/build-local-nmake/generated/starter/project_config.hpp, and D:/git/CLI/build-local-nmake/Testing/Temporary/CTestCostData.txt as the next cleanup candidates."
+    },
+    {
+      "id": "local-nmake-top-level-generated-artifacts-pass-7",
+      "title": "2026-04-18T22:00:46.4681523+09:00: Reviewed D:/git/CLI/build-local-nmake/cmake_install.cmake, D:/git/CLI/build-local-nmake/CTestTestfile.cmake, D:/git/CLI/build-local-nmake/Makefile, D:/git/CLI/build-local-nmake/generated/starter/project_config.hpp, and D:/git/CLI/build-local-nmake/Testing/Temporary/CTestCostData.txt, confirmed those generated install, testfile, build-rule, generated config-header, and CTest cost-data artifacts only contain neutral starter names, local source/build paths, standard CMake/NMake metadata, generated project constants, or doctest timing data, treated the machine-specific install prefix, local CMake tool paths, and absolute workspace paths as generator provenance rather than starter branding, left all five files unchanged, exhausted that queued top-level generated-artifact batch, and queued D:/git/CLI/build-local-nmake/Testing/Temporary/LastTest.log, D:/git/CLI/build-local-nmake/cli-starter.exe, D:/git/CLI/build-local-nmake/cli-starter.ilk, D:/git/CLI/build-local-nmake/cli-starter.pdb, and D:/git/CLI/build-local-nmake/starter_core.lib as the next cleanup candidates."
+    }
+  ],
+  "in_progress": [
+    {
+      "id": "local-validation",
+      "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction",
+      "next_step": "Continue local edits inside D:/git/CLI, rerun python tests/validate_management_docs.py after future management-doc changes, and use git from D:/git/CLI for intentional publish steps."
+    },
+    {
+      "id": "legacy-trace-removal",
+      "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
+      "next_step": "Review D:/git/CLI/build-local-nmake/Testing/Temporary/LastTest.log, D:/git/CLI/build-local-nmake/cli-starter.exe, D:/git/CLI/build-local-nmake/cli-starter.ilk, D:/git/CLI/build-local-nmake/cli-starter.pdb, and D:/git/CLI/build-local-nmake/starter_core.lib."
+    }
+  ],
+  "next_recommended": [
+    {
+      "order": 1,
+      "action": "Review D:/git/CLI/build-local-nmake/Testing/Temporary/LastTest.log, D:/git/CLI/build-local-nmake/cli-starter.exe, D:/git/CLI/build-local-nmake/cli-starter.ilk, D:/git/CLI/build-local-nmake/cli-starter.pdb, and D:/git/CLI/build-local-nmake/starter_core.lib.",
+      "why": "The latest batch exhausted the queued top-level generated install, testfile, makefile, generated-header, and cost-data artifacts, so the cleanup queue now moves into the remaining runtime outputs and debug/library artifacts."
+    },
+    {
+      "order": 2,
+      "action": "When a publishable starter change set is ready, commit and push from D:/git/CLI so the standalone GitHub Actions workflow can record its first hosted run on the custom-cli remote.",
+      "why": "The remote is now connected and the repo-local workflow is in place, but hosted verification remains unobserved until the first intentional push."
+    }
+  ],
+  "open_risks": [
+    {
+      "id": "legacy-trace-regression",
+      "title": "Legacy organization-specific traces could reappear in docs or metadata",
+      "impact": "The starter would drift away from a neutral reusable baseline.",
+      "mitigation": "Keep wording generic and remove any newly discovered legacy-specific names, identifiers, or paths during edits."
+    },
+    {
+      "id": "management-format-drift",
+      "title": "Management files must stay JSON-compatible to preserve stock-Python validation",
+      "impact": "Switching to unrestricted YAML syntax would break the current validator.",
+      "mitigation": "Keep docs/management instances inside the JSON-compatible subset or upgrade the validator intentionally."
+    },
+    {
+      "id": "git-resume-drift",
+      "title": "Operators could still run CLI starter git commands from D:/git instead of D:/git/CLI",
+      "impact": "Remote or history changes could hit the unrelated parent repository instead of the standalone custom-cli repository.",
+      "mitigation": "Use D:/git/CLI as the repository root for CLI starter git work and leave the parent D:/git repository untouched."
+    },
+    {
+      "id": "hosted-verification-gap",
+      "title": "Hosted cross-platform build evidence has not yet been recorded for the standalone custom-cli repository",
+      "impact": "The repo-local workflow is configured, but no GitHub Actions run has been observed on the connected custom-cli remote yet.",
+      "mitigation": "Push an intentional change set from D:/git/CLI and record the first hosted build and CTest results after it completes."
+    }
+  ],
+  "verification_pending": [
+    {
+      "id": "hosted-ci-confirmation",
+      "description": "Record the first GitHub Actions results from D:/git/CLI/.github/workflows/ci.yml after the first intentional push to origin."
+    }
+  ],
+  "updated_at": "2026-04-18T22:12:19.0265375+09:00"
+}

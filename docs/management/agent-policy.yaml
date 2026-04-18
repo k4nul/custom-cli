@@ -1,0 +1,137 @@
+{
+  "version": "1.0",
+  "naming_principles": {
+    "required_attributes": [
+      "neutral",
+      "reusable",
+      "domain-agnostic"
+    ],
+    "banned_patterns": [
+      "organization-specific branding",
+      "legacy organization-specific names, identifiers, or deployment paths",
+      "service-specific deployment paths",
+      "support contact details",
+      "product-only terminology in starter examples"
+    ],
+    "recommended_styles": [
+      "kebab-case for file and directory names",
+      "snake_case for schema keys and data fields",
+      "PascalCase for C++ types"
+    ],
+    "source_of_truth": "docs/management/agent-policy.yaml"
+  },
+  "fact_handling": {
+    "statement_labels": [
+      "confirmed_fact",
+      "observed_in_code",
+      "proposal_or_interpretation"
+    ],
+    "required_pre_change_steps": [
+      "inspect_repository_shape",
+      "inspect_build_and_entrypoints",
+      "inspect_relevant_docs_and_dependencies"
+    ],
+    "change_gate": "Do not make destructive or high-impact tracked changes before repository inspection, and remove any remaining legacy organization-specific names, paths, or references when they are discovered."
+  },
+  "change_policy": {
+    "default_flow": [
+      "discover",
+      "plan",
+      "implement",
+      "verify",
+      "document"
+    ],
+    "destructive_change_requirements": [
+      "dependency_review",
+      "impact_review",
+      "documented_rationale"
+    ],
+    "critical_path_rule": "If the immediate next action is blocked on a task, prefer the main agent over delegation unless delegation clearly shortens wait time. Treat D:/git/CLI as the CLI starter's standalone delivery repository inside the broader D:/git workspace; when repository-history or remote work is explicitly needed, run git workflows from D:/git/CLI and avoid applying CLI starter git operations to the unrelated parent repository."
+  },
+  "subagent_policy": {
+    "sizing": {
+      "small": {
+        "criteria": [
+          "single-file or highly localized change",
+          "minor document edit",
+          "short exploration or small code adjustment",
+          "work that the main agent can finish immediately without waiting"
+        ],
+        "allowed": false
+      },
+      "medium": {
+        "criteria": [
+          "multiple files inside one cohesive work item",
+          "bounded change with a clear handoff surface",
+          "delegation can help but does not require parallel fan-out"
+        ],
+        "allowed": true,
+        "max_agents": 1
+      },
+      "large": {
+        "criteria": [
+          "multi-subsystem work",
+          "independent workstreams can progress in parallel",
+          "integration effort is required after delegated work returns"
+        ],
+        "allowed": true,
+        "max_agents": 2,
+        "disjoint_ownership": true
+      }
+    },
+    "default_behavior": {
+      "small": "handle_locally",
+      "medium": "delegate_only_if_scope_is_well_bounded",
+      "large": "split_into_disjoint_workstreams_and_delegate_selectively"
+    },
+    "model_selection": {
+      "core_rule": "When delegation is allowed, choose the sub-agent model explicitly based on task scope, ambiguity, risk, and speed needs instead of relying on a one-size-fits-all default.",
+      "selection_guidelines": [
+        "Use a smaller or faster model for narrow exploration, routine document edits, and well-bounded implementation tasks with low ambiguity.",
+        "Use a stronger model for ambiguous requirements, higher-risk changes, cross-file design work, or tasks where rework would cost more than extra reasoning time.",
+        "Prefer the least heavy model that can complete the delegated task reliably enough to avoid unnecessary handoff churn.",
+        "Re-evaluate the assigned model when a delegated task changes meaningfully in scope, risk, or required reasoning depth."
+      ],
+      "prompt_requirement": "Delegation prompts should state the intended task shape clearly enough that the chosen model matches the work unit."
+    },
+    "delegation_conditions": [
+      "Use sub-agents only when the task is medium or large.",
+      "Delegate only when the work unit is concrete, self-contained, and materially advances the main task.",
+      "Prefer delegation for sidecar work that can run in parallel with main-agent progress.",
+      "When delegating, select the sub-agent model that best fits the work instead of inheriting or defaulting without review."
+    ],
+    "forbidden_cases": [
+      "Do not use sub-agents for small tasks.",
+      "Do not delegate urgent critical-path work when the main agent needs the answer immediately.",
+      "Do not delegate overlapping write scopes without explicit ownership boundaries.",
+      "Do not use a heavyweight model for simple delegated work when a smaller model can complete it reliably."
+    ],
+    "ownership_rules": [
+      "Assign file or subsystem ownership for every delegated implementation task.",
+      "Require delegated work to preserve and adapt to other in-flight changes instead of reverting them.",
+      "Use at most one sub-agent for medium work unless scope is reclassified as large."
+    ],
+    "integration_rules": [
+      "The main agent reviews delegated output before integrating it.",
+      "The main agent records any resulting policy or documentation changes in the repository source of truth.",
+      "The main agent is responsible for final verification across delegated work products."
+    ]
+  },
+  "documentation_policy": {
+    "prose_docs": [
+      "README.md",
+      "docs/project-overview.md",
+      "docs/architecture.md",
+      "docs/migration-from-legacy.md"
+    ],
+    "schema_docs": [
+      "docs/management/phases.yaml",
+      "docs/management/plan.yaml",
+      "docs/management/agent-policy.yaml",
+      "docs/management/verification.yaml",
+      "docs/management/decisions.yaml",
+      "docs/management/handoff.yaml"
+    ],
+    "source_of_truth": "Operational rules and progress tracking live under docs/management/."
+  }
+}
