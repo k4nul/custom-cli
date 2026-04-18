@@ -1,0 +1,315 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Management agent policy document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "naming_principles",
+    "fact_handling",
+    "change_policy",
+    "subagent_policy",
+    "documentation_policy"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "naming_principles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_attributes",
+        "banned_patterns",
+        "recommended_styles",
+        "source_of_truth"
+      ],
+      "properties": {
+        "required_attributes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "banned_patterns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommended_styles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_of_truth": {
+          "type": "string"
+        }
+      }
+    },
+    "fact_handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement_labels",
+        "required_pre_change_steps",
+        "change_gate"
+      ],
+      "properties": {
+        "statement_labels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_pre_change_steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "change_gate": {
+          "type": "string"
+        }
+      }
+    },
+    "change_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_flow",
+        "destructive_change_requirements",
+        "critical_path_rule"
+      ],
+      "properties": {
+        "default_flow": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "destructive_change_requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "critical_path_rule": {
+          "type": "string"
+        }
+      }
+    },
+    "subagent_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sizing",
+        "default_behavior",
+        "model_selection",
+        "delegation_conditions",
+        "forbidden_cases",
+        "ownership_rules",
+        "integration_rules"
+      ],
+      "properties": {
+        "sizing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "properties": {
+            "small": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "criteria",
+                "allowed"
+              ],
+              "properties": {
+                "criteria": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "allowed": {
+                  "type": "boolean",
+                  "const": false
+                }
+              }
+            },
+            "medium": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "criteria",
+                "allowed",
+                "max_agents"
+              ],
+              "properties": {
+                "criteria": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "allowed": {
+                  "type": "boolean",
+                  "const": true
+                },
+                "max_agents": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "large": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "criteria",
+                "allowed",
+                "max_agents",
+                "disjoint_ownership"
+              ],
+              "properties": {
+                "criteria": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "allowed": {
+                  "type": "boolean",
+                  "const": true
+                },
+                "max_agents": {
+                  "type": "integer",
+                  "minimum": 2
+                },
+                "disjoint_ownership": {
+                  "type": "boolean",
+                  "const": true
+                }
+              }
+            }
+          }
+        },
+        "default_behavior": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "small",
+            "medium",
+            "large"
+          ],
+          "properties": {
+            "small": {
+              "type": "string"
+            },
+            "medium": {
+              "type": "string"
+            },
+            "large": {
+              "type": "string"
+            }
+          }
+        },
+        "model_selection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "core_rule",
+            "selection_guidelines",
+            "prompt_requirement"
+          ],
+          "properties": {
+            "core_rule": {
+              "type": "string"
+            },
+            "selection_guidelines": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            },
+            "prompt_requirement": {
+              "type": "string"
+            }
+          }
+        },
+        "delegation_conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "forbidden_cases": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "ownership_rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "integration_rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "documentation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prose_docs",
+        "schema_docs",
+        "source_of_truth"
+      ],
+      "properties": {
+        "prose_docs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "schema_docs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_of_truth": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

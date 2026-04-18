@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"D:/git/CLI/build-local-nmake/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

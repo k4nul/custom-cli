@@ -1,0 +1,13 @@
+{
+  "prompt": "starter",
+  "default_name": "world",
+  "enabled_commands": [
+    "about",
+    "hello",
+    "echo",
+    "config",
+    "doctor"
+  ],
+  "notes": "Customize this file after copying the starter."
+}
+

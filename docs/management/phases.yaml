@@ -1,0 +1,182 @@
+{
+  "version": "1.0",
+  "phase_order": [
+    "discover",
+    "plan",
+    "implement",
+    "verify",
+    "handoff"
+  ],
+  "phases": [
+    {
+      "id": "discover",
+      "name": "Repository Investigation",
+      "objective": [
+        "Establish repository shape, entry points, dependencies, and constraints before changing tracked files."
+      ],
+      "entry_criteria": [
+        "A new task or change request exists."
+      ],
+      "required_inputs": [
+        "Repository working tree",
+        "Relevant user request",
+        "Existing docs and build files"
+      ],
+      "outputs": [
+        "Confirmed facts about current structure",
+        "Observed implementation hotspots",
+        "Known blockers and unknowns"
+      ],
+      "recommended_actions": [
+        "Inspect directory structure",
+        "Inspect build system and entry points",
+        "Search for policy- or scope-relevant files"
+      ],
+      "exit_criteria": [
+        "Current state is documented with enough detail to plan changes safely."
+      ],
+      "status_allowed": [
+        "pending",
+        "in_progress",
+        "completed",
+        "blocked"
+      ]
+    },
+    {
+      "id": "plan",
+      "name": "Decision-Complete Planning",
+      "objective": [
+        "Turn discovered facts into an implementation-ready plan with explicit assumptions and verification."
+      ],
+      "entry_criteria": [
+        "Repository investigation completed or high-risk unknowns are isolated."
+      ],
+      "required_inputs": [
+        "Discovery findings",
+        "Documented constraints",
+        "Current repository policies"
+      ],
+      "outputs": [
+        "Ordered implementation work",
+        "Risk list",
+        "Verification strategy"
+      ],
+      "recommended_actions": [
+        "Group work by subsystem or behavior",
+        "Lock assumptions that affect implementation shape",
+        "Record blockers and next actions"
+      ],
+      "exit_criteria": [
+        "An implementer can execute without needing to make new design decisions."
+      ],
+      "status_allowed": [
+        "pending",
+        "in_progress",
+        "completed",
+        "blocked"
+      ]
+    },
+    {
+      "id": "implement",
+      "name": "Tracked Change Execution",
+      "objective": [
+        "Apply approved repository changes while preserving neutral naming, reusable structure, and documented intent."
+      ],
+      "entry_criteria": [
+        "Implementation approach is fixed enough to execute safely."
+      ],
+      "required_inputs": [
+        "Current plan",
+        "Source-of-truth policies",
+        "Verification expectations"
+      ],
+      "outputs": [
+        "Updated tracked files",
+        "Aligned docs and schemas",
+        "Implementation notes for follow-up"
+      ],
+      "recommended_actions": [
+        "Edit source and docs together when behavior changes",
+        "Keep schema and instance files aligned",
+        "Avoid reintroducing product-specific terms"
+      ],
+      "exit_criteria": [
+        "Tracked changes match the approved plan and are ready for verification."
+      ],
+      "status_allowed": [
+        "pending",
+        "in_progress",
+        "completed",
+        "blocked"
+      ]
+    },
+    {
+      "id": "verify",
+      "name": "Validation and Consistency Checks",
+      "objective": [
+        "Confirm that code, docs, management files, and validation rules agree."
+      ],
+      "entry_criteria": [
+        "Implementation changes are present in the working tree."
+      ],
+      "required_inputs": [
+        "Updated repository files",
+        "Verification checklist",
+        "Available local tools"
+      ],
+      "outputs": [
+        "Validation results",
+        "Known test gaps",
+        "Documented residual risks"
+      ],
+      "recommended_actions": [
+        "Run schema validation",
+        "Run available tests",
+        "Check README and AGENTS links and commands"
+      ],
+      "exit_criteria": [
+        "Completed checks and remaining gaps are both explicit."
+      ],
+      "status_allowed": [
+        "pending",
+        "in_progress",
+        "completed",
+        "blocked"
+      ]
+    },
+    {
+      "id": "handoff",
+      "name": "State Transfer",
+      "objective": [
+        "Leave the next operator with current state, next recommended actions, and open risks."
+      ],
+      "entry_criteria": [
+        "Verification finished or blocked with documented reasons."
+      ],
+      "required_inputs": [
+        "Current plan state",
+        "Verification results",
+        "Outstanding work"
+      ],
+      "outputs": [
+        "Updated handoff record",
+        "Prioritized next steps",
+        "Explicit blockers"
+      ],
+      "recommended_actions": [
+        "Summarize what changed",
+        "List follow-up work in execution order",
+        "Preserve known blockers and mitigations"
+      ],
+      "exit_criteria": [
+        "Another engineer or agent can continue without reconstructing context."
+      ],
+      "status_allowed": [
+        "pending",
+        "in_progress",
+        "completed",
+        "blocked"
+      ]
+    }
+  ]
+}
