@@ -9,4 +9,4 @@ config/local.json
 config/*.local.json
 *.user
 *.suo
-
+cron-prompt.txt

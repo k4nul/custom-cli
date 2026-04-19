@@ -6,13 +6,13 @@ This directory vendors small header-only dependencies so the starter does not de
 
 - `CLI11` `v2.6.2`
   - Source: <https://github.com/CLIUtils/CLI11>
-  - License file: [licenses/CLI11-LICENSE.txt](/D:/git/CLI/third_party/licenses/CLI11-LICENSE.txt)
+  - License file: [licenses/CLI11-LICENSE.txt](licenses/CLI11-LICENSE.txt)
 - `nlohmann/json` `v3.12.0`
   - Source: <https://github.com/nlohmann/json>
-  - License file: [licenses/nlohmann-json-LICENSE.txt](/D:/git/CLI/third_party/licenses/nlohmann-json-LICENSE.txt)
+  - License file: [licenses/nlohmann-json-LICENSE.txt](licenses/nlohmann-json-LICENSE.txt)
 - `doctest` `v2.5.2`
   - Source: <https://github.com/doctest/doctest>
-  - License file: [licenses/doctest-LICENSE.txt](/D:/git/CLI/third_party/licenses/doctest-LICENSE.txt)
+  - License file: [licenses/doctest-LICENSE.txt](licenses/doctest-LICENSE.txt)
 
 ## Update Guidance
 
