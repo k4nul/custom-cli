@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-19T18:32:07+09:00 retried the blocked publish step with `git add .gitignore`, confirmed `.git/index.lock` still cannot be created on the session's read-only Git metadata mount, then sequentially re-reviewed `.gitignore`, AGENTS.md, README.md, and docs/decisions.md, and found no further starter-facing cleanup to apply beyond the existing pending change set.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-19T20:54:41+09:00 sequentially re-reviewed docs/handoff.md, docs/roadmap.md, third_party/README.md, docs/management/plan.yaml, and docs/management/handoff.yaml, confirmed those next five pending starter-facing candidates needed no further edits, committed and pushed the pending documentation and management change set to origin/main as b4dbbd4131649dd8f83be0547a2c51c38629ba65, and then found that the available GitHub workflow and commit-status interfaces still returned no run or status data for that pushed main-branch commit in this session.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -40,6 +40,10 @@
     {
       "id": "standalone-cli-repo-bootstrap",
       "title": "2026-04-18: Accepted D13, initialized D:/git/CLI as a standalone Git repository on main, connected origin to https://github.com/k4nul/custom-cli.git, added D:/git/CLI/.github/workflows/ci.yml, and reran python tests/validate_management_docs.py successfully."
+    },
+    {
+      "id": "standalone-cli-doc-refresh-publish",
+      "title": "2026-04-19T20:54:41+09:00: Sequentially re-reviewed docs/handoff.md, docs/roadmap.md, third_party/README.md, docs/management/plan.yaml, and docs/management/handoff.yaml with no further starter-facing edits needed, then committed and pushed the pending `.gitignore`, AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/management/{plan,handoff}.yaml, docs/roadmap.md, and third_party/README.md change set to origin/main as b4dbbd4131649dd8f83be0547a2c51c38629ba65."
     },
     {
       "id": "legacy-trace-doc-pass",
@@ -770,19 +774,19 @@
     {
       "id": "local-validation",
       "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction",
-      "next_step": "Move to a git-writable and network-enabled environment rooted at D:/git/CLI, commit the pending local .gitignore, AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, third_party/README.md, and management-doc updates, and then record the first hosted workflow result after pushing."
+      "next_step": "Record the first hosted workflow result associated with pushed commit b4dbbd4131649dd8f83be0547a2c51c38629ba65 by using an interface that exposes push-triggered GitHub Actions runs or commit checks for the repository."
     },
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue is exhausted again outside docs/management/*.yaml after the `.gitignore` check plus the repository-relative doc-link cleanup in AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, and third_party/README.md; review the next newly introduced or newly modified starter-facing doc or metadata file before the next commit from a git-writable D:/git/CLI environment."
+      "next_step": "The current live modified-file review queue is exhausted again outside docs/management/*.yaml after the `.gitignore` check plus the repository-relative doc-link cleanup in AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, and third_party/README.md; review the next newly introduced or newly modified starter-facing doc or metadata file before the next future commit."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "From a git-writable and network-enabled environment rooted at D:/git/CLI, commit the pending local .gitignore, AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, third_party/README.md, and management-doc updates to main, then push to origin and observe D:/git/CLI/.github/workflows/ci.yml.",
-      "why": "The latest AGENTS-guided review batches reconfirmed that the pending `.gitignore`, AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/management/handoff.yaml, docs/management/plan.yaml, docs/roadmap.md, and third_party/README.md changes need no further cleanup, but a direct write under D:/git/CLI/.git still fails in this sandbox, so the local change set must be committed and published from a git-writable environment before the first hosted run can be recorded."
+      "action": "Record the first hosted GitHub Actions result associated with pushed commit b4dbbd4131649dd8f83be0547a2c51c38629ba65 from D:/git/CLI/.github/workflows/ci.yml, or record the next intentional push if GitHub only surfaces a later run.",
+      "why": "The pending documentation and management change set is now on origin/main, but the authenticated workflow and commit-status interfaces available in this session still return no run or status data for that pushed main-branch commit, so the first hosted result remains to be recorded."
     },
     {
       "order": 2,
@@ -811,16 +815,16 @@
     },
     {
       "id": "hosted-verification-gap",
-      "title": "Hosted cross-platform build evidence has not yet been recorded for the standalone custom-cli repository",
-      "impact": "The repo-local workflow is configured, but no GitHub Actions run has been observed on the connected custom-cli remote yet.",
-      "mitigation": "Push an intentional change set from D:/git/CLI and record the first hosted build and CTest results after it completes."
+      "title": "Hosted cross-platform build evidence has not yet been recorded for pushed commit b4dbbd4131649dd8f83be0547a2c51c38629ba65 on the standalone custom-cli repository",
+      "impact": "The repo-local workflow is configured and the latest documentation change set is already on origin/main, but no GitHub Actions run or commit-check result has been observed for that pushed commit in this session yet.",
+      "mitigation": "Inspect the Actions UI or another authenticated GitHub interface that exposes push-triggered runs for the repository, then record the first hosted build and CTest results."
     }
   ],
   "verification_pending": [
     {
       "id": "hosted-ci-confirmation",
-      "description": "Record the first GitHub Actions results from D:/git/CLI/.github/workflows/ci.yml after the first intentional push to origin."
+      "description": "Record the first GitHub Actions results from D:/git/CLI/.github/workflows/ci.yml that correspond to pushed commit b4dbbd4131649dd8f83be0547a2c51c38629ba65, or the next intentional push if GitHub only exposes a later run."
     }
   ],
-  "updated_at": "2026-04-19T18:32:07+09:00"
+  "updated_at": "2026-04-19T20:54:41+09:00"
 }
