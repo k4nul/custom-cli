@@ -1,19 +1,22 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-19T21:13:25+09:00 queried the GitHub connector for hosted workflow results and commit statuses on pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, and 75c5c609dad45adc135eaac97b0391add1f2420f, confirmed that no push-triggered run or status records are exposed for any of the three commits in this session, then re-reviewed AGENTS.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, and CMakeLists.txt and found no newly introduced legacy organization-specific traces or starter-facing drift before refreshing the blocked workflow-observation state.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-20T00:08:04+09:00 re-reviewed README.md, D:/git/CLI/.github/workflows/ci.yml, CMakeLists.txt, docs/management/verification.yaml, and scripts/github_ci_status.py, confirmed the validation launcher guidance and repo-local workflow entrypoints still align, hardened ./scripts/github_ci_status.py to hydrate missing push workflow runs from GitHub Actions check-run URLs, and verified that fallback against commit 58fac98 to recover workflow run 24628868853 (`CLI Starter CI`) with all three check runs succeeding even while the legacy combined status endpoint still reported `pending` with zero individual statuses.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
       "Legacy migration notes now use generic descriptions instead of carrying forward organization-specific names.",
       "The CLI starter delivery repository is D:/git/CLI, even though the broader D:/git workspace still contains other unrelated projects.",
       "The hosted verification entrypoint for the standalone repository is D:/git/CLI/.github/workflows/ci.yml.",
+      "Repo-local ./scripts/github_ci_status.py can inspect private push-triggered workflow runs and check runs through GitHub REST without requiring `gh`.",
       "Current policy allows local edits, local validation, and explicitly requested git workflows from D:/git/CLI while keeping the parent D:/git repository untouched."
     ],
     "source_of_truth": [
       "docs/management/*.yaml",
       "docs/management/schema/*.json",
-      "tests/validate_management_docs.py"
+      "tests/validate_management_docs.py",
+      "cmake/validate_management_docs.cmake",
+      "scripts/github_ci_status.py"
     ]
   },
   "done": [
@@ -28,6 +31,18 @@
     {
       "id": "validation-script",
       "title": "A stock-Python validation script for management docs was added."
+    },
+    {
+      "id": "validation-launcher-refresh",
+      "title": "2026-04-19T23:59:51+09:00: README, the executable validation script path, the CMake validation target, and the workflow entrypoint were aligned so management-doc validation no longer depends on a default `python` command in this shell."
+    },
+    {
+      "id": "private-ci-helper",
+      "title": "2026-04-19T23:59:51+09:00: Added ./scripts/github_ci_status.py and used it to confirm private push workflow run 24628436516 for b4dbbd4131649dd8f83be0547a2c51c38629ba65 completed successfully with three successful check runs."
+    },
+    {
+      "id": "private-ci-helper-fallback-refresh",
+      "title": "2026-04-20T00:08:04+09:00: Updated ./scripts/github_ci_status.py to recover private push workflow runs from GitHub Actions check-run URLs when the head-sha workflow-run list is empty, and verified that commit 58fac98 resolves to workflow run 24628868853 with three successful check runs."
     },
     {
       "id": "legacy-trace-policy",
@@ -774,7 +789,7 @@
     {
       "id": "local-validation",
       "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction",
-      "next_step": "Use the GitHub Actions UI or another authenticated interface with private-repository push-run visibility, such as `gh` or REST API access outside this shell, to record the first hosted workflow result for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or 75c5c609dad45adc135eaac97b0391add1f2420f."
+      "next_step": "Reuse ./scripts/github_ci_status.py after future pushes when hosted workflow evidence needs to be refreshed, and record the resulting workflow-run and check-run outcomes in docs/management/handoff.yaml."
     },
     {
       "id": "legacy-trace-removal",
@@ -785,13 +800,13 @@
   "next_recommended": [
     {
       "order": 1,
-      "action": "Record the first hosted GitHub Actions result associated with pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or 75c5c609dad45adc135eaac97b0391add1f2420f from D:/git/CLI/.github/workflows/ci.yml, or record the next intentional push if GitHub only surfaces a later run.",
-      "why": "The repository is private, the GitHub connector still exposes no push-triggered run or commit-status data for any of the three pushed commits checked in this session, `gh` is not installed in this shell, and unauthenticated public REST calls return 404, so the first hosted result still requires a different authenticated interface."
+      "action": "Review the next newly introduced or newly modified starter-facing doc or metadata file for legacy organization-specific traces before it is committed.",
+      "why": "Legacy-trace removal remains an ongoing guardrail for future edits now that the current worktree queue is exhausted again after this batch's re-review of AGENTS.md, README.md, .github/workflows/ci.yml, CMakeLists.txt, and the management records."
     },
     {
       "order": 2,
-      "action": "Review the next newly introduced or newly modified starter-facing doc or metadata file for legacy organization-specific traces before it is committed.",
-      "why": "Legacy-trace removal remains an ongoing guardrail for future edits now that the current worktree queue is exhausted again after this batch's re-review of AGENTS.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, and CMakeLists.txt."
+      "action": "Use ./scripts/github_ci_status.py <commit-sha> after future pushes whenever hosted verification evidence needs to be refreshed for the standalone custom-cli workflow.",
+      "why": "The first private hosted result is now recorded locally, and the repo-local helper can query workflow runs plus check runs even when the GitHub connector or `gh` are unavailable in the shell."
     }
   ],
   "open_risks": [
@@ -814,17 +829,12 @@
       "mitigation": "Use D:/git/CLI as the repository root for CLI starter git work and leave the parent D:/git repository untouched."
     },
     {
-      "id": "hosted-verification-gap",
-      "title": "Hosted cross-platform build evidence has not yet been recorded for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or 75c5c609dad45adc135eaac97b0391add1f2420f on the standalone custom-cli repository",
-      "impact": "The repo-local workflow is configured and all three pushed main-branch commits are already on origin/main, but no GitHub Actions run or commit-check result has been observed for any of them through the interfaces available in this session.",
-      "mitigation": "Inspect the Actions UI or another authenticated interface that can see private-repository push-triggered runs, then record the first hosted build and CTest results."
+      "id": "legacy-status-endpoint-gap",
+      "title": "GitHub's legacy combined status endpoint can stay `pending` even when private Actions check runs have already succeeded",
+      "impact": "Operators could misread hosted verification if they inspect only the legacy combined-status payload instead of the workflow runs and check runs that actually correspond to the private workflow.",
+      "mitigation": "Use ./scripts/github_ci_status.py and rely on workflow runs plus check runs for hosted verification instead of treating the legacy combined status endpoint as authoritative."
     }
   ],
-  "verification_pending": [
-    {
-      "id": "hosted-ci-confirmation",
-      "description": "Record the first GitHub Actions results from D:/git/CLI/.github/workflows/ci.yml that correspond to pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or 75c5c609dad45adc135eaac97b0391add1f2420f, or the next intentional push if GitHub only exposes a later run."
-    }
-  ],
-  "updated_at": "2026-04-19T21:13:25+09:00"
+  "verification_pending": [],
+  "updated_at": "2026-04-20T00:08:04+09:00"
 }

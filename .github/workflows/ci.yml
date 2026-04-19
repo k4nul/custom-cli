@@ -19,7 +19,7 @@ jobs:
           python-version: "3.x"
 
       - name: Validate management docs
-        run: python tests/validate_management_docs.py
+        run: cmake -P cmake/validate_management_docs.cmake
 
   build-and-test:
     name: Build and Test (${{ matrix.os }})

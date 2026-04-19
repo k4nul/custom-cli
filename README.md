@@ -95,8 +95,10 @@ The repository keeps these files in a JSON-compatible YAML subset so they can be
 Validation command:
 
 ```bash
-python tests/validate_management_docs.py
+./tests/validate_management_docs.py
 ```
+
+Configured builds also expose a `validate_management_docs` target, and GitHub Actions runs the same validation through [cmake/validate_management_docs.cmake](cmake/validate_management_docs.cmake) after Python setup.
 
 Starter test command sequence:
 
@@ -107,6 +109,14 @@ ctest --test-dir build --output-on-failure
 ```
 
 GitHub Actions mirrors those verification steps on `ubuntu-latest` and `windows-latest`, and also runs the management-doc validation script on every push and pull request.
+
+Hosted CI inspection for a private GitHub repository can stay inside the shell without `gh`:
+
+```bash
+./scripts/github_ci_status.py <commit-sha>
+```
+
+The helper prefers `GH_TOKEN` or `GITHUB_TOKEN` when present and otherwise reuses HTTPS credentials from `git credential fill` so it can report push-triggered workflow runs, combined commit status, and check runs for a private commit.
 
 ## Dependency choices
 

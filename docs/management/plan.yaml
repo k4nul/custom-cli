@@ -18,7 +18,7 @@
       "related_phase": "implement",
       "notes": [
         "Update management instances whenever policy or project direction changes.",
-        "Run python tests/validate_management_docs.py after management-doc edits.",
+        "Run ./tests/validate_management_docs.py after management-doc edits.",
         "2026-04-18: Accepted D13 to treat D:/git/CLI as the standalone CLI starter repository, reconnect hosted verification under D:/git/CLI/.github/workflows/ci.yml, and scope git workflows to D:/git/CLI.",
         "2026-04-18T22:12:19.0265375+09:00: Initialized D:/git/CLI as a standalone Git repository on main, connected origin to https://github.com/k4nul/custom-cli.git, and kept the broader D:/git repository untouched.",
         "2026-04-19T12:03:40+09:00: Ran the current batch against the accepted next actions by rechecking the pending D:/git/CLI/.gitignore change plus README.md, D:/git/CLI/.github/workflows/ci.yml, and CMakeLists.txt, confirmed the `cron-prompt.txt` ignore rule stays neutral and the README/workflow/build commands remain aligned, and attempted to commit from D:/git/CLI but the sandbox rejected `.git/index.lock` creation on a read-only file system so the pending local change set still needs a git-writable environment before it can be pushed and recorded in hosted CI.",
@@ -44,7 +44,8 @@
         "2026-04-19T18:32:07+09:00: Followed AGENTS.md plus the current plan and handoff queue by first retrying the blocked publish step with `git add .gitignore`, confirmed `.git/index.lock` still cannot be created on the sandbox's read-only Git metadata mount, then sequentially re-reviewed `.gitignore`, AGENTS.md, README.md, and docs/decisions.md as the next four pending candidates in the batch, confirmed the pending `cron-prompt.txt` ignore rule plus the repository-relative link cleanup still need no further edits, and left commit creation blocked until the worktree is moved to a git-writable D:/git/CLI environment.",
         "2026-04-19T20:54:41+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially re-reviewing docs/handoff.md, docs/roadmap.md, third_party/README.md, docs/management/plan.yaml, and docs/management/handoff.yaml, confirmed those next five pending starter-facing candidates needed no further edits, committed and pushed the pending `.gitignore`, AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/management/{plan,handoff}.yaml, docs/roadmap.md, and third_party/README.md change set to origin/main as b4dbbd4131649dd8f83be0547a2c51c38629ba65, and then attempted to observe the repo-local GitHub Actions run through the available GitHub workflow and commit-status interfaces only to find no run or status records exposed for that pushed main-branch commit in this session yet.",
         "2026-04-19T21:03:50+09:00: Followed AGENTS.md plus the current plan and handoff queue by first attempting to observe hosted workflow results for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65 and 94bc552299ec585c38f2b1c7a54441075933f7d0 through the GitHub connector, confirmed that push-triggered workflow-run and commit-status queries still return no visible results for either commit, confirmed through the GitHub repository search interface that `k4nul/custom-cli` is private, found that `gh` is not installed in this shell and unauthenticated public GitHub REST calls return 404 for the repository, then sequentially re-reviewed D:/git/CLI/.github/workflows/ci.yml, README.md, docs/management/plan.yaml, and docs/management/handoff.yaml and found no newly introduced legacy organization-specific traces before refreshing the still-blocked management state for this batch.",
-        "2026-04-19T21:13:25+09:00: Followed AGENTS.md plus the current plan and handoff queue by querying the GitHub connector again for workflow-run and commit-status visibility on pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, and 75c5c609dad45adc135eaac97b0391add1f2420f, confirmed that no push-triggered runs or statuses are exposed for any of the three commits in this session, then sequentially re-reviewed AGENTS.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, and CMakeLists.txt and found no newly introduced legacy organization-specific traces or starter-facing drift before refreshing the blocked workflow-observation state for this batch."
+        "2026-04-19T21:13:25+09:00: Followed AGENTS.md plus the current plan and handoff queue by querying the GitHub connector again for workflow-run and commit-status visibility on pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, and 75c5c609dad45adc135eaac97b0391add1f2420f, confirmed that no push-triggered runs or statuses are exposed for any of the three commits in this session, then sequentially re-reviewed AGENTS.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, and CMakeLists.txt and found no newly introduced legacy organization-specific traces or starter-facing drift before refreshing the blocked workflow-observation state for this batch.",
+        "2026-04-20T00:08:04+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing the next five pending starter-facing candidates README.md, D:/git/CLI/.github/workflows/ci.yml, CMakeLists.txt, docs/management/verification.yaml, and scripts/github_ci_status.py, confirmed that the README launcher guidance plus the workflow and CMake validation entrypoints still need no further edits, improved scripts/github_ci_status.py so it hydrates missing push workflow runs from GitHub Actions check-run URLs when the head-sha workflow-run listing endpoint returns zero rows, and verified the helper against commit 58fac98 to confirm workflow run 24628868853 with three successful check runs even while the legacy combined status endpoint stayed `pending`."
       ]
     },
     {
@@ -248,25 +249,18 @@
   "next_actions": [
     {
       "order": 1,
-      "action": "Record the first hosted GitHub Actions result associated with pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or 75c5c609dad45adc135eaac97b0391add1f2420f from D:/git/CLI/.github/workflows/ci.yml, or record the next intentional push if GitHub only surfaces a later run.",
-      "owner": "next-operator",
-      "exit_signal": "docs/management/handoff.yaml records the first observed hosted run and outcome for the standalone custom-cli workflow."
-    },
-    {
-      "order": 2,
       "action": "Review starter-facing docs and metadata for any newly introduced legacy organization-specific traces before each future commit, and rewrite them locally when discovered.",
       "owner": "next-operator",
       "exit_signal": "No newly discovered starter-facing file carries legacy organization-specific names, identifiers, or deployment paths."
-    }
-  ],
-  "blockers": [
+    },
     {
-      "id": "hosted-workflow-observation-gap",
-      "title": "The private repository's push-triggered workflow runs still do not expose through the authenticated interfaces available in this session, and this shell does not have `gh` installed.",
-      "impact": "The first hosted GitHub Actions result for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, and 75c5c609dad45adc135eaac97b0391add1f2420f cannot yet be recorded even though all three commits are already on origin/main.",
-      "mitigation": "Use the GitHub Actions UI or another authenticated interface with private-repository push-run visibility, such as `gh` or REST API access outside this shell, then record the observed result in docs/management/handoff.yaml."
+      "order": 2,
+      "action": "Use ./scripts/github_ci_status.py <commit-sha> after future pushes when hosted verification evidence needs to be refreshed for the standalone custom-cli workflow.",
+      "owner": "next-operator",
+      "exit_signal": "docs/management/handoff.yaml records any newly needed hosted workflow run and check-run outcomes for the referenced commit."
     }
   ],
+  "blockers": [],
   "risks": [
     {
       "id": "legacy-trace-regression",
@@ -287,11 +281,11 @@
       "mitigation": "Keep the delivery boundary explicit in AGENTS.md, agent-policy.yaml, plan.yaml, and handoff.yaml, and run CLI starter git commands only from D:/git/CLI."
     },
     {
-      "id": "hosted-verification-gap",
-      "title": "The standalone GitHub Actions workflow result has not yet been recorded for pushed custom-cli main-branch commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or 75c5c609dad45adc135eaac97b0391add1f2420f",
+      "id": "legacy-status-endpoint-gap",
+      "title": "GitHub's legacy combined status endpoint can stay `pending` even when private Actions check runs have already succeeded",
       "severity": "medium",
-      "mitigation": "Keep D:/git/CLI/.github/workflows/ci.yml aligned with README.md and record the first hosted result that corresponds to b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, 75c5c609dad45adc135eaac97b0391add1f2420f, or the next intentional push from D:/git/CLI."
+      "mitigation": "Use ./scripts/github_ci_status.py and rely on workflow runs plus check runs for hosted verification instead of treating the legacy combined status endpoint as authoritative."
     }
   ],
-  "updated_at": "2026-04-19T21:13:25+09:00"
+  "updated_at": "2026-04-20T00:08:04+09:00"
 }
