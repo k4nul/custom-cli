@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-20T01:42:00+09:00 sequentially re-reviewed README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and D:/git/CLI/.github/workflows/ci.yml, confirmed those five starter-facing files still need no further edits, and refreshed docs/management/{plan,handoff}.yaml once for this review-only batch before validation.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided follow-up at 2026-04-20T01:45:52+09:00 confirmed push workflow run 24634034954 for commit 7f1521c completed successfully with three successful check runs even though the legacy combined status endpoint remained `pending`, after the preceding review-only batch had rechecked README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and D:/git/CLI/.github/workflows/ci.yml with no further edits needed.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -47,6 +47,10 @@
     {
       "id": "private-ci-helper-head-refresh",
       "title": "2026-04-20T00:17:35+09:00: Reused ./scripts/github_ci_status.py for HEAD commit 04a2ac5, confirmed push workflow run 24632177427 completed successfully with three successful check runs even though the legacy combined status endpoint stayed `pending`, and re-reviewed README.md, D:/git/CLI/.github/workflows/ci.yml, CMakeLists.txt, and docs/management/verification.yaml with no further edits needed."
+    },
+    {
+      "id": "private-ci-helper-post-review-refresh",
+      "title": "2026-04-20T01:45:52+09:00: After pushing commit 7f1521c, reused ./scripts/github_ci_status.py and confirmed push workflow run 24634034954 completed successfully with three successful check runs even though the legacy combined status endpoint stayed `pending`."
     },
     {
       "id": "legacy-trace-policy",
@@ -840,5 +844,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-20T01:42:00+09:00"
+  "updated_at": "2026-04-20T01:45:52+09:00"
 }
