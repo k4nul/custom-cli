@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-20T01:11:47+09:00 sequentially re-reviewed src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, tests/validate_management_docs.py, and docs/management/schema/decision.schema.json, confirmed those five starter-facing files still need no further edits, and refreshed docs/management/{plan,handoff}.yaml once for this review-only batch before validation.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-20T01:22:01+09:00 sequentially re-reviewed docs/management/schema/verification.schema.json, docs/management/schema/handoff.schema.json, docs/management/schema/agent-policy.schema.json, docs/management/schema/phase.schema.json, and docs/management/schema/plan.schema.json, confirmed those five management schema files still need no further edits, and refreshed docs/management/{plan,handoff}.yaml once for this review-only batch before validation.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -798,14 +798,14 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue is still quiet after the re-review of src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp in this batch; if another same-sequence sweep is requested, continue with src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, tests/validate_management_docs.py, and docs/management/schema/phase.schema.json."
+      "next_step": "The current live modified-file review queue is still quiet after the re-review of docs/management/schema/verification.schema.json, docs/management/schema/handoff.schema.json, docs/management/schema/agent-policy.schema.json, docs/management/schema/phase.schema.json, and docs/management/schema/plan.schema.json in this batch; if another same-sequence sweep is requested, continue with docs/management/plan.yaml, docs/management/agent-policy.yaml, docs/management/decisions.yaml, docs/management/verification.yaml, and docs/management/phases.yaml."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "If another same-sequence sweep is requested, review src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, tests/validate_management_docs.py, and docs/management/schema/phase.schema.json for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch re-reviewed src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp with no changes needed, so these are the next concrete candidates if the neutrality sweep continues in sequence."
+      "action": "If another same-sequence sweep is requested, review docs/management/plan.yaml, docs/management/agent-policy.yaml, docs/management/decisions.yaml, docs/management/verification.yaml, and docs/management/phases.yaml for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch re-reviewed the remaining management schema files docs/management/schema/verification.schema.json, docs/management/schema/handoff.schema.json, docs/management/schema/agent-policy.schema.json, docs/management/schema/phase.schema.json, and docs/management/schema/plan.schema.json with no changes needed, so these are the next concrete candidates if the neutrality sweep continues in sequence."
     },
     {
       "order": 2,
@@ -840,5 +840,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-20T01:01:44+09:00"
+  "updated_at": "2026-04-20T01:22:01+09:00"
 }
