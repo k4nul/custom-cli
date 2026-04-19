@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest hosted verification evidence is still push workflow run 24634034954 for commit 7f1521c with three successful check runs even though the legacy combined status endpoint remained `pending`; the latest AGENTS-guided follow-up at 2026-04-20T06:01:07+09:00 then rechecked src/commands/echo_command.cpp, src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, and src/core/tokenize.cpp with no further edits needed.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest hosted verification evidence is still push workflow run 24634034954 for commit 7f1521c with three successful check runs even though the legacy combined status endpoint remained `pending`; the latest AGENTS-guided follow-up at 2026-04-20T06:11:13+09:00 then rechecked tests/config_tests.cpp, README.md, docs/project-overview.md, docs/architecture.md, and docs/migration-from-legacy.md with no further edits needed.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -791,6 +791,10 @@
     {
       "id": "publish-readiness-and-doc-recheck-blocker-20260419-180205",
       "title": "2026-04-19T18:02:05+09:00: Followed AGENTS.md plus the current plan and handoff queue by first retrying the blocked publish step with `git add` across the pending `.gitignore`, AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/management/{plan,handoff}.yaml, docs/roadmap.md, and third_party/README.md change set, confirmed `.git/index.lock` creation still fails on the sandbox's read-only Git metadata mount, then sequentially re-reviewed docs/handoff.md, docs/roadmap.md, third_party/README.md, docs/management/plan.yaml, and docs/management/handoff.yaml, and confirmed the thin-index links, third-party license links, and current management next-action or blocker state need no further edits beyond the existing change set."
+    },
+    {
+      "id": "starter-doc-and-test-sweep-pass-20260420-061113",
+      "title": "2026-04-20T06:11:13+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing tests/config_tests.cpp, README.md, docs/project-overview.md, docs/architecture.md, and docs/migration-from-legacy.md, confirmed those test and starter-facing documentation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, left the reviewed files unchanged, and queued D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, and config/cli-starter.json as the next same-sequence candidates before the requested end-of-batch validation run."
     }
   ],
   "in_progress": [
@@ -802,14 +806,14 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue is still quiet after the re-review of src/app/application.cpp, src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, and src/commands/doctor_command.cpp in this batch; if another same-sequence sweep is requested, continue with src/commands/echo_command.cpp, src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, and src/core/tokenize.cpp."
+      "next_step": "The current live modified-file review queue is still quiet after the re-review of tests/config_tests.cpp, README.md, docs/project-overview.md, docs/architecture.md, and docs/migration-from-legacy.md in this batch; if another same-sequence sweep is requested, continue with D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, and config/cli-starter.json."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "If another same-sequence sweep is requested, review tests/config_tests.cpp, README.md, docs/project-overview.md, docs/architecture.md, and docs/migration-from-legacy.md for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch re-reviewed src/commands/echo_command.cpp, src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, and src/core/tokenize.cpp with no changes needed, so the adjacent test and starter-facing documentation files are the next concrete candidates if the neutrality sweep continues in sequence."
+      "action": "If another same-sequence sweep is requested, review D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, and config/cli-starter.json for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch re-reviewed tests/config_tests.cpp, README.md, docs/project-overview.md, docs/architecture.md, and docs/migration-from-legacy.md with no changes needed, so the adjacent workflow, validation, and template files are the next concrete candidates if the neutrality sweep continues in sequence."
     },
     {
       "order": 2,
@@ -844,5 +848,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-20T06:01:07+09:00"
+  "updated_at": "2026-04-20T06:11:13+09:00"
 }
