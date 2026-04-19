@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-20T00:32:09+09:00 sequentially re-reviewed docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, config/cli-starter.json, and cmake/project_config.hpp.in, confirmed those five starter-facing files still need no further edits, and refreshed docs/management/{plan,handoff}.yaml for this review-only batch.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-20T00:41:40+09:00 sequentially re-reviewed include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp, confirmed those five public headers still need no further edits, and refreshed docs/management/{plan,handoff}.yaml once for this review-only batch before validation.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -798,14 +798,14 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue is exhausted again after the re-review of README.md, D:/git/CLI/.github/workflows/ci.yml, CMakeLists.txt, and docs/management/verification.yaml in this batch; review the next newly introduced or newly modified starter-facing doc or metadata file before the next future commit."
+      "next_step": "The current live modified-file review queue is still quiet after the re-review of include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp in this batch; if another same-sequence sweep is requested, continue with include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "Review the next newly introduced or newly modified starter-facing doc or metadata file for legacy organization-specific traces before it is committed.",
-      "why": "Legacy-trace removal remains an ongoing guardrail for future edits now that the current worktree queue is exhausted again after this batch's re-review of README.md, .github/workflows/ci.yml, CMakeLists.txt, docs/management/verification.yaml, and the management records."
+      "action": "If another same-sequence sweep is requested, review include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch re-reviewed the next starter-facing public headers and found no changes needed, so these are the next concrete candidates if the neutrality sweep continues in sequence."
     },
     {
       "order": 2,
@@ -840,5 +840,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-20T00:32:09+09:00"
+  "updated_at": "2026-04-20T00:41:40+09:00"
 }
