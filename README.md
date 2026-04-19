@@ -69,9 +69,9 @@ cmake -S . -B build -DCLI_STARTER_BINARY_NAME=my-cli -DCLI_STARTER_DISPLAY_NAME=
 ## Adding a new command
 
 1. Add a new `src/commands/<name>_command.cpp`.
-2. Declare the registrar in [include/starter/commands/registrars.hpp](/D:/git/CLI/include/starter/commands/registrars.hpp).
-3. Register it from [src/commands/register_commands.cpp](/D:/git/CLI/src/commands/register_commands.cpp).
-4. Document user-facing behavior in [docs/architecture.md](/D:/git/CLI/docs/architecture.md).
+2. Declare the registrar in [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp).
+3. Register it from [src/commands/register_commands.cpp](src/commands/register_commands.cpp).
+4. Document user-facing behavior in [docs/architecture.md](docs/architecture.md).
 
 The sample commands intentionally show different patterns:
 - `hello`: consumes config defaults and command flags
@@ -117,12 +117,12 @@ The starter uses smaller, explicit pieces instead of a monolithic utility layer:
 - `doctest` for tests
 - Standard C++17 library plus small local helpers for tokenization, file I/O, and error handling
 
-Dependency source notes live in [third_party/README.md](/D:/git/CLI/third_party/README.md), and the migration rationale lives in [docs/migration-from-legacy.md](/D:/git/CLI/docs/migration-from-legacy.md).
+Dependency source notes live in [third_party/README.md](third_party/README.md), and the migration rationale lives in [docs/migration-from-legacy.md](docs/migration-from-legacy.md).
 
 ## Documentation map
 
-- Project direction: [docs/project-overview.md](/D:/git/CLI/docs/project-overview.md)
-- Code structure: [docs/architecture.md](/D:/git/CLI/docs/architecture.md)
-- Legacy migration details: [docs/migration-from-legacy.md](/D:/git/CLI/docs/migration-from-legacy.md)
-- Management files: [docs/management/phases.yaml](/D:/git/CLI/docs/management/phases.yaml), [docs/management/plan.yaml](/D:/git/CLI/docs/management/plan.yaml), [docs/management/agent-policy.yaml](/D:/git/CLI/docs/management/agent-policy.yaml), [docs/management/verification.yaml](/D:/git/CLI/docs/management/verification.yaml), [docs/management/decisions.yaml](/D:/git/CLI/docs/management/decisions.yaml), [docs/management/handoff.yaml](/D:/git/CLI/docs/management/handoff.yaml)
-- Legacy prose indexes: [docs/decisions.md](/D:/git/CLI/docs/decisions.md), [docs/handoff.md](/D:/git/CLI/docs/handoff.md), [docs/roadmap.md](/D:/git/CLI/docs/roadmap.md)
+- Project direction: [docs/project-overview.md](docs/project-overview.md)
+- Code structure: [docs/architecture.md](docs/architecture.md)
+- Legacy migration details: [docs/migration-from-legacy.md](docs/migration-from-legacy.md)
+- Management files: [docs/management/phases.yaml](docs/management/phases.yaml), [docs/management/plan.yaml](docs/management/plan.yaml), [docs/management/agent-policy.yaml](docs/management/agent-policy.yaml), [docs/management/verification.yaml](docs/management/verification.yaml), [docs/management/decisions.yaml](docs/management/decisions.yaml), [docs/management/handoff.yaml](docs/management/handoff.yaml)
+- Legacy prose indexes: [docs/decisions.md](docs/decisions.md), [docs/handoff.md](docs/handoff.md), [docs/roadmap.md](docs/roadmap.md)
