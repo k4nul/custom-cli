@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-20T00:08:04+09:00 re-reviewed README.md, D:/git/CLI/.github/workflows/ci.yml, CMakeLists.txt, docs/management/verification.yaml, and scripts/github_ci_status.py, confirmed the validation launcher guidance and repo-local workflow entrypoints still align, hardened ./scripts/github_ci_status.py to hydrate missing push workflow runs from GitHub Actions check-run URLs, and verified that fallback against commit 58fac98 to recover workflow run 24628868853 (`CLI Starter CI`) with all three check runs succeeding even while the legacy combined status endpoint still reported `pending` with zero individual statuses.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-20T00:17:35+09:00 refreshed hosted verification for HEAD commit 04a2ac5 through ./scripts/github_ci_status.py, confirmed push workflow run 24632177427 (`CLI Starter CI`) with all three check runs succeeding while the legacy combined status endpoint still reported `pending` with zero individual statuses, and re-reviewed README.md, D:/git/CLI/.github/workflows/ci.yml, CMakeLists.txt, and docs/management/verification.yaml with no further starter-facing edits required.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -43,6 +43,10 @@
     {
       "id": "private-ci-helper-fallback-refresh",
       "title": "2026-04-20T00:08:04+09:00: Updated ./scripts/github_ci_status.py to recover private push workflow runs from GitHub Actions check-run URLs when the head-sha workflow-run list is empty, and verified that commit 58fac98 resolves to workflow run 24628868853 with three successful check runs."
+    },
+    {
+      "id": "private-ci-helper-head-refresh",
+      "title": "2026-04-20T00:17:35+09:00: Reused ./scripts/github_ci_status.py for HEAD commit 04a2ac5, confirmed push workflow run 24632177427 completed successfully with three successful check runs even though the legacy combined status endpoint stayed `pending`, and re-reviewed README.md, D:/git/CLI/.github/workflows/ci.yml, CMakeLists.txt, and docs/management/verification.yaml with no further edits needed."
     },
     {
       "id": "legacy-trace-policy",
@@ -789,19 +793,19 @@
     {
       "id": "local-validation",
       "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction",
-      "next_step": "Reuse ./scripts/github_ci_status.py after future pushes when hosted workflow evidence needs to be refreshed, and record the resulting workflow-run and check-run outcomes in docs/management/handoff.yaml."
+      "next_step": "Reuse ./scripts/github_ci_status.py after future pushes when hosted workflow evidence needs to be refreshed again, and record the resulting workflow-run and check-run outcomes in docs/management/handoff.yaml."
     },
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue is exhausted again after the re-review of AGENTS.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, and CMakeLists.txt in this batch; review the next newly introduced or newly modified starter-facing doc or metadata file before the next future commit."
+      "next_step": "The current live modified-file review queue is exhausted again after the re-review of README.md, D:/git/CLI/.github/workflows/ci.yml, CMakeLists.txt, and docs/management/verification.yaml in this batch; review the next newly introduced or newly modified starter-facing doc or metadata file before the next future commit."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
       "action": "Review the next newly introduced or newly modified starter-facing doc or metadata file for legacy organization-specific traces before it is committed.",
-      "why": "Legacy-trace removal remains an ongoing guardrail for future edits now that the current worktree queue is exhausted again after this batch's re-review of AGENTS.md, README.md, .github/workflows/ci.yml, CMakeLists.txt, and the management records."
+      "why": "Legacy-trace removal remains an ongoing guardrail for future edits now that the current worktree queue is exhausted again after this batch's re-review of README.md, .github/workflows/ci.yml, CMakeLists.txt, docs/management/verification.yaml, and the management records."
     },
     {
       "order": 2,
@@ -836,5 +840,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-20T00:08:04+09:00"
+  "updated_at": "2026-04-20T00:17:35+09:00"
 }
