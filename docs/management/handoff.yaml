@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still push workflow run 24634034954 for commit 7f1521c with three successful check runs even though the legacy combined status endpoint remained `pending`. The latest AGENTS-guided follow-up at 2026-04-20T08:12:01+09:00 re-reviewed docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, and scripts/github_ci_status.py with no further edits needed, and the next same-sequence candidates now roll forward to config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still push workflow run 24634034954 for commit 7f1521c with three successful check runs even though the legacy combined status endpoint remained `pending`. The latest AGENTS-guided follow-up at 2026-04-20T08:21:08+09:00 re-reviewed config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp with no further edits needed, and the next same-sequence candidates now roll forward to include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -67,6 +67,10 @@
     {
       "id": "starter-tokenize-docs-batch-pass-20260420-080110",
       "title": "2026-04-20T08:01:10+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/core/tokenize.cpp, tests/config_tests.cpp, README.md, docs/project-overview.md, and docs/architecture.md, confirmed those core, test, and starter-facing documentation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, left the reviewed files unchanged, ran `python tests/validate_management_docs.py` successfully through a temporary PATH shim that exposed `/usr/bin/python3` as `python` for this shell, and queued docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, and scripts/github_ci_status.py as the next same-sequence candidates before any future commit."
+    },
+    {
+      "id": "starter-config-template-header-resweep-pass-20260420-082108",
+      "title": "2026-04-20T08:21:08+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp, confirmed those checked-in template and public-header files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, left the reviewed files unchanged, and queued include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp as the next same-sequence candidates before the requested end-of-batch validation run."
     },
     {
       "id": "legacy-trace-policy",
@@ -881,5 +885,5 @@
       "description": "The latest batch already ran the required `python tests/validate_management_docs.py` command successfully through a temporary PATH shim, but future batches still need either a default `python` launcher in PATH or the same shim because this shell exposes only `/usr/bin/python3` by default."
     }
   ],
-  "updated_at": "2026-04-20T08:12:01+09:00"
+  "updated_at": "2026-04-20T08:21:08+09:00"
 }
