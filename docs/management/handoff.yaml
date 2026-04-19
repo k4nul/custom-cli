@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest hosted verification evidence is still push workflow run 24634034954 for commit 7f1521c with three successful check runs even though the legacy combined status endpoint remained `pending`; the latest AGENTS-guided follow-up at 2026-04-20T06:51:16+09:00 then rechecked src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp with no further edits needed.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest hosted verification evidence is still push workflow run 24634034954 for commit 7f1521c with three successful check runs even though the legacy combined status endpoint remained `pending`; the latest AGENTS-guided follow-up at 2026-04-20T07:01:23+09:00 then rechecked src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md with no further edits needed.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -799,6 +799,10 @@
     {
       "id": "starter-command-sweep-pass-20260420-065116",
       "title": "2026-04-20T06:51:16+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, confirmed those command implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, left the reviewed files unchanged, and queued src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md as the next same-sequence candidates before the requested end-of-batch validation run."
+    },
+    {
+      "id": "starter-core-doc-sweep-pass-20260420-070123",
+      "title": "2026-04-20T07:01:23+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, confirmed those core, test, and starter-facing documentation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, left the reviewed files unchanged, and queued docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, and cmake/validate_management_docs.cmake as the next same-sequence candidates before the requested end-of-batch validation run."
     }
   ],
   "in_progress": [
@@ -810,14 +814,14 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue is still quiet after the re-review of src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp in this batch; if another same-sequence sweep is requested, continue with src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md."
+      "next_step": "The current live modified-file review queue is still quiet after the re-review of src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md in this batch; if another same-sequence sweep is requested, continue with docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, and cmake/validate_management_docs.cmake."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "If another same-sequence sweep is requested, review src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch re-reviewed the command implementation files with no changes needed, so the adjacent core, test, and starter-facing documentation files are the next concrete candidates if the neutrality sweep continues in sequence."
+      "action": "If another same-sequence sweep is requested, review docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, and cmake/validate_management_docs.cmake for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch re-reviewed the adjacent core, test, and README files with no changes needed, so the next concrete same-sequence candidates roll forward into the remaining starter-facing docs, workflow metadata, and validation support files."
     },
     {
       "order": 2,
@@ -852,5 +856,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-20T06:51:16+09:00"
+  "updated_at": "2026-04-20T07:01:23+09:00"
 }
