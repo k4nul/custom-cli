@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-19T21:03:50+09:00 first attempted to observe hosted workflow results for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65 and 94bc552299ec585c38f2b1c7a54441075933f7d0, confirmed the GitHub connector still exposes no push-triggered run or commit-status data for either commit, confirmed the repository is private, found that `gh` is unavailable in this shell and unauthenticated public GitHub REST requests return 404 for the repository, then re-reviewed D:/git/CLI/.github/workflows/ci.yml, README.md, docs/management/plan.yaml, and docs/management/handoff.yaml and found no newly introduced legacy organization-specific traces before refreshing the blocked workflow-observation state.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the management docs validate cleanly. The latest AGENTS-guided batch at 2026-04-19T21:13:25+09:00 queried the GitHub connector for hosted workflow results and commit statuses on pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, and 75c5c609dad45adc135eaac97b0391add1f2420f, confirmed that no push-triggered run or status records are exposed for any of the three commits in this session, then re-reviewed AGENTS.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, and CMakeLists.txt and found no newly introduced legacy organization-specific traces or starter-facing drift before refreshing the blocked workflow-observation state.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -774,24 +774,24 @@
     {
       "id": "local-validation",
       "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction",
-      "next_step": "Use the GitHub Actions UI or another authenticated interface with private-repository push-run visibility, such as `gh` or REST API access outside this shell, to record the first hosted workflow result for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65 or 94bc552299ec585c38f2b1c7a54441075933f7d0."
+      "next_step": "Use the GitHub Actions UI or another authenticated interface with private-repository push-run visibility, such as `gh` or REST API access outside this shell, to record the first hosted workflow result for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or 75c5c609dad45adc135eaac97b0391add1f2420f."
     },
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue is exhausted again after the re-review of D:/git/CLI/.github/workflows/ci.yml, README.md, docs/management/plan.yaml, and docs/management/handoff.yaml in this batch; review the next newly introduced or newly modified starter-facing doc or metadata file before the next future commit."
+      "next_step": "The current live modified-file review queue is exhausted again after the re-review of AGENTS.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, and CMakeLists.txt in this batch; review the next newly introduced or newly modified starter-facing doc or metadata file before the next future commit."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "Record the first hosted GitHub Actions result associated with pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65 or 94bc552299ec585c38f2b1c7a54441075933f7d0 from D:/git/CLI/.github/workflows/ci.yml, or record the next intentional push if GitHub only surfaces a later run.",
-      "why": "The repository is private, the GitHub connector still exposes no push-triggered run or commit-status data for either pushed commit, `gh` is not installed in this shell, and unauthenticated public REST calls return 404, so the first hosted result still requires a different authenticated interface."
+      "action": "Record the first hosted GitHub Actions result associated with pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or 75c5c609dad45adc135eaac97b0391add1f2420f from D:/git/CLI/.github/workflows/ci.yml, or record the next intentional push if GitHub only surfaces a later run.",
+      "why": "The repository is private, the GitHub connector still exposes no push-triggered run or commit-status data for any of the three pushed commits checked in this session, `gh` is not installed in this shell, and unauthenticated public REST calls return 404, so the first hosted result still requires a different authenticated interface."
     },
     {
       "order": 2,
       "action": "Review the next newly introduced or newly modified starter-facing doc or metadata file for legacy organization-specific traces before it is committed.",
-      "why": "Legacy-trace removal remains an ongoing guardrail for future edits now that the current worktree queue is exhausted again after this batch's re-review of D:/git/CLI/.github/workflows/ci.yml, README.md, docs/management/plan.yaml, and docs/management/handoff.yaml."
+      "why": "Legacy-trace removal remains an ongoing guardrail for future edits now that the current worktree queue is exhausted again after this batch's re-review of AGENTS.md, docs/decisions.md, docs/handoff.md, docs/roadmap.md, and CMakeLists.txt."
     }
   ],
   "open_risks": [
@@ -815,16 +815,16 @@
     },
     {
       "id": "hosted-verification-gap",
-      "title": "Hosted cross-platform build evidence has not yet been recorded for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65 or 94bc552299ec585c38f2b1c7a54441075933f7d0 on the standalone custom-cli repository",
-      "impact": "The repo-local workflow is configured and both pushed main-branch commits are already on origin/main, but no GitHub Actions run or commit-check result has been observed for either commit through the interfaces available in this session.",
+      "title": "Hosted cross-platform build evidence has not yet been recorded for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or 75c5c609dad45adc135eaac97b0391add1f2420f on the standalone custom-cli repository",
+      "impact": "The repo-local workflow is configured and all three pushed main-branch commits are already on origin/main, but no GitHub Actions run or commit-check result has been observed for any of them through the interfaces available in this session.",
       "mitigation": "Inspect the Actions UI or another authenticated interface that can see private-repository push-triggered runs, then record the first hosted build and CTest results."
     }
   ],
   "verification_pending": [
     {
       "id": "hosted-ci-confirmation",
-      "description": "Record the first GitHub Actions results from D:/git/CLI/.github/workflows/ci.yml that correspond to pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65 or 94bc552299ec585c38f2b1c7a54441075933f7d0, or the next intentional push if GitHub only exposes a later run."
+      "description": "Record the first GitHub Actions results from D:/git/CLI/.github/workflows/ci.yml that correspond to pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or 75c5c609dad45adc135eaac97b0391add1f2420f, or the next intentional push if GitHub only exposes a later run."
     }
   ],
-  "updated_at": "2026-04-19T21:03:50+09:00"
+  "updated_at": "2026-04-19T21:13:25+09:00"
 }
