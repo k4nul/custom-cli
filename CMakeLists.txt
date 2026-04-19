@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.18)
 project(CLIStarter VERSION 0.1.0 LANGUAGES CXX)
 
 include(CTest)
-find_package(Python3 COMPONENTS Interpreter QUIET)
 
 set(CLI_STARTER_BINARY_NAME "cli-starter" CACHE STRING "Output executable name")
 set(CLI_STARTER_DISPLAY_NAME "CLI Starter" CACHE STRING "Human-friendly project name")
@@ -15,6 +14,13 @@ configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/project_config.hpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/generated/starter/project_config.hpp
     @ONLY
+)
+
+add_custom_target(
+    validate_management_docs
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/validate_management_docs.cmake
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Validating management docs"
 )
 
 add_library(starter_core
@@ -62,9 +68,9 @@ if(CLI_STARTER_BUILD_TESTS)
     add_test(NAME starter_tests COMMAND starter_tests)
 endif()
 
-if(BUILD_TESTING AND Python3_Interpreter_FOUND)
+if(BUILD_TESTING)
     add_test(
         NAME management_docs_schema
-        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/validate_management_docs.py
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/validate_management_docs.cmake
     )
 endif()
