@@ -42,7 +42,8 @@
         "2026-04-19T18:02:05+09:00: Followed AGENTS.md plus the current plan and handoff queue by first retrying the blocked publish step with `git add` across the pending `.gitignore`, AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/management/{plan,handoff}.yaml, docs/roadmap.md, and third_party/README.md change set, confirmed `.git/index.lock` creation still fails on the sandbox's read-only Git metadata mount, then sequentially re-reviewed docs/handoff.md, docs/roadmap.md, third_party/README.md, docs/management/plan.yaml, and docs/management/handoff.yaml, and confirmed the thin-index links, third-party license links, and current management next-action or blocker state need no further edits beyond the existing change set.",
         "2026-04-19T18:24:13+09:00: Followed AGENTS.md plus the current plan and handoff queue by first retrying the blocked publish step with `git add` across the pending `.gitignore`, AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/management/{plan,handoff}.yaml, docs/roadmap.md, and third_party/README.md change set, confirmed `.git/index.lock` creation still fails on the sandbox's read-only Git metadata mount, then sequentially re-reviewed `.gitignore`, AGENTS.md, README.md, and docs/decisions.md, confirmed the `cron-prompt.txt` ignore rule plus the repository-relative thin-index links need no further edits, and refreshed the management state for this batch before the required validation run.",
         "2026-04-19T18:32:07+09:00: Followed AGENTS.md plus the current plan and handoff queue by first retrying the blocked publish step with `git add .gitignore`, confirmed `.git/index.lock` still cannot be created on the sandbox's read-only Git metadata mount, then sequentially re-reviewed `.gitignore`, AGENTS.md, README.md, and docs/decisions.md as the next four pending candidates in the batch, confirmed the pending `cron-prompt.txt` ignore rule plus the repository-relative link cleanup still need no further edits, and left commit creation blocked until the worktree is moved to a git-writable D:/git/CLI environment.",
-        "2026-04-19T20:54:41+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially re-reviewing docs/handoff.md, docs/roadmap.md, third_party/README.md, docs/management/plan.yaml, and docs/management/handoff.yaml, confirmed those next five pending starter-facing candidates needed no further edits, committed and pushed the pending `.gitignore`, AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/management/{plan,handoff}.yaml, docs/roadmap.md, and third_party/README.md change set to origin/main as b4dbbd4131649dd8f83be0547a2c51c38629ba65, and then attempted to observe the repo-local GitHub Actions run through the available GitHub workflow and commit-status interfaces only to find no run or status records exposed for that pushed main-branch commit in this session yet."
+        "2026-04-19T20:54:41+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially re-reviewing docs/handoff.md, docs/roadmap.md, third_party/README.md, docs/management/plan.yaml, and docs/management/handoff.yaml, confirmed those next five pending starter-facing candidates needed no further edits, committed and pushed the pending `.gitignore`, AGENTS.md, README.md, docs/decisions.md, docs/handoff.md, docs/management/{plan,handoff}.yaml, docs/roadmap.md, and third_party/README.md change set to origin/main as b4dbbd4131649dd8f83be0547a2c51c38629ba65, and then attempted to observe the repo-local GitHub Actions run through the available GitHub workflow and commit-status interfaces only to find no run or status records exposed for that pushed main-branch commit in this session yet.",
+        "2026-04-19T21:03:50+09:00: Followed AGENTS.md plus the current plan and handoff queue by first attempting to observe hosted workflow results for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65 and 94bc552299ec585c38f2b1c7a54441075933f7d0 through the GitHub connector, confirmed that push-triggered workflow-run and commit-status queries still return no visible results for either commit, confirmed through the GitHub repository search interface that `k4nul/custom-cli` is private, found that `gh` is not installed in this shell and unauthenticated public GitHub REST calls return 404 for the repository, then sequentially re-reviewed D:/git/CLI/.github/workflows/ci.yml, README.md, docs/management/plan.yaml, and docs/management/handoff.yaml and found no newly introduced legacy organization-specific traces before refreshing the still-blocked management state for this batch."
       ]
     },
     {
@@ -246,7 +247,7 @@
   "next_actions": [
     {
       "order": 1,
-      "action": "Record the first hosted GitHub Actions result associated with pushed commit b4dbbd4131649dd8f83be0547a2c51c38629ba65 from D:/git/CLI/.github/workflows/ci.yml, or record the next intentional push if GitHub only surfaces a later run.",
+      "action": "Record the first hosted GitHub Actions result associated with pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65 or 94bc552299ec585c38f2b1c7a54441075933f7d0 from D:/git/CLI/.github/workflows/ci.yml, or record the next intentional push if GitHub only surfaces a later run.",
       "owner": "next-operator",
       "exit_signal": "docs/management/handoff.yaml records the first observed hosted run and outcome for the standalone custom-cli workflow."
     },
@@ -260,9 +261,9 @@
   "blockers": [
     {
       "id": "hosted-workflow-observation-gap",
-      "title": "The pushed main-branch commit does not expose workflow-run or commit-status records through the authenticated interfaces available in this session yet.",
-      "impact": "The first hosted GitHub Actions result for b4dbbd4131649dd8f83be0547a2c51c38629ba65 cannot yet be recorded even though the pending documentation and management change set has already been pushed to origin/main.",
-      "mitigation": "Check the Actions UI or query GitHub with an authenticated interface that exposes push-triggered runs for this repository, then record the observed result in docs/management/handoff.yaml."
+      "title": "The private repository's push-triggered workflow runs still do not expose through the authenticated interfaces available in this session, and this shell does not have `gh` installed.",
+      "impact": "The first hosted GitHub Actions result for pushed commits b4dbbd4131649dd8f83be0547a2c51c38629ba65 and 94bc552299ec585c38f2b1c7a54441075933f7d0 cannot yet be recorded even though both commits are already on origin/main.",
+      "mitigation": "Use the GitHub Actions UI or another authenticated interface with private-repository push-run visibility, such as `gh` or REST API access outside this shell, then record the observed result in docs/management/handoff.yaml."
     }
   ],
   "risks": [
@@ -286,10 +287,10 @@
     },
     {
       "id": "hosted-verification-gap",
-      "title": "The standalone GitHub Actions workflow result has not yet been recorded for the pushed custom-cli main-branch commit",
+      "title": "The standalone GitHub Actions workflow result has not yet been recorded for pushed custom-cli main-branch commits b4dbbd4131649dd8f83be0547a2c51c38629ba65 or 94bc552299ec585c38f2b1c7a54441075933f7d0",
       "severity": "medium",
-      "mitigation": "Keep D:/git/CLI/.github/workflows/ci.yml aligned with README.md and record the first hosted result that corresponds to b4dbbd4131649dd8f83be0547a2c51c38629ba65 or the next intentional push from D:/git/CLI."
+      "mitigation": "Keep D:/git/CLI/.github/workflows/ci.yml aligned with README.md and record the first hosted result that corresponds to b4dbbd4131649dd8f83be0547a2c51c38629ba65, 94bc552299ec585c38f2b1c7a54441075933f7d0, or the next intentional push from D:/git/CLI."
     }
   ],
-  "updated_at": "2026-04-19T20:54:41+09:00"
+  "updated_at": "2026-04-19T21:03:50+09:00"
 }
