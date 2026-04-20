@@ -59,7 +59,7 @@
       "checks": [
         {
           "id": "schema-script",
-          "description": "tests/validate_management_docs.py exits successfully through the repository's Python 3 launcher path."
+          "description": "./tests/validate_management_docs.py exits successfully when run directly or through an explicit Python 3 interpreter."
         },
         {
           "id": "doc-links",
