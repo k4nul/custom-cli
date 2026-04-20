@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is now the push workflow snapshot for run 24658682525 on commit ad9bb05, where `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` completed successfully, `Build and Test (windows-latest)` was still in progress at capture time, and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-20T18:23:42+09:00 sequentially reviewed src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp, replaced the hard-coded argv[0] test binary name with `load_project_info().binary_name`, and realigned the next same-sequence candidates to README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and D:/git/CLI/.github/workflows/ci.yml before the required single end-of-batch validation run.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24658682525 on commit ad9bb05, where `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` completed successfully, `Build and Test (windows-latest)` was still in progress at capture time, and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-20T18:31:52+09:00 sequentially reviewed README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and D:/git/CLI/.github/workflows/ci.yml, confirmed those starter-facing docs and workflow metadata still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, left the reviewed files unchanged, reran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully through the documented temporary PATH shim, and realigned the next same-sequence candidates to cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -20,6 +20,10 @@
     ]
   },
   "done": [
+    {
+      "id": "starter-docs-workflow-batch-pass-20260420-183152",
+      "title": "2026-04-20T18:31:52+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and D:/git/CLI/.github/workflows/ci.yml, confirmed those starter-facing docs and workflow metadata still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, left the reviewed files unchanged, reran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully through the documented temporary PATH shim, and realigned the next same-sequence candidates to cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in."
+    },
     {
       "id": "starter-command-core-test-batch-pass-20260420-182342",
       "title": "2026-04-20T18:23:42+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp, confirmed the first four files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, replaced the hard-coded `cli-starter` argv[0] in tests/config_tests.cpp with project metadata from `load_project_info().binary_name`, pushed commit ad9bb05 (`Use project metadata in argv test`) to origin/main, captured push workflow run 24658682525 where `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` completed successfully, `Build and Test (windows-latest)` was still in progress, and the legacy combined status endpoint remained `pending`, and realigned the next same-sequence candidates to README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and D:/git/CLI/.github/workflows/ci.yml before the required single end-of-batch validation run."
@@ -1061,19 +1065,19 @@
     {
       "id": "local-validation",
       "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction",
-      "next_step": "Reuse ./scripts/github_ci_status.py after future pushes whenever hosted verification evidence needs to be refreshed for the standalone workflow, because the final 26a67a1 snapshot is now recorded."
+      "next_step": "After future pushes, reuse ./scripts/github_ci_status.py <commit-sha> whenever hosted verification evidence needs to be refreshed for the standalone workflow."
     },
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue remains quiet after the review of docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, and scripts/github_ci_status.py in this batch; if another same-sequence sweep is requested, continue with config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp."
+      "next_step": "The current live modified-file review queue remains quiet after the review of README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and D:/git/CLI/.github/workflows/ci.yml in this batch; if another same-sequence sweep is requested, continue with cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "If another same-sequence sweep is requested, review config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, and scripts/github_ci_status.py with no changes needed, so the next concrete same-sequence candidates now roll forward into the checked-in template and public-header files."
+      "action": "If another same-sequence sweep is requested, review cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and D:/git/CLI/.github/workflows/ci.yml with no changes needed, so the next concrete same-sequence candidates now roll forward into the validation-support and checked-in template files."
     },
     {
       "order": 2,
@@ -1113,5 +1117,5 @@
       "description": "Future batches still need the required `python tests/validate_management_docs.py` command to run through a temporary PATH shim that maps `python` to `/usr/bin/python3`, unless the environment gains a default `python` launcher in PATH."
     }
   ],
-  "updated_at": "2026-04-20T18:01:14+09:00"
+  "updated_at": "2026-04-20T18:31:52+09:00"
 }
