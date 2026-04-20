@@ -1,13 +1,14 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24658682525 on commit ad9bb05, where `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` completed successfully, `Build and Test (windows-latest)` was still in progress at capture time, and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-20T18:51:42+09:00 sequentially reviewed include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp, confirmed those public headers still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, left the reviewed files unchanged, reran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully through the documented temporary PATH shim, and realigned the next same-sequence candidates to include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24658682525 on commit ad9bb05, where `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` completed successfully, `Build and Test (windows-latest)` was still in progress at capture time, and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-20T19:02:05+09:00 sequentially reviewed include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp, confirmed those registrar, entrypoint, application, and command-implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct string-pattern checks that none of the five files contain `custom-cli`, `k4nul`, `cppcore`, `legacy`, or D:/git path traces, and reintroduced the live validation-command blocker because the exact requested `python tests/validate_management_docs.py` invocation still needs a temporary PATH shim in this default shell before the next same-sequence candidates at src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
       "Legacy migration notes now use generic descriptions instead of carrying forward organization-specific names.",
       "The CLI starter delivery repository is D:/git/CLI, even though the broader D:/git workspace still contains other unrelated projects.",
       "The hosted verification entrypoint for the standalone repository is D:/git/CLI/.github/workflows/ci.yml.",
+      "The management-doc validator is executable as ./tests/validate_management_docs.py in the default shell and also supports an explicit Python 3 interpreter path.",
       "Repo-local ./scripts/github_ci_status.py can inspect private push-triggered workflow runs and check runs through GitHub REST without requiring `gh`.",
       "Current policy allows local edits, local validation, and explicitly requested git workflows from D:/git/CLI while keeping the parent D:/git repository untouched."
     ],
@@ -20,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "management-validator-command-alignment-20260420-185700",
+      "title": "2026-04-20T18:57:00+09:00: Followed AGENTS.md plus the current plan and handoff queue by reviewing tests/validate_management_docs.py, README.md, docs/management/verification.yaml, docs/management/plan.yaml, and docs/management/handoff.yaml, confirmed the validator already supports direct execution through its python3 shebang, aligned the current verification guidance around `./tests/validate_management_docs.py` or an explicit Python 3 interpreter, removed the stale temporary-`python`-shim blocker from the live management state, and kept the next same-sequence candidates at include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp."
+    },
     {
       "id": "starter-public-header-batch-pass-20260420-185142",
       "title": "2026-04-20T18:51:42+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp, confirmed those public headers still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, left the reviewed files unchanged, reran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully through the documented temporary PATH shim, and realigned the next same-sequence candidates to include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp."
@@ -1073,19 +1078,19 @@
     {
       "id": "local-validation",
       "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction",
-      "next_step": "After future pushes, reuse ./scripts/github_ci_status.py <commit-sha> whenever hosted verification evidence needs to be refreshed for the standalone workflow."
+      "next_step": "Run the required `python tests/validate_management_docs.py` command through a temporary PATH shim that exposes `python` as the available Python 3 interpreter, then keep using ./scripts/github_ci_status.py <commit-sha> after future pushes whenever hosted verification evidence needs to be refreshed for the standalone workflow."
     },
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue remains quiet after the review of README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and D:/git/CLI/.github/workflows/ci.yml in this batch; if another same-sequence sweep is requested, continue with cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in."
+      "next_step": "The current live modified-file review queue remains quiet after the review of include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp in this batch; if another same-sequence sweep is requested, continue with src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "If another same-sequence sweep is requested, review include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in with no changes needed, so the next concrete same-sequence candidates now roll forward into the starter public headers."
+      "action": "If another same-sequence sweep is requested, review src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances into the remaining command implementations and core config loader."
     },
     {
       "order": 2,
@@ -1122,8 +1127,8 @@
   "verification_pending": [
     {
       "id": "management-doc-validation-python-launcher",
-      "description": "Future batches still need the required `python tests/validate_management_docs.py` command to run through a temporary PATH shim that maps `python` to `/usr/bin/python3`, unless the environment gains a default `python` launcher in PATH."
+      "description": "The required `python tests/validate_management_docs.py` command still needs a temporary PATH shim that maps `python` to the available Python 3 interpreter because `python` is not on PATH in the default shell."
     }
   ],
-  "updated_at": "2026-04-20T18:41:48+09:00"
+  "updated_at": "2026-04-20T19:02:05+09:00"
 }
