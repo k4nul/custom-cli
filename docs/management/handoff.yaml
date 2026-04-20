@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still push workflow run 24642188760 for commit 914cdee with three successful check runs even though the legacy combined status endpoint remained `pending`. The latest AGENTS-guided follow-up at 2026-04-20T17:01:56+09:00 reviewed include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, include/starter/app/application.hpp, and include/starter/commands/registrars.hpp, found no further edits needed, ran the required one-shot `python tests/validate_management_docs.py` validation through the documented PATH shim, and kept the next same-sequence candidates aligned at src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, src/commands/about_command.cpp, and src/commands/config_command.cpp.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is now push workflow run 24655387930 for commit 26a67a1, where `Management Docs` and `Build and Test (ubuntu-latest)` have already completed successfully while `Build and Test (windows-latest)` is still in progress and the legacy combined status endpoint still reports `pending`. The latest AGENTS-guided follow-up at 2026-04-20T17:06:15+09:00 refreshed hosted verification through ./scripts/github_ci_status.py after pushing the management-state commit and kept the next same-sequence candidates aligned at src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, src/commands/about_command.cpp, and src/commands/config_command.cpp.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -20,6 +20,10 @@
     ]
   },
   "done": [
+    {
+      "id": "starter-hosted-verification-refresh-20260420-170615",
+      "title": "2026-04-20T17:06:15+09:00: After pushing commit 26a67a1, ran ./scripts/github_ci_status.py 26a67a1 and confirmed push workflow run 24655387930 for D:/git/CLI/.github/workflows/ci.yml is visible with `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` completed successfully, `Build and Test (windows-latest)` still in progress, and the legacy combined status endpoint still reporting `pending`."
+    },
     {
       "id": "starter-public-header-registrar-batch-pass-20260420-170156",
       "title": "2026-04-20T17:01:56+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, include/starter/app/application.hpp, and include/starter/commands/registrars.hpp, confirmed those public-header and registrar declaration files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, left the reviewed files unchanged, ran the single end-of-batch `python tests/validate_management_docs.py` validation successfully through a temporary PATH shim that exposed `/usr/bin/python3` as `python`, and realigned the next same-sequence candidates to src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, src/commands/about_command.cpp, and src/commands/config_command.cpp before any future commit."
@@ -1025,7 +1029,7 @@
     {
       "id": "local-validation",
       "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction",
-      "next_step": "Reuse ./scripts/github_ci_status.py after future pushes when hosted workflow evidence needs to be refreshed again, and record the resulting workflow-run and check-run outcomes in docs/management/handoff.yaml."
+      "next_step": "If a final hosted-verification snapshot is needed for commit 26a67a1, rerun ./scripts/github_ci_status.py 26a67a1 after workflow run 24655387930 finishes so the current in-progress windows job can be recorded with its final conclusion; otherwise reuse the script after future pushes."
     },
     {
       "id": "legacy-trace-removal",
@@ -1041,8 +1045,8 @@
     },
     {
       "order": 2,
-      "action": "Use ./scripts/github_ci_status.py <commit-sha> after future pushes whenever hosted verification evidence needs to be refreshed for the standalone custom-cli workflow.",
-      "why": "The first private hosted result is now recorded locally, and the repo-local helper can query workflow runs plus check runs even when the GitHub connector or `gh` are unavailable in the shell."
+      "action": "If you need a final hosted-verification snapshot for commit 26a67a1, rerun ./scripts/github_ci_status.py 26a67a1 after workflow run 24655387930 finishes so the current windows job conclusion can be recorded.",
+      "why": "The push-triggered workflow is visible and partially successful already, but `Build and Test (windows-latest)` was still in progress when the latest evidence refresh ran and the legacy combined status endpoint still reported `pending`."
     }
   ],
   "open_risks": [
@@ -1077,5 +1081,5 @@
       "description": "Future batches still need the required `python tests/validate_management_docs.py` command to run through a temporary PATH shim that maps `python` to `/usr/bin/python3`, unless the environment gains a default `python` launcher in PATH."
     }
   ],
-  "updated_at": "2026-04-20T17:01:56+09:00"
+  "updated_at": "2026-04-20T17:06:15+09:00"
 }
