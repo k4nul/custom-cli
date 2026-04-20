@@ -40,9 +40,10 @@ TEST_CASE("config can round-trip through JSON") {
 TEST_CASE("application accepts hello subcommand options from argv order") {
     std::ostringstream out;
     std::ostringstream err;
-    starter::Application application(starter::load_project_info(), out, err);
+    const auto project_info = starter::load_project_info();
+    starter::Application application(project_info, out, err);
 
-    std::vector<std::string> arg_storage = {"cli-starter", "hello", "--name", "starter user"};
+    std::vector<std::string> arg_storage = {project_info.binary_name, "hello", "--name", "starter user"};
     std::vector<char*> argv;
     argv.reserve(arg_storage.size());
     for (auto& arg : arg_storage) {
