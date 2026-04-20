@@ -19,6 +19,7 @@
       "notes": [
         "Update management instances whenever policy or project direction changes.",
         "Run ./tests/validate_management_docs.py after management-doc edits.",
+        "2026-04-20T20:31:52+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, and config/cli-starter.json, confirmed those workflow, validation-support, workflow-inspection, and starter-template files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the batch, and realigned the next same-sequence candidates to cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, and include/starter/core/tokenize.hpp before the required single end-of-batch `python tests/validate_management_docs.py` validation run.",
         "2026-04-20T20:11:26+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/commands/echo_command.cpp, src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, and src/core/tokenize.cpp, confirmed those command and core implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct string-pattern checks that none of the five files contain `custom-cli`, `k4nul`, `cppcore`, `legacy`, or D:/git path traces, found no starter-facing edits to make in the batch, and realigned the next same-sequence candidates to tests/config_tests.cpp, README.md, docs/project-overview.md, docs/architecture.md, and docs/migration-from-legacy.md before the required single end-of-batch `python tests/validate_management_docs.py` validation run.",
         "2026-04-18: Accepted D13 to treat D:/git/CLI as the standalone CLI starter repository, reconnect hosted verification under D:/git/CLI/.github/workflows/ci.yml, and scope git workflows to D:/git/CLI.",
         "2026-04-18T22:12:19.0265375+09:00: Initialized D:/git/CLI as a standalone Git repository on main, connected origin to https://github.com/k4nul/custom-cli.git, and kept the broader D:/git repository untouched.",
@@ -416,5 +417,5 @@
       "mitigation": "Use ./scripts/github_ci_status.py and rely on workflow runs plus check runs for hosted verification instead of treating the legacy combined status endpoint as authoritative."
     }
   ],
-  "updated_at": "2026-04-20T20:21:08+09:00"
+  "updated_at": "2026-04-20T20:31:52+09:00"
 }
