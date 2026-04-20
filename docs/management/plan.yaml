@@ -380,5 +380,5 @@
       "mitigation": "Use ./scripts/github_ci_status.py and rely on workflow runs plus check runs for hosted verification instead of treating the legacy combined status endpoint as authoritative."
     }
   ],
-  "updated_at": "2026-04-20T13:51:58+09:00"
+  "updated_at": "2026-04-20T14:01:25+09:00"
 }
