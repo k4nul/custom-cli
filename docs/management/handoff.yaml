@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24658682525 on commit ad9bb05, where `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` completed successfully, `Build and Test (windows-latest)` was still in progress at capture time, and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-22T04:40:57+09:00 sequentially reviewed src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp, confirmed those config-command, doctor-command, echo-command, hello-command, and core-config implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, and realigned the next same-sequence candidates to src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, README.md, and docs/project-overview.md.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24658682525 on commit ad9bb05, where `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` completed successfully, `Build and Test (windows-latest)` was still in progress at capture time, and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-22T04:51:33+09:00 sequentially reviewed src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, README.md, and docs/project-overview.md, confirmed those project-info, tokenization, config-test, README, and project-overview files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, and realigned the next same-sequence candidates to docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, and tests/validate_management_docs.py.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -21,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "starter-projectinfo-tokenize-test-readme-overview-review-batch-pass-20260422-045133",
+      "title": "2026-04-22T04:51:33+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, README.md, and docs/project-overview.md, confirmed those project-info, tokenization, config-test, README, and project-overview files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct fixed-string checks that src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\git`, `service-specific`, `deployment path`, `legacy`, or `organization-specific` traces, treated README.md and docs/project-overview.md generic `legacy`, `organization-specific`, and `deployment paths` removal-category wording as neutral starter policy wording, found no starter-facing edits to make in the reviewed files, and realigned the next same-sequence candidates to docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, and tests/validate_management_docs.py before the required single end-of-batch validation run."
+    },
     {
       "id": "starter-config-doctor-echo-hello-coreconfig-review-batch-pass-20260422-044057",
       "title": "2026-04-22T04:40:57+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp, confirmed those config-command, doctor-command, echo-command, hello-command, and core-config implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct fixed-string checks that none of the five files contain `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\git`, `service-specific`, `deployment path`, `legacy`, or `organization-specific` traces, found no starter-facing edits to make in the reviewed files, and realigned the next same-sequence candidates to src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, README.md, and docs/project-overview.md before the required single end-of-batch validation run."
@@ -1311,14 +1315,14 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue remains quiet after the review of src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp in this batch; if another same-sequence sweep is requested, continue with src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, README.md, and docs/project-overview.md."
+      "next_step": "The current live modified-file review queue remains quiet after the review of src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, README.md, and docs/project-overview.md in this batch; if another same-sequence sweep is requested, continue with docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, and tests/validate_management_docs.py."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "If another same-sequence sweep is requested, review src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, README.md, and docs/project-overview.md for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed command and core config implementation files with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances to project-info, tokenization, config-test, README, and project-overview files."
+      "action": "If another same-sequence sweep is requested, review docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, cmake/validate_management_docs.cmake, and tests/validate_management_docs.py for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed project-info, tokenization, config-test, README, and project-overview files with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances to architecture, migration, workflow, CMake validation, and management-validator files."
     },
     {
       "order": 2,
@@ -1353,5 +1357,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-22T04:40:57+09:00"
+  "updated_at": "2026-04-22T04:51:33+09:00"
 }
