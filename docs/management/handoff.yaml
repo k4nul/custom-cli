@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24658682525 on commit ad9bb05, where `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` completed successfully, `Build and Test (windows-latest)` was still in progress at capture time, and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-22T01:51:27+09:00 sequentially reviewed src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, confirmed those about-command, config-command, doctor-command, echo-command, and hello-command implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, and realigned the next same-sequence candidates to src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24658682525 on commit ad9bb05, where `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` completed successfully, `Build and Test (windows-latest)` was still in progress at capture time, and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-22T02:01:27+09:00 sequentially reviewed src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, confirmed those core-config, project-info, tokenization, config-test, and README files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, and realigned the next same-sequence candidates to docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, and cmake/validate_management_docs.cmake.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -21,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "starter-core-test-readme-review-batch-pass-20260422-020127",
+      "title": "2026-04-22T02:01:27+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, confirmed those core-config, project-info, tokenization, config-test, and README files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct fixed-string checks that src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\git`, `service-specific`, `deployment path`, `legacy`, or `organization-specific` traces, treated README.md generic `legacy` and `organization-specific` removal-category wording as neutral starter policy wording, found no starter-facing edits to make in the reviewed files, and realigned the next same-sequence candidates to docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, and cmake/validate_management_docs.cmake before the required single end-of-batch validation run."
+    },
     {
       "id": "starter-command-implementation-review-batch-pass-20260422-015127",
       "title": "2026-04-22T01:51:27+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, confirmed those about-command, config-command, doctor-command, echo-command, and hello-command implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct fixed-string checks that none of the five files contain `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\git`, `service-specific`, `deployment path`, `legacy`, or `organization-specific` traces, found no starter-facing edits to make in the reviewed files, and realigned the next same-sequence candidates to src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md before the required single end-of-batch validation run."
@@ -1243,14 +1247,14 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue remains quiet after the review of src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp in this batch; if another same-sequence sweep is requested, continue with src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md."
+      "next_step": "The current live modified-file review queue remains quiet after the review of src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md in this batch; if another same-sequence sweep is requested, continue with docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, and cmake/validate_management_docs.cmake."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "If another same-sequence sweep is requested, review src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed the command implementation files with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances to the core implementation, config test, and README files."
+      "action": "If another same-sequence sweep is requested, review docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, D:/git/CLI/.github/workflows/ci.yml, and cmake/validate_management_docs.cmake for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed the core implementation, config test, and README files with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances to starter-facing docs, workflow metadata, and CMake validation support."
     },
     {
       "order": 2,
@@ -1285,5 +1289,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-22T01:51:27+09:00"
+  "updated_at": "2026-04-22T02:01:27+09:00"
 }
