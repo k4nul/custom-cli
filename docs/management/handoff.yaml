@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is the push workflow snapshot for run 24753458647 on commit 0964c77, where `Management Docs`, `Build and Test (ubuntu-latest)`, and `Build and Test (windows-latest)` all completed successfully while the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-22T10:51:02+09:00 sequentially reviewed cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, and include/starter/core/tokenize.hpp, confirmed those CMake project-config template, public core config header, exit-code header, project-info header, and tokenization header files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated files needed cleanup, and realigned the next same-sequence candidates to include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is the push workflow snapshot for run 24753458647 on commit 0964c77, where `Management Docs`, `Build and Test (ubuntu-latest)`, and `Build and Test (windows-latest)` all completed successfully while the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-22T11:01:14+09:00 sequentially reviewed include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp, confirmed those application declaration, command registrar declaration, entrypoint, application implementation, and command-registration implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated files needed cleanup, and realigned the next same-sequence candidates to src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -21,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "starter-application-registrar-entrypoint-review-batch-pass-20260422-110114",
+      "title": "2026-04-22T11:01:14+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp, confirmed those application declaration, command registrar declaration, entrypoint, application implementation, and command-registration implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct fixed-string checks that none of the five files contain `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, `legacy`, or `organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated files needed cleanup, and realigned the next same-sequence candidates to src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp before the required single end-of-batch validation run."
+    },
     {
       "id": "starter-template-public-core-header-review-batch-pass-20260422-105102",
       "title": "2026-04-22T10:51:02+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, and include/starter/core/tokenize.hpp, confirmed those CMake project-config template, public core config header, exit-code header, project-info header, and tokenization header files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct fixed-string checks that none of the five files contain `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, `legacy`, or `organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated files needed cleanup, and realigned the next same-sequence candidates to include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp before the required single end-of-batch validation run."
@@ -1459,14 +1463,14 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue remains quiet after the review of cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, and include/starter/core/tokenize.hpp in this batch; if another same-sequence sweep is requested, continue with include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp."
+      "next_step": "The current live modified-file review queue remains quiet after the review of include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp in this batch; if another same-sequence sweep is requested, continue with src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "If another same-sequence sweep is requested, review include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed the CMake project-config template and public core headers with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances to application, registrar, entrypoint, and application implementation files."
+      "action": "If another same-sequence sweep is requested, review src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed the application declaration, command registrar declaration, entrypoint, application implementation, and command-registration implementation files with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances to command implementation files."
     },
     {
       "order": 2,
@@ -1501,5 +1505,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-22T10:51:02+09:00"
+  "updated_at": "2026-04-22T11:01:14+09:00"
 }
