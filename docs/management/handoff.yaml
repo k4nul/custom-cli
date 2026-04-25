@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is the push workflow snapshot for run 24937570466 on commit 6fddc27, where `Management Docs` completed successfully while `Build and Test (ubuntu-latest)` and `Build and Test (windows-latest)` remained in progress and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-26T06:21:42+09:00 sequentially reviewed config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp, confirmed those starter-template, project-config template, and public core header files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is the push workflow snapshot for run 24937570466 on commit 6fddc27, where `Management Docs` completed successfully while `Build and Test (ubuntu-latest)` and `Build and Test (windows-latest)` remained in progress and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-26T06:30:56+09:00 sequentially reviewed include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp, confirmed those public tokenization, application, command-registrar, entrypoint, and application-flow files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, and src/commands/echo_command.cpp.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -21,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "starter-tokenize-application-registrar-entrypoint-app-review-batch-pass-20260426-063056",
+      "title": "2026-04-26T06:30:56+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp, confirmed those public tokenization, application, command-registrar, entrypoint, and application-flow files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct fixed-string checks that none of the five files contain `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, and src/commands/echo_command.cpp before the required single end-of-batch validation run."
+    },
     {
       "id": "starter-template-core-header-review-batch-pass-20260426-062142",
       "title": "2026-04-26T06:21:42+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp, confirmed those starter-template, project-config template, and public core header files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct fixed-string checks that none of the five files contain `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp before the required single end-of-batch validation run."
@@ -1847,14 +1851,14 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The latest same-sequence batch reviewed config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp with no new legacy-specific wording or path traces found; if another same-sequence sweep is requested, continue with include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp."
+      "next_step": "The latest same-sequence batch reviewed include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp with no new legacy-specific wording or path traces found; if another same-sequence sweep is requested, continue with src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, and src/commands/echo_command.cpp."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "If another same-sequence sweep is requested, review include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances to the next public tokenization, application, registrar, and entrypoint set."
+      "action": "If another same-sequence sweep is requested, review src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, and src/commands/echo_command.cpp for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances to the next command-registration and command-implementation set."
     },
     {
       "order": 2,
@@ -1889,5 +1893,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-26T06:21:42+09:00"
+  "updated_at": "2026-04-26T06:30:56+09:00"
 }
