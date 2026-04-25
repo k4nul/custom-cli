@@ -1587,7 +1587,7 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current live modified-file review queue remains quiet after the review of src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md in this batch; if another same-sequence sweep is requested, continue with docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake."
+      "next_step": "The current live modified-file review queue remains quiet after the review of docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake in this batch; if another same-sequence sweep is requested, continue with tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, cmake/project_config.hpp.in, and include/starter/core/config.hpp."
     }
   ],
   "next_recommended": [
