@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is the push workflow snapshot for run 24933920278 on commit a640c3f, where `Management Docs` completed successfully while `Build and Test (ubuntu-latest)` and `Build and Test (windows-latest)` remained in progress and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-26T00:21:14+09:00 sequentially reviewed src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, confirmed those core implementation, starter test, and starter-facing README files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is the push workflow snapshot for run 24933920278 on commit a640c3f, where `Management Docs` completed successfully while `Build and Test (ubuntu-latest)` and `Build and Test (windows-latest)` remained in progress and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-26T00:31:06+09:00 sequentially reviewed docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake, confirmed those starter-facing docs, workflow metadata, and validation-support files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully, and realigned the next same-sequence candidates to tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, cmake/project_config.hpp.in, and include/starter/core/config.hpp.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -21,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "starter-doc-workflow-validation-review-batch-pass-20260426-003106",
+      "title": "2026-04-26T00:31:06+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake, confirmed those starter-facing docs, workflow metadata, and validation-support files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, treated docs/project-overview.md, docs/architecture.md, and docs/migration-from-legacy.md generic `legacy`, `organization-specific`, and `deployment path` wording as neutral starter policy language, reconfirmed through direct fixed-string checks that .github/workflows/ci.yml and cmake/validate_management_docs.cmake contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, `legacy`, or `organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully, and realigned the next same-sequence candidates to tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, cmake/project_config.hpp.in, and include/starter/core/config.hpp."
+    },
     {
       "id": "starter-core-test-readme-review-batch-pass-20260426-002114",
       "title": "2026-04-26T00:21:14+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, confirmed those core implementation, starter test, and starter-facing README files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct fixed-string checks that src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, `legacy`, or `organization-specific` traces, treated README.md generic `legacy`, `organization-specific`, and migration-reference wording as neutral starter policy language, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake before the required single end-of-batch `python tests/validate_management_docs.py` validation run."
@@ -1703,14 +1707,14 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The current same-sequence queue remains quiet after the review of src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md in this batch; if another same-sequence sweep is requested, continue with docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake."
+      "next_step": "The current same-sequence queue remains quiet after the review of docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake in this batch; if another same-sequence sweep is requested, continue with tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, cmake/project_config.hpp.in, and include/starter/core/config.hpp."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "If another same-sequence sweep is requested, review docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances to the next docs and workflow-support set."
+      "action": "If another same-sequence sweep is requested, review tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, cmake/project_config.hpp.in, and include/starter/core/config.hpp for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake with no new legacy-specific wording or path traces found, so the concrete same-sequence queue now advances to the next validation-support, helper, template, and public-header set."
     },
     {
       "order": 2,
@@ -1745,5 +1749,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-26T00:21:14+09:00"
+  "updated_at": "2026-04-26T00:31:06+09:00"
 }
