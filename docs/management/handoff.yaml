@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is the push workflow snapshot for run 24753458647 on commit 0964c77, where `Management Docs`, `Build and Test (ubuntu-latest)`, and `Build and Test (windows-latest)` all completed successfully while the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-26T00:11:12+09:00 sequentially reviewed src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, confirmed those starter-facing command implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is the push workflow snapshot for run 24933920278 on commit a640c3f, where `Management Docs` completed successfully while `Build and Test (ubuntu-latest)` and `Build and Test (windows-latest)` remained in progress and the legacy combined status endpoint still reported `pending`. The latest AGENTS-guided follow-up at 2026-04-26T00:11:12+09:00 sequentially reviewed src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, confirmed those starter-facing command implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -21,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "hosted-verification-refresh-a640c3f-20260426-001313",
+      "title": "2026-04-26T00:13:13+09:00: After pushing commit a640c3f from D:/git/CLI, ran ./scripts/github_ci_status.py a640c3f to refresh hosted verification evidence and confirmed push workflow run 24933920278 for D:/git/CLI/.github/workflows/ci.yml is visible with `Management Docs` completed successfully, `Build and Test (ubuntu-latest)` still in progress, `Build and Test (windows-latest)` still in progress, and the legacy combined status endpoint still reporting `pending`."
+    },
     {
       "id": "starter-command-implementation-review-batch-pass-20260426-001112",
       "title": "2026-04-26T00:11:12+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, confirmed those starter-facing command implementation files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, reconfirmed through direct fixed-string checks that none of the five files contain `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, `legacy`, or `organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md before the required single end-of-batch `python tests/validate_management_docs.py` validation run."
@@ -1737,5 +1741,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-26T00:11:12+09:00"
+  "updated_at": "2026-04-26T00:13:13+09:00"
 }
