@@ -22,7 +22,7 @@ The new direction intentionally narrows scope. This starter keeps the reusable C
 
 ## What Was Removed
 
-- Organization names, product names, support details, and deployment paths
+- Organization names, product names, support details, and environment-specific install locations
 - Product update logic, admin escalation flows, and hidden maintenance commands
 - External build assumptions tied to unavailable sibling repositories
 
@@ -38,4 +38,3 @@ The new direction intentionally narrows scope. This starter keeps the reusable C
 - Developers who want a copyable CLI template
 - Teams that need a small C++ command shell without inheriting old product baggage
 - Future maintainers who need a repository that explains itself quickly
-
