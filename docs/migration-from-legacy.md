@@ -14,11 +14,11 @@ The old build also linked to sibling repositories that were not present inside t
 
 Removed or replaced categories:
 
-- legacy organization-specific directory names, target names, and class names
+- former repo-specific directory names, target names, and class names
 - product names in help text, banners, RC metadata, and error messages
 - organization contact information
 - hidden backdoor-like commands
-- hard-coded organization-specific deployment paths
+- hard-coded install locations tied to one environment
 - product codes and update logic tied to a specific environment
 
 ## Shared Utility Layer Breakdown
