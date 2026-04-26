@@ -118,6 +118,26 @@ TEST_CASE("tab completion filters root command prefixes") {
     CHECK(e_tab.replacement == "efgh");
 }
 
+TEST_CASE("tab completion expands shared candidate prefixes") {
+    starter::TabCompletionState state;
+    const std::vector<std::string> help_commands = {"help", "hello"};
+
+    const auto h_prefix = starter::resolve_completion("h", 1, help_commands);
+    const auto h_tab = starter::choose_tab_completion(h_prefix, "h", 1, state);
+    CHECK(h_tab.kind == starter::CompletionActionKind::replace);
+    CHECK(h_tab.replacement == "hel");
+
+    const auto hel_prefix = starter::resolve_completion("hel", 3, help_commands);
+    const auto hel_second_tab = starter::choose_tab_completion(hel_prefix, "hel", 3, state);
+    CHECK(hel_second_tab.kind == starter::CompletionActionKind::list);
+    CHECK(hel_second_tab.candidates == help_commands);
+
+    const std::vector<std::string> mixed_commands = {"help", "hello", "happy"};
+    const auto mixed_h_prefix = starter::resolve_completion("h", 1, mixed_commands);
+    const auto mixed_h_tab = starter::choose_tab_completion(mixed_h_prefix, "h", 1, state);
+    CHECK(mixed_h_tab.kind == starter::CompletionActionKind::no_change);
+}
+
 TEST_CASE("tab completion reflects starter commands subcommands and options") {
     std::ostringstream out;
     std::ostringstream err;
