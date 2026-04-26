@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. Accepted decision D13 still treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate, but accepted decision D14 now removes repo-local GitHub Actions and narrows verification to Linux-only local commands. As of 2026-04-26T16:17:16+09:00, repo-local .github/workflows/ci.yml and scripts/github_ci_status.py were deleted, per-user CMake 4.3.2 is available on PATH at /home/k4nul/.local/bin/cmake, GNU Make and g++ 11.4.0 are available, and local verification succeeded with `python3 tests/validate_management_docs.py`, `cmake -S . -B /tmp/custom-cli-build -DCLI_STARTER_BUILD_TESTS=ON`, `cmake --build /tmp/custom-cli-build`, and `ctest --test-dir /tmp/custom-cli-build --output-on-failure`.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. Accepted decision D13 still treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate, but accepted decision D14 now removes repo-local GitHub Actions and narrows verification to Linux-only local commands. As of 2026-04-26T16:17:16+09:00, repo-local .github/workflows/ci.yml and scripts/github_ci_status.py were deleted, per-user CMake 4.3.2 is available on PATH at /home/k4nul/.local/bin/cmake, GNU Make and g++ 11.4.0 are available, and local verification succeeded with `python3 tests/validate_management_docs.py`, `cmake -S . -B /tmp/custom-cli-build -DCLI_STARTER_BUILD_TESTS=ON`, `cmake --build /tmp/custom-cli-build`, and `ctest --test-dir /tmp/custom-cli-build --output-on-failure`. As of 2026-04-26T16:31:57+09:00, the same-sequence review of docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, cmake/validate_management_docs.cmake, and tests/validate_management_docs.py found no newly introduced legacy traces, and the next same-sequence candidates are config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -22,6 +22,10 @@
     ]
   },
   "done": [
+    {
+      "id": "starter-doc-validator-review-batch-pass-20260426-163157",
+      "title": "2026-04-26T16:31:57+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, cmake/validate_management_docs.cmake, and tests/validate_management_docs.py, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, treated the generic `legacy`, `organization-specific`, and `product-specific` wording in the prose docs as neutral starter policy language, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, and realigned the next same-sequence candidates to config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp."
+    },
     {
       "id": "linux-only-local-verification-transition-20260426-161716",
       "title": "2026-04-26T16:17:16+09:00: Accepted D14 to remove repo-local GitHub Actions and make the starter Linux-only, updated README.md plus the management records to describe the new verification scope, deleted .github/workflows/ci.yml and scripts/github_ci_status.py, and verified the new baseline successfully with `python3 tests/validate_management_docs.py`, `cmake -S . -B /tmp/custom-cli-build -DCLI_STARTER_BUILD_TESTS=ON`, `cmake --build /tmp/custom-cli-build`, and `ctest --test-dir /tmp/custom-cli-build --output-on-failure` using g++ 11.4.0 and CMake 4.3.2."
@@ -2141,5 +2145,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-26T16:17:16+09:00"
+  "updated_at": "2026-04-26T16:31:57+09:00"
 }
