@@ -17,6 +17,7 @@
       "status": "in_progress",
       "related_phase": "implement",
       "notes": [
+        "2026-04-26T15:41:59+09:00: Committed and pushed 7a7048e (`Improve hosted CI blocker diagnostics`), then followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, and include/starter/core/tokenize.hpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, removed the generated scripts/__pycache__/ directory, refreshed hosted verification with `./scripts/github_ci_status.py 7a7048e --wait-seconds 30 --poll-interval 5`, and confirmed push workflow run 24950353261 concluded `failure`, `Management Docs` check run 73059227319 concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, and the check annotation repeated that recent account payments failed or the Actions spending limit needs to be increased before jobs can start; the next same-sequence candidates are now include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp.",
         "2026-04-26T15:35:41+09:00: Addressed the still-external GitHub Actions billing or spending blocker behind `Management Docs` check run 73055365070 in workflow run 24948929328 by strengthening scripts/github_ci_status.py to hydrate check-run details and annotations, emit detected billing/spending/payment-method lockouts in text and JSON output, updating README.md to describe that richer hosted-CI inspection path, and rerunning `python3 -m py_compile scripts/github_ci_status.py`, `python3 scripts/github_ci_status.py --help`, and `python3 tests/validate_management_docs.py` successfully without changing the blocked hosted-run outcome itself.",
         "2026-04-26T15:31:51+09:00: Followed AGENTS.md plus the current plan and handoff queue by keeping the GitHub Actions billing or spending issue behind `Management Docs` check run 73055365070 in workflow run 24948929328 as an unchanged external blocker, then sequentially reviewed .github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, and config/cli-starter.json, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, and realigned the next same-sequence candidates to cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, and include/starter/core/tokenize.hpp.",
         "2026-04-26T15:22:01+09:00: Followed AGENTS.md plus the current plan and handoff queue by keeping the GitHub Actions billing or spending issue behind `Management Docs` check run 73055365070 in workflow run 24948929328 as an unchanged external blocker, then sequentially reviewed tests/config_tests.cpp, README.md, docs/project-overview.md, docs/architecture.md, and docs/migration-from-legacy.md, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, treated the generic `legacy`, `organization-specific`, and `product-specific` wording in the prose docs as neutral starter policy language, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, and realigned the next same-sequence candidates to .github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, and config/cli-starter.json.",
@@ -667,13 +668,13 @@
   "next_actions": [
     {
       "order": 1,
-      "action": "Restore GitHub Actions billing or spending capacity for the repository owner account, then rerun hosted verification with a new push or rerun so the standalone custom-cli workflow can actually start `Management Docs` check run 73055365070 and downstream build jobs again after the latest failing run 24948929328.",
+      "action": "Restore GitHub Actions billing or spending capacity for the repository owner account, then rerun hosted verification with a new push or rerun so the standalone custom-cli workflow can actually start `Management Docs` check run 73059227319 and downstream build jobs again after the latest failing run 24950353261.",
       "owner": "next-operator",
       "exit_signal": "A fresh hosted workflow run starts normally after the billing block is cleared, and docs/management/handoff.yaml records the resulting evidence."
     },
     {
       "order": 2,
-      "action": "Review cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, and include/starter/core/tokenize.hpp as the next same-sequence repository-owned candidates for any newly introduced legacy organization-specific traces before each future commit, and rewrite them locally when discovered.",
+      "action": "Review include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp as the next same-sequence repository-owned candidates for any newly introduced legacy organization-specific traces before each future commit, and rewrite them locally when discovered.",
       "owner": "next-operator",
       "exit_signal": "No newly discovered starter-facing file carries legacy organization-specific names, identifiers, or deployment paths."
     },
@@ -688,8 +689,8 @@
     {
       "id": "hosted-actions-billing-blocker",
       "title": "Hosted GitHub Actions jobs cannot start until the account billing or spending issue is cleared",
-      "impact": "The latest hosted verification run 24948929328 never reached repository steps, `Build and Test (${{ matrix.os }})` was skipped behind `needs`, and local validation is the only working verification path in this workspace until billing is restored.",
-      "mitigation": "Fix the failed payment or spending-limit condition reported by the `Management Docs` check-run 73055365070 annotation, then trigger a fresh push or rerun and inspect it with ./scripts/github_ci_status.py before treating hosted CI as healthy again."
+      "impact": "The latest hosted verification run 24950353261 never reached repository steps, `Build and Test (${{ matrix.os }})` was skipped behind `needs`, and local validation is the only working verification path in this workspace until billing is restored.",
+      "mitigation": "Fix the failed payment or spending-limit condition reported by the `Management Docs` check-run 73059227319 annotation, then trigger a fresh push or rerun and inspect it with ./scripts/github_ci_status.py before treating hosted CI as healthy again."
     }
   ],
   "risks": [
@@ -718,5 +719,5 @@
       "mitigation": "Use ./scripts/github_ci_status.py and rely on workflow runs plus check runs for hosted verification instead of treating the legacy combined status endpoint as authoritative."
     }
   ],
-  "updated_at": "2026-04-26T15:35:41+09:00"
+  "updated_at": "2026-04-26T15:41:59+09:00"
 }
