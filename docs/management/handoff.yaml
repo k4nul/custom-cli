@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24946533843 on commit ca4b33d6cf911e08d995dfb10bb7a5192267f1ef, where `Management Docs` check run 73048831265 concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, and the direct annotation query repeated that recent account payments failed or the Actions spending limit needs to be increased before jobs can start even though local `python tests/validate_management_docs.py` validation still passed. The latest AGENTS-guided follow-up at 2026-04-26T13:01:17+09:00 reviewed include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp without needing edits, realigned the next same-sequence candidates to src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, and src/commands/echo_command.cpp, and kept the billing-rooted blocker in place.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24946533843 on commit ca4b33d6cf911e08d995dfb10bb7a5192267f1ef, where `Management Docs` check run 73048831265 concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, and the direct annotation query repeated that recent account payments failed or the Actions spending limit needs to be increased before jobs can start even though local `python tests/validate_management_docs.py` validation still passed. The latest AGENTS-guided follow-up at 2026-04-26T13:11:37+09:00 reviewed src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, and src/commands/echo_command.cpp without needing edits, realigned the next same-sequence candidates to src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp, and kept the billing-rooted blocker in place.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -2011,7 +2011,7 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The latest same-sequence batch reviewed config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp without needing edits; if another same-sequence sweep is requested, continue with include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp."
+      "next_step": "The latest same-sequence batch reviewed src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, and src/commands/echo_command.cpp without needing edits; if another same-sequence sweep is requested, continue with src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp."
     }
   ],
   "next_recommended": [
@@ -2022,8 +2022,8 @@
     },
     {
       "order": 2,
-      "action": "If another same-sequence sweep is requested after the hosted billing issue is cleared or deferred, review include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, and src/app/application.cpp for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, and include/starter/core/project_info.hpp, found no edits to make, and advanced the concrete same-sequence queue to the next header and entrypoint files."
+      "action": "If another same-sequence sweep is requested after the hosted billing issue is cleared or deferred, review src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, and src/commands/echo_command.cpp, found no edits to make, and advanced the concrete same-sequence queue to the next command, core, and test files."
     },
     {
       "order": 3,
@@ -2063,5 +2063,5 @@
       "description": "Clear the GitHub Actions billing or spending block repeated on `Management Docs` check run 73048831265 in workflow run 24946533843, then confirm with a fresh workflow run that `Management Docs` and the downstream build jobs start normally."
     }
   ],
-  "updated_at": "2026-04-26T12:51:49+09:00"
+  "updated_at": "2026-04-26T13:11:37+09:00"
 }
