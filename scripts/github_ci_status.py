@@ -27,6 +27,21 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_WORKFLOW_PATH = ".github/workflows/ci.yml"
 API_ROOT = "https://api.github.com"
 WORKFLOW_RUN_URL_RE = re.compile(r"/actions/runs/(?P<run_id>\d+)")
+BLOCKER_PATTERNS = {
+    "github_actions_billing_or_budget_block": [
+        re.compile(r"recent account payments failed", re.IGNORECASE),
+        re.compile(r"spending limit", re.IGNORECASE),
+        re.compile(r"budget limit", re.IGNORECASE),
+        re.compile(r"payment method", re.IGNORECASE),
+    ]
+}
+BLOCKER_NEXT_STEPS = {
+    "github_actions_billing_or_budget_block": (
+        "Check the repository owner's GitHub billing payment method and any "
+        "Actions budgets that stop usage, then rerun the workflow."
+    )
+}
+SUMMARY_TEXT_LIMIT = 240
 
 
 def parse_args() -> argparse.Namespace:
@@ -145,6 +160,142 @@ def github_get(path: str, headers: dict[str, str]) -> Any:
         raise RuntimeError(f"GitHub API request failed for {path}: {error.reason}") from error
 
 
+def normalize_text(value: Any) -> str | None:
+    if not isinstance(value, str):
+        return None
+
+    collapsed = " ".join(value.split())
+    return collapsed or None
+
+
+def trim_text(value: str, limit: int = SUMMARY_TEXT_LIMIT) -> str:
+    if len(value) <= limit:
+        return value
+    return value[: limit - 3].rstrip() + "..."
+
+
+def unique_texts(values: list[str]) -> list[str]:
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        ordered.append(value)
+    return ordered
+
+
+def fetch_check_run_annotations(repo_slug: str, check_run_id: int, headers: dict[str, str]) -> list[dict[str, Any]]:
+    annotations = github_get(
+        f"/repos/{repo_slug}/check-runs/{check_run_id}/annotations?per_page=100",
+        headers,
+    )
+    if not isinstance(annotations, list):
+        return []
+    return [annotation for annotation in annotations if isinstance(annotation, dict)]
+
+
+def hydrate_check_run(
+    repo_slug: str,
+    check_run: dict[str, Any],
+    headers: dict[str, str],
+) -> dict[str, Any]:
+    hydrated = dict(check_run)
+    check_run_id = hydrated.get("id")
+    if not isinstance(check_run_id, int):
+        return hydrated
+
+    try:
+        details = github_get(f"/repos/{repo_slug}/check-runs/{check_run_id}", headers)
+    except RuntimeError as error:
+        hydrated["detail_fetch_error"] = str(error)
+        details = None
+
+    if isinstance(details, dict):
+        hydrated.update(details)
+
+    try:
+        hydrated["annotations"] = fetch_check_run_annotations(repo_slug, check_run_id, headers)
+    except RuntimeError as error:
+        hydrated["annotation_fetch_error"] = str(error)
+
+    return hydrated
+
+
+def hydrate_check_runs(
+    repo_slug: str,
+    check_runs: list[dict[str, Any]],
+    headers: dict[str, str],
+) -> list[dict[str, Any]]:
+    return [hydrate_check_run(repo_slug, check_run, headers) for check_run in check_runs]
+
+
+def extract_check_run_notes(check_run: dict[str, Any]) -> list[str]:
+    notes: list[str] = []
+
+    output = check_run.get("output")
+    if isinstance(output, dict):
+        for key in ("title", "summary", "text"):
+            text = normalize_text(output.get(key))
+            if text:
+                notes.append(text)
+
+    annotations = check_run.get("annotations")
+    if isinstance(annotations, list):
+        for annotation in annotations:
+            if not isinstance(annotation, dict):
+                continue
+            for key in ("title", "message", "raw_details"):
+                text = normalize_text(annotation.get(key))
+                if text:
+                    notes.append(text)
+
+    return unique_texts(notes)
+
+
+def detect_known_blocker(check_run: dict[str, Any]) -> dict[str, Any] | None:
+    for note in extract_check_run_notes(check_run):
+        for blocker_kind, patterns in BLOCKER_PATTERNS.items():
+            if any(pattern.search(note) for pattern in patterns):
+                return {
+                    "check_run_id": check_run.get("id"),
+                    "check_run_name": check_run.get("name"),
+                    "kind": blocker_kind,
+                    "message": trim_text(note),
+                    "next_step": BLOCKER_NEXT_STEPS[blocker_kind],
+                }
+    return None
+
+
+def collect_known_blockers(check_runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    blockers: list[dict[str, Any]] = []
+    for check_run in check_runs:
+        blocker = detect_known_blocker(check_run)
+        if blocker is not None:
+            blockers.append(blocker)
+    return blockers
+
+
+def format_annotation(annotation: dict[str, Any]) -> str:
+    location = normalize_text(annotation.get("path")) or "n/a"
+    start_line = annotation.get("start_line")
+    if isinstance(start_line, int):
+        location = f"{location}:{start_line}"
+
+    message = (
+        normalize_text(annotation.get("message"))
+        or normalize_text(annotation.get("title"))
+        or "n/a"
+    )
+    return ", ".join(
+        [
+            f"level={annotation.get('annotation_level') or 'n/a'}",
+            f"location={location}",
+            f"message={trim_text(message, 160)}",
+        ]
+    )
+
+
 def infer_workflow_run_ids(check_runs: list[dict[str, Any]]) -> set[int]:
     run_ids: set[int] = set()
     for check in check_runs:
@@ -185,6 +336,7 @@ def fetch_commit_snapshot(repo_slug: str, commit: str, headers: dict[str, str]) 
     combined_status = github_get(f"/repos/{repo_slug}/commits/{commit}/status", headers)
     check_runs = github_get(f"/repos/{repo_slug}/commits/{commit}/check-runs?per_page=100", headers).get("check_runs", [])
     workflow_runs = hydrate_workflow_runs(repo_slug, workflow_runs, check_runs, headers)
+    check_runs = hydrate_check_runs(repo_slug, check_runs, headers)
     return {
         "workflow_runs": workflow_runs,
         "combined_status": combined_status,
@@ -283,6 +435,35 @@ def summarize(snapshot: dict[str, Any], repo_slug: str, commit: str, workflow_pa
                 ]
             )
         )
+        output = check.get("output")
+        if isinstance(output, dict):
+            summary = normalize_text(output.get("summary"))
+            if summary:
+                lines.append(f"   summary={trim_text(summary)}")
+
+        annotations = check.get("annotations")
+        if isinstance(annotations, list):
+            for annotation in annotations[:3]:
+                if isinstance(annotation, dict):
+                    lines.append(f"   annotation={format_annotation(annotation)}")
+            if len(annotations) > 3:
+                lines.append(f"   annotation=... ({len(annotations) - 3} more)")
+
+    blockers = collect_known_blockers(check_runs)
+    if blockers:
+        lines.append(f"Detected blockers: {len(blockers)}")
+        for blocker in blockers:
+            lines.append(
+                " - "
+                + ", ".join(
+                    [
+                        f"check={blocker.get('check_run_name') or 'n/a'}",
+                        f"kind={blocker['kind']}",
+                        f"message={blocker['message']}",
+                        f"next_step={blocker['next_step']}",
+                    ]
+                )
+            )
 
     return "\n".join(lines)
 
@@ -312,6 +493,7 @@ def main() -> int:
         "workflow_runs": filtered_runs,
         "combined_status": snapshot["combined_status"],
         "check_runs": snapshot["check_runs"],
+        "detected_blockers": collect_known_blockers(snapshot["check_runs"]),
     }
 
     if args.json:

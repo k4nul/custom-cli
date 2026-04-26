@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24948929328 on commit cb73a8a47913b0503c2b9b106ec9872e5ecab5a0, where `Management Docs` check run 73055365070 concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, and the direct annotation query repeated that recent account payments failed or the Actions spending limit needs to be increased before jobs can start. The latest AGENTS-guided same-sequence review at 2026-04-26T15:31:51+09:00 covered .github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, and config/cli-starter.json without needing edits, realigned the next same-sequence candidates to cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, and include/starter/core/tokenize.hpp, and kept the billing-rooted blocker in place.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24948929328 on commit cb73a8a47913b0503c2b9b106ec9872e5ecab5a0, where `Management Docs` check run 73055365070 concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, and the direct annotation query repeated that recent account payments failed or the Actions spending limit needs to be increased before jobs can start. As of 2026-04-26T15:35:41+09:00, the repo-local hosted-CI helper and README guidance were updated so `./scripts/github_ci_status.py` now hydrates check-run details plus annotations, surfaces known billing/spending/payment-method blockers directly in the shell output, and keeps the external billing-rooted blocker explicit while local validation continues to pass.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -9,7 +9,7 @@
       "The CLI starter delivery repository is D:/git/CLI, even though the broader D:/git workspace still contains other unrelated projects.",
       "The hosted verification entrypoint for the standalone repository is D:/git/CLI/.github/workflows/ci.yml.",
       "The management-doc validator is executable as ./tests/validate_management_docs.py in the default shell and also supports an explicit Python 3 interpreter path.",
-      "Repo-local ./scripts/github_ci_status.py can inspect private push-triggered workflow runs and check runs through GitHub REST without requiring `gh`.",
+      "Repo-local ./scripts/github_ci_status.py can inspect private push-triggered workflow runs, check runs, and check-run annotations through GitHub REST without requiring `gh`, and now highlights known billing or spending lockouts directly in its output.",
       "Current policy allows local edits, local validation, and explicitly requested git workflows from D:/git/CLI while keeping the parent D:/git repository untouched."
     ],
     "source_of_truth": [
@@ -21,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "github-ci-status-billing-diagnostics-update-20260426-153541",
+      "title": "2026-04-26T15:35:41+09:00: Updated scripts/github_ci_status.py so it hydrates check-run details and annotations, surfaces detected billing, spending, and payment-method blockers in both text and JSON output, updated README.md to describe the richer hosted-CI inspection path, and reran `python3 -m py_compile scripts/github_ci_status.py`, `python3 scripts/github_ci_status.py --help`, and `python3 tests/validate_management_docs.py` successfully while the external GitHub Actions billing block behind `Management Docs` check run 73055365070 in workflow run 24948929328 remained unchanged."
+    },
     {
       "id": "starter-workflow-validator-helper-config-review-batch-pass-20260426-153151",
       "title": "2026-04-26T15:31:51+09:00: Followed AGENTS.md plus the current plan and handoff queue by keeping the GitHub Actions billing or spending issue behind `Management Docs` check run 73055365070 in workflow run 24948929328 as an unchanged external blocker, then sequentially reviewed .github/workflows/ci.yml, cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, and config/cli-starter.json, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, and realigned the next same-sequence candidates to cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, and include/starter/core/tokenize.hpp."
@@ -2119,5 +2123,5 @@
       "description": "Clear the GitHub Actions billing or spending block repeated on `Management Docs` check run 73055365070 in workflow run 24948929328, then confirm with a fresh workflow run that `Management Docs` and the downstream build jobs start normally."
     }
   ],
-  "updated_at": "2026-04-26T15:31:51+09:00"
+  "updated_at": "2026-04-26T15:35:41+09:00"
 }
