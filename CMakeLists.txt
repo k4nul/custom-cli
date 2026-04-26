@@ -38,8 +38,10 @@ add_library(starter_core
     src/commands/echo_command.cpp
     src/commands/hello_command.cpp
     src/commands/register_commands.cpp
+    src/core/completion.cpp
     src/core/config.cpp
     src/core/project_info.cpp
+    src/core/shell_line_reader.cpp
     src/core/tokenize.cpp
 )
 
