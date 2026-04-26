@@ -17,6 +17,7 @@
       "status": "in_progress",
       "related_phase": "implement",
       "notes": [
+        "2026-04-26T11:31:59+09:00: Followed AGENTS.md plus the current plan and handoff queue by first refreshing hosted verification for HEAD commit 53d5793a111efa18f223658e706840dca09b748e with ./scripts/github_ci_status.py and a direct GitHub API annotation query, confirmed push workflow run 24946222190 still concluded `failure` because `Management Docs` job 73048020202 never started and repeated the same billing or spending-limit annotation, then sequentially reviewed src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, treated README.md generic `organization-specific` and migration wording as neutral starter policy language, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, realigned the next same-sequence candidates to docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake, and ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully.",
         "2026-04-26T11:22:42+09:00: Followed AGENTS.md plus the current plan and handoff queue by first refreshing hosted verification for HEAD commit 10b50c0441126b9157685e8a97e88f0511745d34 with ./scripts/github_ci_status.py and a direct GitHub API annotation query, confirmed push workflow run 24946026275 still concluded `failure` because `Management Docs` job 73047534177 never started and repeated the same billing or spending-limit annotation, then sequentially reviewed src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, realigned the next same-sequence candidates to src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, and ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully.",
         "2026-04-26T11:11:01+09:00: Followed AGENTS.md plus the current plan and handoff queue by keeping the GitHub Actions billing or spending issue behind `Management Docs` job 73044809488 as an unchanged external blocker, then sequentially reviewed include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, realigned the next same-sequence candidates to src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, and ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully.",
         "2026-04-26T11:01:20+09:00: Followed AGENTS.md plus the current plan and handoff queue by keeping the GitHub Actions billing or spending issue behind `Management Docs` job 73044809488 as an unchanged external blocker, then sequentially reviewed cmake/project_config.hpp.in, include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, and include/starter/core/tokenize.hpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, realigned the next same-sequence candidates to include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp, and ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully.",
@@ -638,13 +639,13 @@
   "next_actions": [
     {
       "order": 1,
-      "action": "Restore GitHub Actions billing or spending capacity for the repository owner account, then rerun hosted verification with a new push or rerun so the standalone custom-cli workflow can actually start `Management Docs` and downstream build jobs again.",
+      "action": "Restore GitHub Actions billing or spending capacity for the repository owner account, then rerun hosted verification with a new push or rerun so the standalone custom-cli workflow can actually start `Management Docs` job 73048020202 and downstream build jobs again after the latest failing run 24946222190.",
       "owner": "next-operator",
       "exit_signal": "A fresh hosted workflow run starts normally after the billing block is cleared, and docs/management/handoff.yaml records the resulting evidence."
     },
     {
       "order": 2,
-      "action": "Review src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md as the next same-sequence starter-facing candidates for any newly introduced legacy organization-specific traces before each future commit, and rewrite them locally when discovered.",
+      "action": "Review docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake as the next same-sequence starter-facing candidates for any newly introduced legacy organization-specific traces before each future commit, and rewrite them locally when discovered.",
       "owner": "next-operator",
       "exit_signal": "No newly discovered starter-facing file carries legacy organization-specific names, identifiers, or deployment paths."
     },
@@ -659,8 +660,8 @@
     {
       "id": "hosted-actions-billing-blocker",
       "title": "Hosted GitHub Actions jobs cannot start until the account billing or spending issue is cleared",
-      "impact": "The latest hosted verification run never reached repository steps, `Build and Test (${{ matrix.os }})` was skipped behind `needs`, and local validation is the only working verification path in this workspace until billing is restored.",
-      "mitigation": "Fix the failed payment or spending-limit condition reported by the `Management Docs` check-run annotation, then trigger a fresh push or rerun and inspect it with ./scripts/github_ci_status.py before treating hosted CI as healthy again."
+      "impact": "The latest hosted verification run 24946222190 never reached repository steps, `Build and Test (${{ matrix.os }})` was skipped behind `needs`, and local validation is the only working verification path in this workspace until billing is restored.",
+      "mitigation": "Fix the failed payment or spending-limit condition reported by the `Management Docs` check-run 73048020202 annotation, then trigger a fresh push or rerun and inspect it with ./scripts/github_ci_status.py before treating hosted CI as healthy again."
     }
   ],
   "risks": [
@@ -689,5 +690,5 @@
       "mitigation": "Use ./scripts/github_ci_status.py and rely on workflow runs plus check runs for hosted verification instead of treating the legacy combined status endpoint as authoritative."
     }
   ],
-  "updated_at": "2026-04-26T11:22:42+09:00"
+  "updated_at": "2026-04-26T11:31:59+09:00"
 }
