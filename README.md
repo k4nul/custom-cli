@@ -41,6 +41,10 @@ build/cli-starter hello --name "template user"
 build/cli-starter
 ```
 
+In interactive shell mode, press `Tab` to complete a command, subcommand, or option only when
+there is a single match. Press `Tab` twice on the same input to list all matches for the current
+prefix.
+
 ## Repository layout
 
 - `src/`: application wiring, commands, and core helpers

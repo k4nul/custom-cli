@@ -7,8 +7,10 @@
 #include <CLI/CLI.hpp>
 
 #include "starter/commands/registrars.hpp"
+#include "starter/core/completion.hpp"
 #include "starter/core/config.hpp"
 #include "starter/core/exit_code.hpp"
+#include "starter/core/shell_line_reader.hpp"
 #include "starter/core/tokenize.hpp"
 
 namespace starter {
@@ -37,17 +39,7 @@ int Application::dispatch(std::vector<std::string> args, bool interactive_mode) 
     bool shell_requested = false;
 
     CLI::App app(project_info_.display_name + " - generic C++ CLI starter");
-    app.set_help_all_flag("--help-all", "Show help for all subcommands.");
-    app.set_version_flag("--version", project_info_.display_name + " " + project_info_.version);
-    app.add_option("-c,--config", config_path, "Path to the JSON configuration file.");
-
-    auto* shell_command = app.add_subcommand("shell", "Start the interactive shell.");
-    shell_command->callback([&]() {
-        command_executed = true;
-        shell_requested = true;
-    });
-
-    register_builtin_commands(app, project_info_, config_path, out_, err_, command_executed);
+    configure_cli_app(app, config_path, command_executed, shell_requested);
 
     try {
         std::reverse(args.begin(), args.end());
@@ -71,6 +63,24 @@ int Application::dispatch(std::vector<std::string> args, bool interactive_mode) 
     return to_int(ExitCode::success);
 }
 
+void Application::configure_cli_app(
+    CLI::App& app,
+    std::string& config_path,
+    bool& command_executed,
+    bool& shell_requested) {
+    app.set_help_all_flag("--help-all", "Show help for all subcommands.");
+    app.set_version_flag("--version", project_info_.display_name + " " + project_info_.version);
+    app.add_option("-c,--config", config_path, "Path to the JSON configuration file.");
+
+    auto* shell_command = app.add_subcommand("shell", "Start the interactive shell.");
+    shell_command->callback([&]() {
+        command_executed = true;
+        shell_requested = true;
+    });
+
+    register_builtin_commands(app, project_info_, config_path, out_, err_, command_executed);
+}
+
 int Application::run_shell(const std::filesystem::path& config_path) {
     active_shell_config_path_ = config_path.string();
     bool loaded_from_disk = false;
@@ -90,15 +100,29 @@ int Application::run_shell(const std::filesystem::path& config_path) {
         out_ << "Using built-in defaults until " << config_path.generic_string() << " exists.\n";
     }
 
+    std::string completion_config_path = config_path.string();
+    bool completion_command_executed = false;
+    bool completion_shell_requested = false;
+    CLI::App completion_app(project_info_.display_name + " - generic C++ CLI starter");
+    configure_cli_app(
+        completion_app,
+        completion_config_path,
+        completion_command_executed,
+        completion_shell_requested);
+    const auto shell_commands = shell_completion_commands();
+    const auto completion_provider = [&](std::string_view current_line, std::size_t cursor) {
+        return resolve_completion(current_line, cursor, completion_app, shell_commands);
+    };
+    const auto prompt_text = prompt + "> ";
+
     std::string line;
     while (true) {
-        out_ << prompt << "> ";
-        out_.flush();
-
-        if (!std::getline(std::cin, line)) {
+        const auto next_line = read_shell_line(prompt_text, out_, completion_provider);
+        if (!next_line.has_value()) {
             out_ << '\n';
             break;
         }
+        line = *next_line;
 
         if (line.empty()) {
             continue;
@@ -139,6 +163,10 @@ int Application::run_shell(const std::filesystem::path& config_path) {
 
     active_shell_config_path_.clear();
     return to_int(ExitCode::success);
+}
+
+std::vector<std::string> Application::shell_completion_commands() const {
+    return {"help", "exit", "quit"};
 }
 
 }  // namespace starter
