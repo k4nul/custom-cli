@@ -17,6 +17,7 @@
       "status": "in_progress",
       "related_phase": "implement",
       "notes": [
+        "2026-04-26T09:04:35+09:00: After committing and pushing 102a89e from D:/git/CLI, ran ./scripts/github_ci_status.py 102a89e --wait-seconds 30 --poll-interval 5 to refresh hosted verification evidence, observed push workflow run 24943823939 where `Management Docs` concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, and the legacy combined status endpoint still reported `pending` with zero individual statuses, then confirmed that GitHub returned no job steps for the failed job and a 404 `BlobNotFound` response when fetching its log so the hosted-management-docs anomaly now needs direct investigation before the workflow can be treated as healthy.",
         "2026-04-26T09:01:18+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully, and realigned the next same-sequence candidates to include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp.",
         "2026-04-26T08:51:18+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and .github/workflows/ci.yml, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in before the required single end-of-batch `python tests/validate_management_docs.py` validation run.",
         "2026-04-26T08:41:17+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and .github/workflows/ci.yml before the required single end-of-batch `python tests/validate_management_docs.py` validation run.",
@@ -274,6 +275,7 @@
       "status": "in_progress",
       "related_phase": "implement",
       "notes": [
+        "2026-04-26T09:04:35+09:00: After committing and pushing 102a89e from D:/git/CLI, ran ./scripts/github_ci_status.py 102a89e --wait-seconds 30 --poll-interval 5 to refresh hosted verification evidence, observed push workflow run 24943823939 where `Management Docs` concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, and the legacy combined status endpoint still reported `pending` with zero individual statuses, then confirmed that GitHub returned no job steps for the failed job and a 404 `BlobNotFound` response when fetching its log so the hosted-management-docs anomaly now needs direct investigation before the workflow can be treated as healthy.",
         "2026-04-26T09:01:18+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully, and realigned the next same-sequence candidates to include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp.",
         "2026-04-26T08:51:18+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and .github/workflows/ci.yml, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in before the required single end-of-batch `python tests/validate_management_docs.py` validation run.",
         "2026-04-26T08:41:17+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no untracked generated or temporary files needed cleanup, and realigned the next same-sequence candidates to README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and .github/workflows/ci.yml before the required single end-of-batch `python tests/validate_management_docs.py` validation run.",
@@ -622,18 +624,31 @@
   "next_actions": [
     {
       "order": 1,
+      "action": "Investigate why push workflow run 24943823939 on commit 102a89e marked `Management Docs` as `failure` and `Build and Test (${{ matrix.os }})` as `skipped` even though local `python tests/validate_management_docs.py` passed, starting with the missing job-step metadata and the 404 `BlobNotFound` log fetch for job 73041642030.",
+      "owner": "next-operator",
+      "exit_signal": "The hosted CI failure mode is explained or fixed, and docs/management/handoff.yaml records the resulting evidence."
+    },
+    {
+      "order": 2,
       "action": "Review include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp as the next same-sequence starter-facing candidates for any newly introduced legacy organization-specific traces before each future commit, and rewrite them locally when discovered.",
       "owner": "next-operator",
       "exit_signal": "No newly discovered starter-facing file carries legacy organization-specific names, identifiers, or deployment paths."
     },
     {
-      "order": 2,
+      "order": 3,
       "action": "Use ./scripts/github_ci_status.py <commit-sha> after future pushes when hosted verification evidence needs to be refreshed for the standalone custom-cli workflow.",
       "owner": "next-operator",
       "exit_signal": "docs/management/handoff.yaml records any newly needed hosted workflow run and check-run outcomes for the referenced commit."
     }
   ],
-  "blockers": [],
+  "blockers": [
+    {
+      "id": "hosted-management-docs-anomaly",
+      "title": "Hosted `Management Docs` verification failed for commit 102a89e while local validation still passed",
+      "impact": "The repository no longer has a clean hosted verification signal for the latest pushed management-doc update, and downstream build jobs were skipped.",
+      "mitigation": "Inspect workflow run 24943823939 and job 73041642030 to explain the missing step metadata plus 404 log blob, then rerun or fix the workflow before relying on hosted CI again."
+    }
+  ],
   "risks": [
     {
       "id": "legacy-trace-regression",
@@ -660,5 +675,5 @@
       "mitigation": "Use ./scripts/github_ci_status.py and rely on workflow runs plus check runs for hosted verification instead of treating the legacy combined status endpoint as authoritative."
     }
   ],
-  "updated_at": "2026-04-26T09:01:18+09:00"
+  "updated_at": "2026-04-26T09:04:35+09:00"
 }
