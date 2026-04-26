@@ -19,6 +19,7 @@
       "status": "completed",
       "related_phase": "handoff",
       "notes": [
+        "2026-04-26T18:21:58+09:00: Updated .codex/cron-prompt.txt so recurring automation now runs `python3 tests/check_project_completion.py` before any batch work, exits immediately with a no-op report when the completion gate passes, and only continues into the batch-review instructions when that completion-state check fails.",
         "2026-04-26T18:21:14+09:00: Honored the next user-requested spot check after the completion gate by sequentially reviewing cmake/validate_management_docs.cmake, tests/validate_management_docs.py, config/cli-starter.json, cmake/project_config.hpp.in, and include/starter/core/config.hpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits or generated-file cleanup to perform, and realigned the next same-sequence candidates to include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, include/starter/app/application.hpp, and include/starter/commands/registrars.hpp while keeping the repository in completion-gated no-op state unless a later regression or new request reopens work.",
         "2026-04-26T18:13:42+09:00: Added tests/check_project_completion.py plus the validate_project_completion CMake helper and ctest entry so recurring automation can now verify the full project completion state in one command before deciding to no-op and exit.",
         "2026-04-26T18:11:27+09:00: Honored the next user-requested review batch after the documented completion gate by sequentially reviewing tests/config_tests.cpp, README.md, docs/project-overview.md, docs/architecture.md, and docs/migration-from-legacy.md, confirmed through direct fixed-string checks that the batch contains none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, treated the generic `legacy`, `organization-specific`, and `product-specific` wording in the prose docs as neutral starter policy language, found no starter-facing edits or generated-file cleanup to perform, and realigned the next same-sequence candidates to cmake/validate_management_docs.cmake, tests/validate_management_docs.py, config/cli-starter.json, cmake/project_config.hpp.in, and include/starter/core/config.hpp while keeping the repository in completion-gated no-op state unless a later regression or new request reopens work.",
@@ -744,5 +745,5 @@
       "mitigation": "Document the local Linux toolchain requirement in README.md and install CMake before treating configure/build failures as project regressions."
     }
   ],
-  "updated_at": "2026-04-26T18:21:14+09:00"
+  "updated_at": "2026-04-26T18:21:58+09:00"
 }
