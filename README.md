@@ -20,8 +20,6 @@ It includes:
 
 - CMake 3.18 or newer
 - A C++17 compiler
-- Python 3, only for repository management-document validation
-
 On Linux, `cmake`, `g++` or `clang++`, and `ctest` are enough for the normal build and test flow.
 On Windows, use Visual Studio, Build Tools for Visual Studio, or another CMake-supported C++ toolchain.
 
@@ -150,9 +148,9 @@ nested subcommands.
 - `src/core/`: shared helpers such as config loading, tokenization, and completion
 - `include/starter/`: public headers for the starter
 - `config/`: checked-in config template
-- `tests/`: starter tests and repository validation scripts
+- `tests/`: starter behavior tests
 - `third_party/`: vendored header-only dependencies and license files
-- `docs/`: architecture, migration notes, and management docs
+- `docs/`: architecture and migration notes
 
 ## Testing
 
@@ -169,16 +167,6 @@ With multi-config generators, add the configuration:
 ```powershell
 ctest --test-dir build -C Debug -R starter_tests --output-on-failure
 ```
-
-Management-document validation is available for maintainers:
-
-```bash
-python3 tests/validate_management_docs.py
-cmake --build build --target validate_management_docs
-```
-
-The repository also contains completion-gate checks for scheduled maintenance automation. Those are
-documented under `docs/management/` and are separate from the normal starter build/test workflow.
 
 ## Dependencies
 
@@ -215,8 +203,6 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 
 - CMake 3.18 이상
 - C++17 컴파일러
-- Python 3, 저장소 관리 문서 검증이 필요할 때만 사용
-
 Linux에서는 보통 `cmake`, `g++` 또는 `clang++`, `ctest`만 있으면 빌드와 테스트가
 가능합니다. Windows에서는 Visual Studio, Visual Studio Build Tools, 또는 CMake가 지원하는
 C++ 툴체인을 사용하면 됩니다.
@@ -346,9 +332,9 @@ cmake -S . -B build \
 - `src/core/`: 설정 로딩, 토큰화, 자동완성 같은 공통 helper
 - `include/starter/`: 스타터용 public header
 - `config/`: 체크인된 설정 템플릿
-- `tests/`: 스타터 테스트와 저장소 검증 스크립트
+- `tests/`: 스타터 동작 테스트
 - `third_party/`: vendored header-only 의존성과 라이선스 파일
-- `docs/`: 아키텍처, 마이그레이션 노트, 관리 문서
+- `docs/`: 아키텍처와 마이그레이션 노트
 
 ## 테스트
 
@@ -365,17 +351,6 @@ multi-config 생성기를 사용하면 설정 이름을 추가합니다.
 ```powershell
 ctest --test-dir build -C Debug -R starter_tests --output-on-failure
 ```
-
-관리자를 위한 문서 검증도 제공됩니다.
-
-```bash
-python3 tests/validate_management_docs.py
-cmake --build build --target validate_management_docs
-```
-
-저장소에는 정기 유지보수 자동화를 위한 completion-gate 검사도 포함되어 있습니다. 이 검사는
-`docs/management/`에 문서화되어 있으며, 일반적인 스타터 빌드/테스트 흐름과는 분리되어
-있습니다.
 
 ## 의존성
 

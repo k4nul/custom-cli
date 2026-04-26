@@ -9,4 +9,7 @@ config/local.json
 config/*.local.json
 *.user
 *.suo
+AGENTS.md
+.codex/
+docs/management/
 cron-prompt.txt
