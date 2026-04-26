@@ -41,9 +41,9 @@ build/cli-starter hello --name "template user"
 build/cli-starter
 ```
 
-In interactive shell mode, press `Tab` to complete a command, subcommand, or option only when
-there is a single match. Press `Tab` twice on the same input to list all matches for the current
-prefix.
+In interactive shell mode, press `Tab` to complete a command, subcommand, or option when there is
+a single match, or to extend to the longest shared prefix when several matches share one. Press
+`Tab` twice on the same input to list all matches for the current prefix.
 
 ## Repository layout
 

@@ -126,6 +126,36 @@ std::vector<std::string> matching_candidates(
     return matches;
 }
 
+std::string longest_common_prefix(const std::vector<std::string>& candidates) {
+    if (candidates.empty()) {
+        return {};
+    }
+
+    std::string prefix = candidates.front();
+    for (std::size_t index = 1; index < candidates.size(); ++index) {
+        const auto& candidate = candidates[index];
+        std::size_t length = 0;
+        while (length < prefix.size() && length < candidate.size() && prefix[length] == candidate[length]) {
+            ++length;
+        }
+        prefix.resize(length);
+        if (prefix.empty()) {
+            break;
+        }
+    }
+    return prefix;
+}
+
+std::string line_after_replacement(
+    std::string_view line,
+    std::size_t replace_begin,
+    std::size_t replace_end,
+    const std::string& replacement) {
+    std::string updated(line);
+    updated.replace(replace_begin, replace_end - replace_begin, replacement);
+    return updated;
+}
+
 const CLI::App& command_context_for(const CLI::App& app, const std::vector<std::string>& context_tokens) {
     const CLI::App* current = &app;
     for (const auto& token : context_tokens) {
@@ -195,6 +225,20 @@ CompletionAction choose_tab_completion(
         action.kind = CompletionActionKind::replace;
         action.replacement = completion.candidates.front();
         reset_tab_completion(state);
+        return action;
+    }
+
+    const auto shared_prefix = longest_common_prefix(completion.candidates);
+    if (shared_prefix.size() > completion.prefix.size()) {
+        action.kind = CompletionActionKind::replace;
+        action.replacement = shared_prefix;
+
+        state.primed = true;
+        state.line = line_after_replacement(line, completion.replace_begin, completion.replace_end, shared_prefix);
+        state.cursor = completion.replace_begin + shared_prefix.size();
+        state.replace_begin = completion.replace_begin;
+        state.replace_end = state.cursor;
+        state.prefix = shared_prefix;
         return action;
     }
 
