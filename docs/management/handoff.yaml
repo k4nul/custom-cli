@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is now the push workflow snapshot for run 24943823939 on commit 102a89e, where `Management Docs` concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, and GitHub returned no job steps plus a 404 `BlobNotFound` response when the failed job log was requested even though local `python tests/validate_management_docs.py` validation still passed. The latest AGENTS-guided follow-up at 2026-04-26T09:04:35+09:00 recorded that hosted-verification anomaly after the batch that reviewed cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in without needing starter-facing edits.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24943823939 on commit 102a89e, where check-run annotation 73041642030 reported that `Management Docs` was not started because recent account payments failed or the Actions spending limit needs to be increased, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, the job exposed no steps, and the redirected log request failed at blob storage auth even though local `python tests/validate_management_docs.py` validation still passed. The latest AGENTS-guided follow-up at 2026-04-26T09:12:47+09:00 recorded that billing-rooted hosted-verification blocker after the batch that reviewed include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp without needing starter-facing edits.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -21,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "hosted-billing-explanation-and-header-review-batch-pass-20260426-091247",
+      "title": "2026-04-26T09:12:47+09:00: Followed AGENTS.md plus the current plan and handoff queue by first investigating workflow run 24943823939 for commit 102a89e with ./scripts/github_ci_status.py and direct GitHub API queries, confirmed from check-run annotation 73041642030 that `Management Docs` never started because recent account payments failed or the Actions spending limit needs to be increased, explained the empty job-step list and unusable redirected log fetch as effects of the job never receiving a runner, then sequentially reviewed include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, deleted the generated scripts/__pycache__/ directory, found no starter-facing edits to make in the reviewed files, realigned the next same-sequence candidates to include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp, and ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully."
+    },
     {
       "id": "hosted-verification-refresh-102a89e-20260426-090435",
       "title": "2026-04-26T09:04:35+09:00: After committing and pushing 102a89e from D:/git/CLI, ran ./scripts/github_ci_status.py 102a89e --wait-seconds 30 --poll-interval 5, observed push workflow run 24943823939 with `Management Docs` concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, and the legacy combined status endpoint still reporting `pending` with zero individual statuses, then confirmed that GitHub returned no job steps for failed job 73041642030 and a 404 `BlobNotFound` response when fetching its job log."
@@ -1906,24 +1910,24 @@
     {
       "id": "local-validation",
       "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction",
-      "next_step": "Investigate why workflow run 24943823939 reported `Management Docs` as `failure` with no job steps and a 404 `BlobNotFound` log fetch even though local `python tests/validate_management_docs.py` passed, then continue running the direct local validation command at the end of each batch."
+      "next_step": "Wait for the GitHub account billing or spending issue behind check-run annotation 73041642030 to be cleared, then refresh hosted verification on a new push or rerun while continuing the direct local validation command at the end of each batch."
     },
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The latest same-sequence batch reviewed cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in without needing edits; if another same-sequence sweep is requested, continue with include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp."
+      "next_step": "The latest same-sequence batch reviewed include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp without needing edits; if another same-sequence sweep is requested, continue with include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
-      "action": "Investigate workflow run 24943823939 for commit 102a89e, focusing on why `Management Docs` failed without step metadata and why the log download for job 73041642030 returned 404 `BlobNotFound`.",
-      "why": "The latest push replaced the last known-green hosted evidence with a failing run, so restoring an explainable verification signal now matters more than continuing the next same-sequence content sweep."
+      "action": "Restore the repository owner's GitHub Actions billing or spending capacity, then trigger a new push or rerun and inspect it with ./scripts/github_ci_status.py.",
+      "why": "Check-run annotation 73041642030 showed the `Management Docs` job never started because of an external billing or spending block, so a clean hosted signal cannot return until that account-level issue is cleared."
     },
     {
       "order": 2,
-      "action": "If another same-sequence sweep is requested after the hosted-verification anomaly is understood, review include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed cmake/validate_management_docs.cmake, tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, and cmake/project_config.hpp.in, found no edits to make, and advanced the concrete same-sequence queue to the next public-header and application-header set."
+      "action": "If another same-sequence sweep is requested after the hosted billing issue is cleared or deferred, review include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp, found no edits to make, and advanced the concrete same-sequence queue to the registrar, entrypoint, application, and command-registration set."
     },
     {
       "order": 3,
@@ -1960,8 +1964,8 @@
   "verification_pending": [
     {
       "id": "hosted-management-docs-run-24943823939",
-      "description": "Explain or fix why workflow run 24943823939 on commit 102a89e reported `Management Docs` as `failure`, skipped the downstream build job, exposed no job-step metadata, and returned 404 `BlobNotFound` when job 73041642030 logs were requested."
+      "description": "Clear the GitHub Actions billing or spending block reported by check-run annotation 73041642030, then confirm with a fresh workflow run that `Management Docs` and the downstream build jobs start normally."
     }
   ],
-  "updated_at": "2026-04-26T09:04:35+09:00"
+  "updated_at": "2026-04-26T09:12:47+09:00"
 }
