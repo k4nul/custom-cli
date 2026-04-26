@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is now the push workflow snapshot for run 24946026275 on commit 10b50c0441126b9157685e8a97e88f0511745d34, where `Management Docs` job 73047534177 concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, the job exposed no steps, and the check-run annotation repeated that recent account payments failed or the Actions spending limit needs to be increased even though local `python tests/validate_management_docs.py` validation still passed. The latest AGENTS-guided follow-up at 2026-04-26T11:22:42+09:00 kept that billing-rooted hosted-verification blocker in place after the batch that refreshed the latest hosted evidence, reviewed src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, validated successfully, and still found no starter-facing edits to make.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is now the push workflow snapshot for run 24946222190 on commit 53d5793a111efa18f223658e706840dca09b748e, where `Management Docs` job 73048020202 concluded `failure`, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, and the check-run annotation repeated that recent account payments failed or the Actions spending limit needs to be increased even though local `python tests/validate_management_docs.py` validation still passed. The latest AGENTS-guided follow-up at 2026-04-26T11:31:59+09:00 kept that billing-rooted hosted-verification blocker in place after the batch that refreshed the latest hosted evidence, reviewed src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, validated successfully, and still found no starter-facing edits to make.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -21,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "hosted-refresh-and-core-readme-review-batch-pass-20260426-113159",
+      "title": "2026-04-26T11:31:59+09:00: Followed AGENTS.md plus the current plan and handoff queue by first refreshing hosted verification for HEAD commit 53d5793a111efa18f223658e706840dca09b748e with ./scripts/github_ci_status.py and a direct GitHub API annotation query, confirmed push workflow run 24946222190 still concluded `failure` because `Management Docs` job 73048020202 never started and repeated the same billing or spending-limit annotation, then sequentially reviewed src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, treated README.md generic `organization-specific` and migration wording as neutral starter policy language, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, realigned the next same-sequence candidates to docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake, and ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully."
+    },
     {
       "id": "hosted-refresh-and-command-review-batch-pass-20260426-112242",
       "title": "2026-04-26T11:22:42+09:00: Followed AGENTS.md plus the current plan and handoff queue by first refreshing hosted verification for HEAD commit 10b50c0441126b9157685e8a97e88f0511745d34 with ./scripts/github_ci_status.py and a direct GitHub API annotation query, confirmed push workflow run 24946026275 still concluded `failure` because `Management Docs` job 73047534177 never started and repeated the same billing or spending-limit annotation, then sequentially reviewed src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, realigned the next same-sequence candidates to src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, and ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully."
@@ -1962,24 +1966,24 @@
     {
       "id": "local-validation",
       "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction",
-      "next_step": "Wait for the GitHub account billing or spending issue behind `Management Docs` job 73047534177 in workflow run 24946026275 to be cleared, then refresh hosted verification on a new push or rerun while continuing the direct local validation command at the end of each batch."
+      "next_step": "Wait for the GitHub account billing or spending issue behind `Management Docs` job 73048020202 in workflow run 24946222190 to be cleared, then refresh hosted verification on a new push or rerun while continuing the direct local validation command at the end of each batch."
     },
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The latest same-sequence batch reviewed src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp without needing edits; if another same-sequence sweep is requested, continue with src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md."
+      "next_step": "The latest same-sequence batch reviewed src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md without needing edits; if another same-sequence sweep is requested, continue with docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake."
     }
   ],
   "next_recommended": [
     {
       "order": 1,
       "action": "Restore the repository owner's GitHub Actions billing or spending capacity, then trigger a new push or rerun and inspect it with ./scripts/github_ci_status.py.",
-      "why": "Workflow run 24946026275 repeated the same billing or spending block on `Management Docs` job 73047534177, so a clean hosted signal cannot return until that account-level issue is cleared."
+      "why": "Workflow run 24946222190 repeated the same billing or spending block on `Management Docs` job 73048020202, so a clean hosted signal cannot return until that account-level issue is cleared."
     },
     {
       "order": 2,
-      "action": "If another same-sequence sweep is requested after the hosted billing issue is cleared or deferred, review src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, found no edits to make, and advanced the concrete same-sequence queue to the core, test, and README set."
+      "action": "If another same-sequence sweep is requested after the hosted billing issue is cleared or deferred, review docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, found no edits to make, and advanced the concrete same-sequence queue to the prose-doc and workflow-support set."
     },
     {
       "order": 3,
@@ -2015,9 +2019,9 @@
   ],
   "verification_pending": [
     {
-      "id": "hosted-management-docs-run-24946026275",
-      "description": "Clear the GitHub Actions billing or spending block repeated on `Management Docs` job 73047534177 in workflow run 24946026275, then confirm with a fresh workflow run that `Management Docs` and the downstream build jobs start normally."
+      "id": "hosted-management-docs-run-24946222190",
+      "description": "Clear the GitHub Actions billing or spending block repeated on `Management Docs` job 73048020202 in workflow run 24946222190, then confirm with a fresh workflow run that `Management Docs` and the downstream build jobs start normally."
     }
   ],
-  "updated_at": "2026-04-26T11:22:42+09:00"
+  "updated_at": "2026-04-26T11:31:59+09:00"
 }
