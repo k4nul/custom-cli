@@ -3,11 +3,11 @@
   "current_phase": "implement",
   "goal": {
     "title": "Carry the accepted CLI starter direction without reintroducing legacy traces",
-    "summary": "Use schema-backed management files as the source of truth while treating D:/git/CLI as the standalone CLI starter delivery repository inside the broader D:/git workspace, with git operations scoped to D:/git/CLI when explicitly needed.",
+    "summary": "Use schema-backed management files as the source of truth while treating D:/git/CLI as the standalone CLI starter delivery repository inside the broader D:/git workspace, with verification scoped to local Linux commands rather than repo-local GitHub Actions.",
     "success_criteria": [
       "Management rules live under docs/management/*.yaml with matching schemas.",
       "Starter-facing docs and metadata remain free of legacy organization-specific names, identifiers, and deployment paths.",
-      "Plan, handoff, AGENTS, and policy docs reflect the accepted standalone-repository direction and scoped git workflows."
+      "Plan, handoff, AGENTS, and policy docs reflect the accepted standalone-repository direction and Linux-only local verification scope."
     ]
   },
   "active_items": [
@@ -17,6 +17,7 @@
       "status": "in_progress",
       "related_phase": "implement",
       "notes": [
+        "2026-04-26T16:17:16+09:00: Accepted D14 to remove repo-local GitHub Actions and switch the starter to Linux-only local verification, updated README.md plus management records to describe the new baseline, deleted .github/workflows/ci.yml and scripts/github_ci_status.py, and confirmed `python3 tests/validate_management_docs.py`, `cmake -S . -B /tmp/custom-cli-build -DCLI_STARTER_BUILD_TESTS=ON`, `cmake --build /tmp/custom-cli-build`, and `ctest --test-dir /tmp/custom-cli-build --output-on-failure` all succeeded with g++ 11.4.0 and CMake 4.3.2.",
         "2026-04-26T16:10:43+09:00: Followed AGENTS.md plus the current plan and handoff queue by keeping the GitHub Actions billing or spending issue behind `Management Docs` check run 73059227319 in workflow run 24950353261 as an unchanged external blocker, then sequentially reviewed src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, treated the generic `organization-specific` wording in README.md as neutral starter policy language, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully, and realigned the next same-sequence candidates to docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake.",
         "2026-04-26T16:01:02+09:00: Followed AGENTS.md plus the current plan and handoff queue by keeping the GitHub Actions billing or spending issue behind `Management Docs` check run 73059227319 in workflow run 24950353261 as an unchanged external blocker, then sequentially reviewed src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully, and realigned the next same-sequence candidates to src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, tests/config_tests.cpp, and README.md.",
         "2026-04-26T15:51:02+09:00: Followed AGENTS.md plus the current plan and handoff queue by keeping the GitHub Actions billing or spending issue behind `Management Docs` check run 73059227319 in workflow run 24950353261 as an unchanged external blocker, then sequentially reviewed include/starter/app/application.hpp, include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, and src/commands/register_commands.cpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully, and realigned the next same-sequence candidates to src/commands/about_command.cpp, src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, and src/commands/hello_command.cpp.",
@@ -664,6 +665,7 @@
       "related_phase": "plan",
       "notes": [
         "2026-04-18: Accepted D13 to treat D:/git/CLI as the standalone CLI starter repository, reconnect hosted verification under D:/git/CLI/.github/workflows/ci.yml, and resume git workflows within D:/git/CLI.",
+        "2026-04-26: Accepted D14 to remove repo-local GitHub Actions, drop Windows and hosted verification from the starter contract, and treat Linux-only local validation as the supported baseline.",
         "The broader D:/git repository remains separate and should not receive CLI starter remote or history changes."
       ]
     }
@@ -671,31 +673,24 @@
   "next_actions": [
     {
       "order": 1,
-      "action": "Restore GitHub Actions billing or spending capacity for the repository owner account, then rerun hosted verification with a new push or rerun so the standalone custom-cli workflow can actually start `Management Docs` check run 73059227319 and downstream build jobs again after the latest failing run 24950353261.",
+      "action": "Use the local Linux verification sequence after future starter-facing edits: run `python3 tests/validate_management_docs.py`, configure/build with CMake, and run `ctest` before treating the change set as verified.",
       "owner": "next-operator",
-      "exit_signal": "A fresh hosted workflow run starts normally after the billing block is cleared, and docs/management/handoff.yaml records the resulting evidence."
+      "exit_signal": "Management-doc validation, local configure/build, and local `ctest` all succeed on the edited tree."
     },
     {
       "order": 2,
-      "action": "Review docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, .github/workflows/ci.yml, and cmake/validate_management_docs.cmake as the next same-sequence repository-owned candidates for any newly introduced legacy organization-specific traces before each future commit, and rewrite them locally when discovered.",
+      "action": "Review docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, cmake/validate_management_docs.cmake, and tests/validate_management_docs.py as the next same-sequence repository-owned candidates for any newly introduced legacy organization-specific traces before each future commit, and rewrite them locally when discovered.",
       "owner": "next-operator",
       "exit_signal": "No newly discovered starter-facing file carries legacy organization-specific names, identifiers, or deployment paths."
     },
     {
       "order": 3,
-      "action": "Use ./scripts/github_ci_status.py <commit-sha> after future pushes when hosted verification evidence needs to be refreshed for the standalone custom-cli workflow.",
+      "action": "If a future operator wants to restore Windows verification or hosted automation, record a new accepted decision before reintroducing any repo-local workflow or GitHub-specific helper.",
       "owner": "next-operator",
-      "exit_signal": "docs/management/handoff.yaml records any newly needed hosted workflow run and check-run outcomes for the referenced commit."
+      "exit_signal": "docs/management/decisions.yaml records the renewed scope before any hosted or cross-platform verification path is added back."
     }
   ],
-  "blockers": [
-    {
-      "id": "hosted-actions-billing-blocker",
-      "title": "Hosted GitHub Actions jobs cannot start until the account billing or spending issue is cleared",
-      "impact": "The latest hosted verification run 24950353261 never reached repository steps, `Build and Test (${{ matrix.os }})` was skipped behind `needs`, and local validation is the only working verification path in this workspace until billing is restored.",
-      "mitigation": "Fix the failed payment or spending-limit condition reported by the `Management Docs` check-run 73059227319 annotation, then trigger a fresh push or rerun and inspect it with ./scripts/github_ci_status.py before treating hosted CI as healthy again."
-    }
-  ],
+  "blockers": [],
   "risks": [
     {
       "id": "legacy-trace-regression",
@@ -716,11 +711,17 @@
       "mitigation": "Keep the delivery boundary explicit in AGENTS.md, agent-policy.yaml, plan.yaml, and handoff.yaml, and run CLI starter git commands only from D:/git/CLI."
     },
     {
-      "id": "legacy-status-endpoint-gap",
-      "title": "GitHub's legacy combined status endpoint can stay `pending` even when private Actions check runs have already succeeded",
+      "id": "linux-only-scope-drift",
+      "title": "Future edits could accidentally reintroduce cross-platform or hosted-CI claims after the Linux-only decision",
       "severity": "medium",
-      "mitigation": "Use ./scripts/github_ci_status.py and rely on workflow runs plus check runs for hosted verification instead of treating the legacy combined status endpoint as authoritative."
+      "mitigation": "Keep README.md and management files explicit that the supported verification baseline is local Linux only unless a later accepted decision expands scope again."
+    },
+    {
+      "id": "local-toolchain-bootstrap",
+      "title": "Fresh Linux environments may still lack CMake on PATH even though the current workspace now has it installed",
+      "severity": "medium",
+      "mitigation": "Document the local Linux toolchain requirement in README.md and install CMake before treating configure/build failures as project regressions."
     }
   ],
-  "updated_at": "2026-04-26T15:51:02+09:00"
+  "updated_at": "2026-04-26T16:17:16+09:00"
 }
