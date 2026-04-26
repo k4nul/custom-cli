@@ -4,11 +4,10 @@
 
 - `src/app/`: application lifecycle and dispatch flow
 - `src/commands/`: command implementations and registrar wiring
-- `src/core/`: shared helpers such as config loading and tokenization
+- `src/core/`: shared helpers such as config loading, tokenization, and completion
 - `include/starter/`: public headers for the starter
 - `config/`: default config template location
 - `tests/`: starter behavior tests
-- `docs/management/`: schema-backed operational state and repository rules
 - `third_party/`: vendored header-only dependencies and license texts
 
 ## Core Components
