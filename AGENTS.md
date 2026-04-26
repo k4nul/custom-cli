@@ -36,6 +36,13 @@ This repository is a generic C++ CLI starter. It is meant to be copied, renamed,
 - Schema definitions for management files: [docs/management/schema/](docs/management/schema)
 - Current direction: keep removing remaining legacy organization-specific traces, treat `D:/git/CLI` as the maintained starter scope and standalone delivery repository inside the broader `D:/git` workspace, and run CLI starter git workflows from `D:/git/CLI` under the accepted direction recorded in [docs/management/decisions.yaml](docs/management/decisions.yaml)
 
+## Completion Gate
+
+- Project exit criteria live in [docs/management/plan.yaml](docs/management/plan.yaml) `goal.success_criteria` and [docs/management/agent-policy.yaml](docs/management/agent-policy.yaml) `completion_policy`
+- Before any scheduled or recurring automation pass, evaluate that completion gate first
+- If all project exit criteria already hold, do not inspect new batches or edit tracked files; send the requested completion notice when a mail connector is available, then exit immediately
+- Reopen work only when a new user request arrives, a blocker reappears, verification fails, or a later accepted decision expands scope
+
 ## Verification
 
 - Verification source of truth: [docs/management/verification.yaml](docs/management/verification.yaml)
