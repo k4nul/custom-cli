@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. Accepted decision D13 still treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate, but accepted decision D14 now removes repo-local GitHub Actions and narrows verification to Linux-only local commands. As of 2026-04-26T16:17:16+09:00, repo-local .github/workflows/ci.yml and scripts/github_ci_status.py were deleted, per-user CMake 4.3.2 is available on PATH at /home/k4nul/.local/bin/cmake, GNU Make and g++ 11.4.0 are available, and local verification succeeded with `python3 tests/validate_management_docs.py`, `cmake -S . -B /tmp/custom-cli-build -DCLI_STARTER_BUILD_TESTS=ON`, `cmake --build /tmp/custom-cli-build`, and `ctest --test-dir /tmp/custom-cli-build --output-on-failure`. As of 2026-04-26T17:20:56+09:00, the same-sequence review of README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and cmake/validate_management_docs.cmake found no newly introduced legacy traces, the required single end-of-batch `python tests/validate_management_docs.py` validation succeeded, and the next same-sequence candidates are tests/validate_management_docs.py, config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, and include/starter/core/exit_code.hpp.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. Accepted decision D13 still treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate, but accepted decision D14 now removes repo-local GitHub Actions and narrows verification to Linux-only local commands. As of 2026-04-26T16:17:16+09:00, repo-local .github/workflows/ci.yml and scripts/github_ci_status.py were deleted, per-user CMake 4.3.2 is available on PATH at /home/k4nul/.local/bin/cmake, GNU Make and g++ 11.4.0 are available, and local verification succeeded with `python3 tests/validate_management_docs.py`, `cmake -S . -B /tmp/custom-cli-build -DCLI_STARTER_BUILD_TESTS=ON`, `cmake --build /tmp/custom-cli-build`, and `ctest --test-dir /tmp/custom-cli-build --output-on-failure`. As of 2026-04-26T17:31:20+09:00, the same-sequence review of tests/validate_management_docs.py, config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, and include/starter/core/exit_code.hpp found no newly introduced legacy traces, the required single end-of-batch `python tests/validate_management_docs.py` validation succeeded, and the next same-sequence candidates are include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, and src/main.cpp.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -22,6 +22,10 @@
     ]
   },
   "done": [
+    {
+      "id": "starter-validator-template-config-exitcode-review-batch-pass-20260426-173120",
+      "title": "2026-04-26T17:31:20+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing tests/validate_management_docs.py, config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, and include/starter/core/exit_code.hpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully, and realigned the next same-sequence candidates to include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, and src/main.cpp."
+    },
     {
       "id": "starter-readme-docs-validator-review-batch-pass-20260426-172056",
       "title": "2026-04-26T17:20:56+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and cmake/validate_management_docs.cmake, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, treated the generic `legacy`, `organization-specific`, and `product-specific` wording in the prose docs as neutral starter policy language, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully, and realigned the next same-sequence candidates to tests/validate_management_docs.py, config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, and include/starter/core/exit_code.hpp."
@@ -2107,12 +2111,12 @@
     {
       "id": "local-validation",
       "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction and Linux-only verification scope",
-      "next_step": "Run the local Linux validation sequence after future starter-facing edits: `python3 tests/validate_management_docs.py`, CMake configure/build, and `ctest`."
+      "next_step": "Run the local Linux validation sequence after future starter-facing edits: `python3 tests/validate_management_docs.py`, CMake configure/build, and `ctest`; for the current 10-minute same-sequence loop, continue next from `include/starter/core/project_info.hpp` and stop only when the queue would cycle back to `tests/validate_management_docs.py`, no batch in that pass required edits, and the ending `python3 tests/validate_management_docs.py` run succeeds."
     },
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The latest same-sequence batch reviewed src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp without needing edits; if another same-sequence sweep is requested, continue with README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and cmake/validate_management_docs.cmake while keeping Linux-only wording intact."
+      "next_step": "The latest same-sequence batch reviewed tests/validate_management_docs.py, config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, and include/starter/core/exit_code.hpp without needing edits; continue next with `include/starter/core/project_info.hpp`, `include/starter/core/tokenize.hpp`, `include/starter/app/application.hpp`, `include/starter/commands/registrars.hpp`, and `src/main.cpp`, and stop the recurring loop only after one full clean pass from the original queue head closes back on `tests/validate_management_docs.py` with no edits needed."
     }
   ],
   "next_recommended": [
@@ -2123,8 +2127,8 @@
     },
     {
       "order": 2,
-      "action": "If another same-sequence sweep is requested, review README.md, docs/project-overview.md, docs/architecture.md, docs/migration-from-legacy.md, and cmake/validate_management_docs.cmake for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed src/commands/hello_command.cpp, src/core/config.cpp, src/core/project_info.cpp, src/core/tokenize.cpp, and tests/config_tests.cpp, found no edits to make, and advanced the concrete same-sequence queue to the next README, docs, and validator-support files."
+      "action": "For the current 10-minute loop, continue from `include/starter/core/project_info.hpp` through the remaining repository-owned starter-facing batches in order, and then stop once the queue would cycle back to `tests/validate_management_docs.py` with no edits required in that full pass.",
+      "why": "That makes the stop condition explicit: one contiguous clean pass from the current queue head, plus a successful ending `python3 tests/validate_management_docs.py` run, is enough to end the recurring sweep instead of looping forever."
     },
     {
       "order": 3,
@@ -2165,5 +2169,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-26T17:20:56+09:00"
+  "updated_at": "2026-04-26T17:32:29+09:00"
 }
