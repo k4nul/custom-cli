@@ -20,6 +20,10 @@
     {
       "id": "subagent-small-disabled",
       "description": "agent-policy.yaml keeps small.allowed set to false."
+    },
+    {
+      "id": "automation-stop-rule-documented",
+      "description": "AGENTS.md and agent-policy.yaml explicitly require scheduled or recurring automation to no-op and exit immediately when the project exit criteria are already satisfied."
     }
   ],
   "phase_checks": [
@@ -93,6 +97,10 @@
     {
       "id": "remaining-gaps-documented",
       "description": "Any missing toolchain or runtime validation is recorded in plan.yaml and handoff.yaml."
+    },
+    {
+      "id": "project-exit-criteria-aligned",
+      "description": "plan.yaml goal.success_criteria and agent-policy.yaml completion_policy describe the same project completion gate."
     }
   ]
 }

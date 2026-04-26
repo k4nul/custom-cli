@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. Accepted decision D13 still treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate, but accepted decision D14 now removes repo-local GitHub Actions and narrows verification to Linux-only local commands. As of 2026-04-26T16:17:16+09:00, repo-local .github/workflows/ci.yml and scripts/github_ci_status.py were deleted, per-user CMake 4.3.2 is available on PATH at /home/k4nul/.local/bin/cmake, GNU Make and g++ 11.4.0 are available, and local verification succeeded with `python3 tests/validate_management_docs.py`, `cmake -S . -B /tmp/custom-cli-build -DCLI_STARTER_BUILD_TESTS=ON`, `cmake --build /tmp/custom-cli-build`, and `ctest --test-dir /tmp/custom-cli-build --output-on-failure`. As of 2026-04-26T17:41:20+09:00, the same-sequence review of include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, and src/main.cpp found no newly introduced legacy traces, and the next same-sequence candidates are src/app/application.cpp, src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, and src/commands/doctor_command.cpp.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. Accepted decision D13 still treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate, while accepted decision D14 removes repo-local GitHub Actions and narrows verification to Linux-only local commands. Repo-local .github/workflows/ci.yml and scripts/github_ci_status.py are absent, per-user CMake 4.3.2 is available on PATH at /home/k4nul/.local/bin/cmake, GNU Make and g++ 11.4.0 are available, and the current tree satisfies the documented project completion gate: management-doc validation passes, local Linux configure/build/ctest pass, starter-facing content remains neutral, and `blockers` is empty. Scheduled or recurring automation must therefore evaluate that gate first and exit immediately without new repository work whenever the same criteria still hold, sending a requested completion notice when a mail connector is available.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -22,6 +22,18 @@
     ]
   },
   "done": [
+    {
+      "id": "project-exit-criteria-confirmed-20260426-175420",
+      "title": "2026-04-26T17:54:20+09:00: Reconfirmed that the current tree satisfies the documented project completion gate by rerunning `python3 tests/validate_management_docs.py`, rebuilding the existing `/tmp/custom-cli-build-final` tree that had been configured with `cmake -S . -B /tmp/custom-cli-build-final -DCLI_STARTER_BUILD_TESTS=ON` via `cmake --build /tmp/custom-cli-build-final`, rerunning `ctest --test-dir /tmp/custom-cli-build-final --output-on-failure`, and rechecking that `.github/workflows/ci.yml` plus `scripts/github_ci_status.py` remain absent while `blockers` stays empty."
+    },
+    {
+      "id": "completion-gate-user-requested-spot-check-noop-20260426-175140",
+      "title": "2026-04-26T17:51:40+09:00: Honored a user-requested one-batch spot check after the completion gate was documented by sequentially reviewing src/app/application.cpp, src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, and src/commands/doctor_command.cpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits or generated-file cleanup to perform, and kept the repository in completion-gated no-op state unless a later regression or new request reopens work."
+    },
+    {
+      "id": "project-completion-gate-and-automation-noop-policy-20260426-175030",
+      "title": "2026-04-26T17:50:30+09:00: Updated AGENTS.md, agent-policy.yaml, verification.yaml, plan.yaml, and handoff.yaml so the project exit criteria are explicit, scheduled or recurring automation must evaluate those criteria before any work, and a satisfied completion gate now requires an immediate no-op exit plus a requested completion email when a mail connector is available."
+    },
     {
       "id": "starter-projectinfo-tokenize-application-registrar-entrypoint-review-batch-pass-20260426-174120",
       "title": "2026-04-26T17:41:20+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, include/starter/app/application.hpp, include/starter/commands/registrars.hpp, and src/main.cpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, and realigned the next same-sequence candidates to src/app/application.cpp, src/commands/register_commands.cpp, src/commands/about_command.cpp, src/commands/config_command.cpp, and src/commands/doctor_command.cpp."
@@ -2111,36 +2123,20 @@
       "title": "2026-04-20T12:02:09+09:00: Followed AGENTS.md plus the current plan and handoff queue by sequentially reviewing tests/validate_management_docs.py, scripts/github_ci_status.py, config/cli-starter.json, cmake/project_config.hpp.in, and include/starter/core/config.hpp, confirmed those validation-support, workflow-inspection, starter-template, and public-header files still avoid newly introduced legacy organization-specific names, identifiers, and deployment paths, found no edits needed after a direct string-pattern check for legacy-specific traces, and queued include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, include/starter/app/application.hpp, and include/starter/commands/registrars.hpp as the next same-sequence candidates before the requested end-of-batch validation run."
     }
   ],
-  "in_progress": [
-    {
-      "id": "local-validation",
-      "title": "Keep management docs and starter-facing docs aligned with the accepted standalone-repository direction and Linux-only verification scope",
-      "next_step": "Run the local Linux validation sequence after future starter-facing edits: `python3 tests/validate_management_docs.py`, CMake configure/build, and `ctest`; for the current 10-minute same-sequence loop, continue next from `include/starter/core/project_info.hpp` and stop only when the queue would cycle back to `tests/validate_management_docs.py`, no batch in that pass required edits, and the ending `python3 tests/validate_management_docs.py` run succeeds; treat the broader Linux-only transition and cleanup effort as finished only after that loop stop condition is met, the final local Linux verification sequence still passes, `.github/workflows/ci.yml` plus `scripts/github_ci_status.py` remain absent under D14, and no blockers reopen."
-    },
-    {
-      "id": "legacy-trace-removal",
-      "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The latest same-sequence batch reviewed tests/validate_management_docs.py, config/cli-starter.json, cmake/project_config.hpp.in, include/starter/core/config.hpp, and include/starter/core/exit_code.hpp without needing edits; continue next with `include/starter/core/project_info.hpp`, `include/starter/core/tokenize.hpp`, `include/starter/app/application.hpp`, `include/starter/commands/registrars.hpp`, and `src/main.cpp`, and stop the recurring loop only after one full clean pass from the original queue head closes back on `tests/validate_management_docs.py` with no edits needed."
-    }
-  ],
+  "in_progress": [],
   "next_recommended": [
     {
       "order": 1,
-      "action": "Use the local Linux verification sequence after future edits: `python3 tests/validate_management_docs.py`, `cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON`, `cmake --build build`, and `ctest --test-dir build --output-on-failure`.",
-      "why": "Accepted decision D14 removed repo-local GitHub Actions and makes local Linux validation the supported verification baseline."
+      "action": "At the start of any scheduled or recurring automation pass, evaluate the project exit criteria first; if they still all hold, do no repository work, send the requested completion notice when a mail connector is available, and exit immediately.",
+      "why": "The project now has an explicit completion gate, and recurring automation should no-op instead of reopening completed work when that gate is already satisfied."
     },
     {
       "order": 2,
-      "action": "For the current 10-minute loop, continue from `include/starter/core/project_info.hpp` through the remaining repository-owned starter-facing batches in order, and then stop once the queue would cycle back to `tests/validate_management_docs.py` with no edits required in that full pass.",
-      "why": "That makes the stop condition explicit: one contiguous clean pass from the current queue head, plus a successful ending `python3 tests/validate_management_docs.py` run, is enough to end the recurring sweep instead of looping forever."
+      "action": "If a new request, reopened blocker, verification regression, or accepted scope-expansion decision appears later, reopen only that work and close it again by satisfying the same project exit criteria.",
+      "why": "That keeps future work bounded while preserving a single consistent definition of project completion."
     },
     {
       "order": 3,
-      "action": "Treat the broader direction-change work as complete only after the recurring sweep has already reached its stop condition, the final local Linux verification sequence still passes, repo-local GitHub Actions plus the GitHub-specific helper remain absent, and `blockers` stays empty.",
-      "why": "That separates `loop stop` from `overall completion`: the sweep ending alone is not enough unless the final Linux-only verification baseline remains green and the D14 scope stays intact."
-    },
-    {
-      "order": 4,
       "action": "If a future operator wants to restore Windows verification or hosted automation, record a new accepted decision before reintroducing any repo-local workflow or GitHub-specific helper.",
       "why": "Accepted decision D14 intentionally narrows the supported verification contract to local Linux only."
     }
@@ -2178,5 +2174,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-26T17:41:20+09:00"
+  "updated_at": "2026-04-26T17:55:22+09:00"
 }
