@@ -101,6 +101,10 @@
     {
       "id": "project-exit-criteria-aligned",
       "description": "plan.yaml goal.success_criteria and agent-policy.yaml completion_policy describe the same project completion gate."
+    },
+    {
+      "id": "project-completion-state-script",
+      "description": "tests/check_project_completion.py confirms the current repository state satisfies the documented project completion gate and recurring-automation no-op policy."
     }
   ]
 }

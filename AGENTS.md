@@ -39,7 +39,7 @@ This repository is a generic C++ CLI starter. It is meant to be copied, renamed,
 ## Completion Gate
 
 - Project exit criteria live in [docs/management/plan.yaml](docs/management/plan.yaml) `goal.success_criteria` and [docs/management/agent-policy.yaml](docs/management/agent-policy.yaml) `completion_policy`
-- Before any scheduled or recurring automation pass, evaluate that completion gate first
+- Before any scheduled or recurring automation pass, run `python3 tests/check_project_completion.py` to evaluate that completion gate first
 - If all project exit criteria already hold, do not inspect new batches or edit tracked files; send the requested completion notice when a mail connector is available, then exit immediately
 - Reopen work only when a new user request arrives, a blocker reappears, verification fails, or a later accepted decision expands scope
 

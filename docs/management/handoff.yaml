@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. Accepted decision D13 still treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate, while accepted decision D14 removes repo-local GitHub Actions and narrows verification to Linux-only local commands. Repo-local .github/workflows/ci.yml and scripts/github_ci_status.py are absent, per-user CMake 4.3.2 is available on PATH at /home/k4nul/.local/bin/cmake, GNU Make and g++ 11.4.0 are available, and the current tree satisfies the documented project completion gate: management-doc validation passes, local Linux configure/build/ctest pass, starter-facing content remains neutral, and `blockers` is empty. Scheduled or recurring automation must therefore evaluate that gate first and exit immediately without new repository work whenever the same criteria still hold, sending a requested completion notice when a mail connector is available.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. Accepted decision D13 still treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate, while accepted decision D14 removes repo-local GitHub Actions and narrows verification to Linux-only local commands. Repo-local .github/workflows/ci.yml and scripts/github_ci_status.py are absent, per-user CMake 4.3.2 is available on PATH at /home/k4nul/.local/bin/cmake, GNU Make and g++ 11.4.0 are available, and the current tree satisfies the documented project completion gate: management-doc validation passes, local Linux configure/build/ctest pass, starter-facing content remains neutral, and `blockers` is empty. Scheduled or recurring automation must therefore run `python3 tests/check_project_completion.py` first and exit immediately without new repository work whenever the same criteria still hold, sending a requested completion notice when a mail connector is available.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -22,6 +22,14 @@
     ]
   },
   "done": [
+    {
+      "id": "completion-gate-user-requested-spot-check-noop-20260426-182114",
+      "title": "2026-04-26T18:21:14+09:00: Honored the next user-requested spot check after the completion gate by sequentially reviewing cmake/validate_management_docs.cmake, tests/validate_management_docs.py, config/cli-starter.json, cmake/project_config.hpp.in, and include/starter/core/config.hpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits or generated-file cleanup to perform, and kept the repository in completion-gated no-op state while realigning the next same-sequence candidates to include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, include/starter/app/application.hpp, and include/starter/commands/registrars.hpp unless a later regression or new request reopens work."
+    },
+    {
+      "id": "project-completion-state-test-added-20260426-181342",
+      "title": "2026-04-26T18:13:42+09:00: Added tests/check_project_completion.py, cmake/validate_project_completion.cmake, and the project_completion_state ctest entry so recurring automation can verify the documented project completion gate in one step before deciding to no-op and exit."
+    },
     {
       "id": "completion-gate-user-requested-spot-check-noop-20260426-181127",
       "title": "2026-04-26T18:11:27+09:00: Honored the next user-requested spot check after the completion gate was documented by sequentially reviewing tests/config_tests.cpp, README.md, docs/project-overview.md, docs/architecture.md, and docs/migration-from-legacy.md, confirmed through direct fixed-string checks that the batch contains none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, treated the generic `legacy`, `organization-specific`, and `product-specific` wording in the prose docs as neutral starter policy language, found no starter-facing edits or generated-file cleanup to perform, and kept the repository in completion-gated no-op state while realigning the next same-sequence candidates to cmake/validate_management_docs.cmake, tests/validate_management_docs.py, config/cli-starter.json, cmake/project_config.hpp.in, and include/starter/core/config.hpp unless a later regression or new request reopens work."
@@ -2135,7 +2143,7 @@
   "next_recommended": [
     {
       "order": 1,
-      "action": "At the start of any scheduled or recurring automation pass, evaluate the project exit criteria first; if they still all hold, do no repository work, send the requested completion notice when a mail connector is available, and exit immediately.",
+      "action": "At the start of any scheduled or recurring automation pass, run `python3 tests/check_project_completion.py` first; if the completion gate still holds, do no repository work, send the requested completion notice when a mail connector is available, and exit immediately.",
       "why": "The project now has an explicit completion gate, and recurring automation should no-op instead of reopening completed work when that gate is already satisfied."
     },
     {
@@ -2182,5 +2190,5 @@
     }
   ],
   "verification_pending": [],
-  "updated_at": "2026-04-26T18:01:24+09:00"
+  "updated_at": "2026-04-26T18:21:14+09:00"
 }
