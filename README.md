@@ -116,7 +116,9 @@ Hosted CI inspection for a private GitHub repository can stay inside the shell w
 ./scripts/github_ci_status.py <commit-sha>
 ```
 
-The helper prefers `GH_TOKEN` or `GITHUB_TOKEN` when present and otherwise reuses HTTPS credentials from `git credential fill` so it can report push-triggered workflow runs, combined commit status, and check runs for a private commit.
+The helper prefers `GH_TOKEN` or `GITHUB_TOKEN` when present and otherwise reuses HTTPS credentials from `git credential fill` so it can report push-triggered workflow runs, combined commit status, check runs, and check-run annotations for a private commit.
+
+If GitHub Actions is blocked before jobs start, the helper also surfaces known account-level blockers such as billing, payment-method, or Actions-budget limits so the next operator can distinguish infrastructure lockouts from repository failures.
 
 ## Dependency choices
 
