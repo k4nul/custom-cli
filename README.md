@@ -100,6 +100,12 @@ python3 tests/validate_management_docs.py
 
 Configured builds also expose a `validate_management_docs` target, which runs [cmake/validate_management_docs.cmake](cmake/validate_management_docs.cmake) locally.
 
+Project completion state command:
+
+```bash
+python3 tests/check_project_completion.py
+```
+
 Supported verification baseline: local Linux with `cmake`, `g++`, and `ctest` available on `PATH`.
 
 Linux-only starter test command sequence:
@@ -110,6 +116,8 @@ cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```
+
+`ctest` also includes a `project_completion_state` check that verifies the documented project exit gate and recurring-automation no-op rules.
 
 ## Dependency choices
 

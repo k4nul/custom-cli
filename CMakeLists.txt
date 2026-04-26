@@ -23,6 +23,13 @@ add_custom_target(
     COMMENT "Validating management docs"
 )
 
+add_custom_target(
+    validate_project_completion
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/validate_project_completion.cmake
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Validating project completion state"
+)
+
 add_library(starter_core
     src/app/application.cpp
     src/commands/about_command.cpp
@@ -72,5 +79,9 @@ if(BUILD_TESTING)
     add_test(
         NAME management_docs_schema
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/validate_management_docs.cmake
+    )
+    add_test(
+        NAME project_completion_state
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/validate_project_completion.cmake
     )
 endif()

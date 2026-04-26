@@ -126,7 +126,7 @@
       "The local Linux verification sequence succeeds: `python3 tests/validate_management_docs.py`, CMake configure/build, and `ctest`.",
       "Accepted decision D14 remains intact: `.github/workflows/ci.yml` and `scripts/github_ci_status.py` stay absent, `blockers` is empty, and only maintenance or deliberate scope-expansion work remains."
     ],
-    "automation_stop_rule": "At the start of any scheduled or recurring automation pass, evaluate the project exit criteria against the current repository state. If all criteria already hold, do not inspect additional batches, do not edit tracked files, do not reopen completed work, and exit immediately after reporting that the project is already complete.",
+    "automation_stop_rule": "At the start of any scheduled or recurring automation pass, run `python3 tests/check_project_completion.py` to evaluate the project exit criteria against the current repository state. If all criteria already hold, do not inspect additional batches, do not edit tracked files, do not reopen completed work, and exit immediately after reporting that the project is already complete.",
     "completion_notification_rule": "If the operator explicitly requested a completion email and a mail connector is available, send a concise completion notice before exiting; otherwise report completion in the normal task response.",
     "reopen_triggers": [
       "a new user request or explicitly assigned task arrives",
