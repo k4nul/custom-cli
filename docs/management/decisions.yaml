@@ -205,7 +205,7 @@
     {
       "id": "D9",
       "title": "Use GitHub Actions for starter CI verification",
-      "status": "accepted",
+      "status": "superseded",
       "date": "2026-04-16",
       "context": [
         "The current local workspace does not provide CMake or a C++ compiler for end-to-end starter verification.",
@@ -369,6 +369,46 @@
         {
           "option": "Create a standalone D:/git/CLI repository without a repo-local workflow",
           "reason_not_selected": "It would leave the standalone repository without the hosted verification path already described in README.md."
+        }
+      ]
+    },
+    {
+      "id": "D14",
+      "title": "Prefer Linux-only local verification over repo-local GitHub Actions",
+      "status": "accepted",
+      "date": "2026-04-26",
+      "context": [
+        "The current Linux workspace now has a working local toolchain path with g++ 11.4.0, GNU Make, and CMake 4.3.2 installed under /home/k4nul/.local/bin, and local configure/build/ctest already succeeded.",
+        "An explicit operator request asked to remove GitHub Actions and make the starter Linux-only.",
+        "Recent hosted runs never reached repository steps because the repository owner's GitHub Actions billing or spending limits blocked job startup."
+      ],
+      "decision": [
+        "Remove the repo-local GitHub Actions workflow under D:/git/CLI/.github/workflows/ci.yml.",
+        "Remove the GitHub-hosted status inspection helper script that only supported the deleted workflow path.",
+        "Treat Linux local validation as the supported verification baseline: run python3 tests/validate_management_docs.py, configure/build with CMake locally, and run ctest locally.",
+        "Drop Windows and hosted CI verification from the starter contract unless a later accepted decision explicitly restores them."
+      ],
+      "rationale": [
+        "The operator explicitly requested Linux-only validation rather than continuing to carry hosted CI complexity and billing dependencies.",
+        "The local toolchain now covers the repository's current verification needs without waiting on external account state."
+      ],
+      "impact": [
+        "README.md, plan.yaml, and handoff.yaml should describe Linux-only local verification instead of hosted or cross-platform CI.",
+        "The repository no longer advertises repo-local GitHub Actions or GitHub-hosted status inspection.",
+        "Future operators must record a new accepted decision before reintroducing Windows verification or hosted automation."
+      ],
+      "alternatives_considered": [
+        {
+          "option": "Keep the current GitHub Actions workflow and wait for billing recovery",
+          "reason_not_selected": "It would preserve an external blocker after the operator explicitly requested Linux-only local verification."
+        },
+        {
+          "option": "Switch immediately to self-hosted GitHub Actions runners",
+          "reason_not_selected": "It would still keep GitHub-specific automation in scope when the request was to remove GitHub Actions entirely."
+        },
+        {
+          "option": "Keep Windows verification while removing only the hosted Linux job",
+          "reason_not_selected": "It would retain cross-platform claims that the operator asked to narrow to Linux-only."
         }
       ]
     }

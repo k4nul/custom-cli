@@ -26,19 +26,19 @@ cmake --build build
 3. Generate a starter config:
 
 ```bash
-build/cli-starter[.exe] config init
+build/cli-starter config init
 ```
 
 4. Run a sample command:
 
 ```bash
-build/cli-starter[.exe] hello --name "template user"
+build/cli-starter hello --name "template user"
 ```
 
 5. Start the interactive shell:
 
 ```bash
-build/cli-starter[.exe]
+build/cli-starter
 ```
 
 ## Repository layout
@@ -95,30 +95,21 @@ The repository keeps these files in a JSON-compatible YAML subset so they can be
 Validation command:
 
 ```bash
-./tests/validate_management_docs.py
+python3 tests/validate_management_docs.py
 ```
 
-Configured builds also expose a `validate_management_docs` target, and GitHub Actions runs the same validation through [cmake/validate_management_docs.cmake](cmake/validate_management_docs.cmake) after Python setup.
+Configured builds also expose a `validate_management_docs` target, which runs [cmake/validate_management_docs.cmake](cmake/validate_management_docs.cmake) locally.
 
-Starter test command sequence:
+Supported verification baseline: local Linux with `cmake`, `g++`, and `ctest` available on `PATH`.
+
+Linux-only starter test command sequence:
 
 ```bash
+python3 tests/validate_management_docs.py
 cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```
-
-GitHub Actions mirrors those verification steps on `ubuntu-latest` and `windows-latest`, and also runs the management-doc validation script on every push and pull request.
-
-Hosted CI inspection for a private GitHub repository can stay inside the shell without `gh`:
-
-```bash
-./scripts/github_ci_status.py <commit-sha>
-```
-
-The helper prefers `GH_TOKEN` or `GITHUB_TOKEN` when present and otherwise reuses HTTPS credentials from `git credential fill` so it can report push-triggered workflow runs, combined commit status, check runs, and check-run annotations for a private commit.
-
-If GitHub Actions is blocked before jobs start, the helper also surfaces known account-level blockers such as billing, payment-method, or Actions-budget limits so the next operator can distinguish infrastructure lockouts from repository failures.
 
 ## Dependency choices
 
