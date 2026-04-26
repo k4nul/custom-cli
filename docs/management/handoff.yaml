@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "current_state": {
-    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24943823939 on commit 102a89e, where check-run annotation 73041642030 reported that `Management Docs` was not started because recent account payments failed or the Actions spending limit needs to be increased, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, the job exposed no steps, and the redirected log request failed at blob storage auth even though local `python tests/validate_management_docs.py` validation still passed. The latest AGENTS-guided follow-up at 2026-04-26T09:12:47+09:00 recorded that billing-rooted hosted-verification blocker after the batch that reviewed include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp without needing starter-facing edits.",
+    "summary": "The repository remains a neutral C++ CLI starter with docs/management as the source of truth. As of 2026-04-18, accepted decision D13 treats D:/git/CLI as the standalone delivery repository for https://github.com/k4nul/custom-cli.git, restores repo-local GitHub Actions at D:/git/CLI/.github/workflows/ci.yml, and scopes git workflows to D:/git/CLI while the broader D:/git workspace remains separate. The standalone repository is initialized locally on branch main, origin points at the custom-cli remote, and the latest hosted verification evidence is still the push workflow snapshot for run 24943823939 on commit 102a89e, where check-run annotation 73041642030 reported that `Management Docs` was not started because recent account payments failed or the Actions spending limit needs to be increased, `Build and Test (${{ matrix.os }})` concluded `skipped`, the legacy combined status endpoint still reported `pending` with zero individual statuses, the job exposed no steps, and the redirected log request failed at blob storage auth even though local `python tests/validate_management_docs.py` validation still passed. The latest AGENTS-guided follow-up at 2026-04-26T09:21:37+09:00 kept that billing-rooted hosted-verification blocker in place after the batch that reviewed include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp without needing starter-facing edits.",
     "repo_shape": [
       "The CLI starter source tree is organized as a neutral reusable template.",
       "Management records are schema-backed under docs/management/.",
@@ -21,6 +21,10 @@
     ]
   },
   "done": [
+    {
+      "id": "starter-registrar-entrypoint-application-about-review-batch-pass-20260426-092137",
+      "title": "2026-04-26T09:21:37+09:00: Followed AGENTS.md plus the current plan and handoff queue by treating the GitHub Actions billing or spending issue behind check-run annotation 73041642030 as an unchanged external blocker, then sequentially reviewed include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, found no starter-facing edits to make in the reviewed files, confirmed no generated or temporary files needed cleanup, realigned the next same-sequence candidates to src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp, and ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully."
+    },
     {
       "id": "hosted-billing-explanation-and-header-review-batch-pass-20260426-091247",
       "title": "2026-04-26T09:12:47+09:00: Followed AGENTS.md plus the current plan and handoff queue by first investigating workflow run 24943823939 for commit 102a89e with ./scripts/github_ci_status.py and direct GitHub API queries, confirmed from check-run annotation 73041642030 that `Management Docs` never started because recent account payments failed or the Actions spending limit needs to be increased, explained the empty job-step list and unusable redirected log fetch as effects of the job never receiving a runner, then sequentially reviewed include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp, confirmed through direct fixed-string checks that all five files contain none of `custom-cli`, `k4nul`, `cppcore`, `D:/git`, `D:\\\\git`, `service-specific`, `deployment path`, or `legacy organization-specific` traces, deleted the generated scripts/__pycache__/ directory, found no starter-facing edits to make in the reviewed files, realigned the next same-sequence candidates to include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp, and ran the required single end-of-batch `python tests/validate_management_docs.py` validation successfully."
@@ -1915,7 +1919,7 @@
     {
       "id": "legacy-trace-removal",
       "title": "Remove remaining legacy organization-specific traces from starter-facing docs and metadata",
-      "next_step": "The latest same-sequence batch reviewed include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp without needing edits; if another same-sequence sweep is requested, continue with include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp."
+      "next_step": "The latest same-sequence batch reviewed include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp without needing edits; if another same-sequence sweep is requested, continue with src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp."
     }
   ],
   "next_recommended": [
@@ -1926,8 +1930,8 @@
     },
     {
       "order": 2,
-      "action": "If another same-sequence sweep is requested after the hosted billing issue is cleared or deferred, review include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp for legacy organization-specific traces before any future commit touching them.",
-      "why": "The latest five-file batch reviewed include/starter/core/config.hpp, include/starter/core/exit_code.hpp, include/starter/core/project_info.hpp, include/starter/core/tokenize.hpp, and include/starter/app/application.hpp, found no edits to make, and advanced the concrete same-sequence queue to the registrar, entrypoint, application, and command-registration set."
+      "action": "If another same-sequence sweep is requested after the hosted billing issue is cleared or deferred, review src/commands/config_command.cpp, src/commands/doctor_command.cpp, src/commands/echo_command.cpp, src/commands/hello_command.cpp, and src/core/config.cpp for legacy organization-specific traces before any future commit touching them.",
+      "why": "The latest five-file batch reviewed include/starter/commands/registrars.hpp, src/main.cpp, src/app/application.cpp, src/commands/register_commands.cpp, and src/commands/about_command.cpp, found no edits to make, and advanced the concrete same-sequence queue to the remaining command-implementation and core-config set."
     },
     {
       "order": 3,
@@ -1967,5 +1971,5 @@
       "description": "Clear the GitHub Actions billing or spending block reported by check-run annotation 73041642030, then confirm with a fresh workflow run that `Management Docs` and the downstream build jobs start normally."
     }
   ],
-  "updated_at": "2026-04-26T09:12:47+09:00"
+  "updated_at": "2026-04-26T09:21:37+09:00"
 }
