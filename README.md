@@ -46,11 +46,13 @@ configuration directory:
 .\build\Debug\cli-starter.exe hello --name "template user"
 ```
 
-Generate a starter config:
+Generate an ignored local starter config:
 
 ```bash
-./build/cli-starter config init
+./build/cli-starter --config ./config/local.json config init
 ```
+
+This keeps the checked-in template at `config/cli-starter.json` unchanged while you experiment.
 
 Start the interactive shell:
 
@@ -207,6 +209,7 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 - [docs/architecture.md](docs/architecture.md): structure and extension points
 - [docs/testing.md](docs/testing.md): CTest/doctest validation flow and coverage notes
 - [docs/troubleshooting.md](docs/troubleshooting.md): common local setup and runtime issues
+- [docs/maintenance.md](docs/maintenance.md): maintainer checklist for command, config, dependency, and documentation changes
 - [docs/migration-from-legacy.md](docs/migration-from-legacy.md): migration notes
 - [third_party/README.md](third_party/README.md): dependency source notes
 
@@ -257,11 +260,13 @@ Visual Studio처럼 multi-config 생성기를 사용하면 실행 파일이 설�
 .\build\Debug\cli-starter.exe hello --name "template user"
 ```
 
-설정 파일 템플릿을 생성합니다.
+무시되는 로컬 설정 파일 템플릿을 생성합니다.
 
 ```bash
-./build/cli-starter config init
+./build/cli-starter --config ./config/local.json config init
 ```
+
+이렇게 하면 실험 중에도 체크인된 `config/cli-starter.json` 템플릿을 바꾸지 않습니다.
 
 인터랙티브 셸을 시작합니다.
 
@@ -418,5 +423,6 @@ ctest --test-dir build -C Debug -R starter_tests --output-on-failure
 - [docs/architecture.md](docs/architecture.md): 구조와 확장 지점
 - [docs/testing.md](docs/testing.md): CTest/doctest 검증 흐름과 테스트 범위
 - [docs/troubleshooting.md](docs/troubleshooting.md): 로컬 설정과 실행 중 자주 겪는 문제
+- [docs/maintenance.md](docs/maintenance.md): 명령, 설정, 의존성, 문서 변경을 위한 maintainer 체크리스트
 - [docs/migration-from-legacy.md](docs/migration-from-legacy.md): 마이그레이션 노트
 - [third_party/README.md](third_party/README.md): 의존성 출처 정보

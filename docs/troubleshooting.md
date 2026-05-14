@@ -82,6 +82,32 @@ config-backed commands. `config init` writes to that path unless an explicit
 Use `--output` when you want to create a template without changing the active
 config path for the command.
 
+## A Config-Backed Command Reports A JSON Error
+
+When the active config path exists, config-backed commands parse it as JSON. If
+the file is malformed, fix the JSON or regenerate a local template:
+
+```bash
+./build/cli-starter --config ./config/local.json config init
+./build/cli-starter --config ./config/local.json config show
+```
+
+The supported fields are `prompt`, `default_name`, `enabled_commands`, and
+`notes`. Missing fields fall back to built-in defaults, but malformed JSON or
+wrong field types are reported as command errors.
+
+## `config init` Cannot Write The Config File
+
+`config init` creates parent directories for the target path, then truncates and
+writes the JSON file. If it reports a write failure, check that the parent path
+is writable and that the target is not a directory or locked by another process.
+
+Prefer the ignored local config path for experiments:
+
+```bash
+./build/cli-starter --config ./config/local.json config init
+```
+
 ## Interactive Input Reports An Input Error
 
 The interactive shell tokenizes input before dispatching commands. Unterminated
