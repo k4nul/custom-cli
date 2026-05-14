@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstddef>
 #include <filesystem>
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -131,6 +132,11 @@ void create_recommended_starter_layout(const fs::path& root) {
     for (const auto& directory : directories) {
         fs::create_directories(root / directory);
     }
+}
+
+void write_text_file(const fs::path& path, const std::string& text) {
+    std::ofstream output(path, std::ios::trunc);
+    output << text;
 }
 
 }  // namespace
@@ -335,6 +341,52 @@ TEST_CASE("config show describes built-in defaults when config is missing") {
     CHECK(result.out == expected.str());
     CHECK(result.err.empty());
     CHECK_FALSE(fs::exists(config_path));
+}
+
+TEST_CASE("config show applies defaults for omitted disk config fields") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "partial.json";
+    const starter::AppConfig defaults;
+    write_text_file(config_path, R"({"default_name":"Grace"})");
+
+    const auto result = run_application({"--config", config_path.string(), "config", "show"});
+    std::ostringstream expected;
+    expected << "Config path: " << config_path.generic_string() << '\n';
+    expected << "Source: disk\n";
+    expected << "Prompt: " << defaults.prompt << '\n';
+    expected << "Default name: Grace\n";
+    expected << "Enabled commands: about, hello, echo, config, doctor\n";
+    expected << "Notes: " << defaults.notes << '\n';
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == expected.str());
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("config show reports malformed disk config through stderr") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "bad.json";
+    write_text_file(config_path, R"({"default_name":)");
+
+    const auto result = run_application({"--config", config_path.string(), "config", "show"});
+
+    CHECK(result.exit_code != 0);
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "parse error"));
+}
+
+TEST_CASE("config-backed hello reports malformed disk config through stderr") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "bad.json";
+    write_text_file(config_path, R"({"default_name":)");
+
+    const auto result = run_application({"--config", config_path.string(), "hello"});
+
+    CHECK(result.exit_code != 0);
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "parse error"));
 }
 
 TEST_CASE("doctor reports healthy starter layout with missing config warning") {
