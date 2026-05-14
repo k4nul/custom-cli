@@ -158,6 +158,38 @@ TEST_CASE("application accepts hello subcommand options from argv order") {
     CHECK(result.err.empty());
 }
 
+TEST_CASE("application echoes positional text") {
+    const auto result = run_application({"echo", "one", "two words", "three"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "one two words three\n");
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("application echoes uppercase positional text") {
+    const auto result = run_application({"echo", "--uppercase", "mixed", "Case"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "MIXED CASE\n");
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("application echoes numbered positional text") {
+    const auto result = run_application({"echo", "--numbered", "one", "two"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "1. one\n2. two\n");
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("application echoes uppercase numbered positional text") {
+    const auto result = run_application({"echo", "--uppercase", "--numbered", "one", "two"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "1. ONE\n2. TWO\n");
+    CHECK(result.err.empty());
+}
+
 TEST_CASE("application reads custom config path for config-backed commands") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "custom.json";
