@@ -1,5 +1,7 @@
 #include "starter/core/project_info.hpp"
 
+#include <filesystem>
+
 #include "starter/project_config.hpp"
 
 namespace starter {
@@ -19,4 +21,3 @@ std::filesystem::path default_config_path(const ProjectInfo& info) {
 }
 
 }  // namespace starter
-

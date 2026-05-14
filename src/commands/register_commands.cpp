@@ -1,5 +1,8 @@
 #include "starter/commands/registrars.hpp"
 
+#include <ostream>
+#include <string>
+
 namespace starter {
 
 void register_builtin_commands(
@@ -17,4 +20,3 @@ void register_builtin_commands(
 }
 
 }  // namespace starter
-

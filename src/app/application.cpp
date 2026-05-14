@@ -1,9 +1,14 @@
 #include "starter/app/application.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <exception>
+#include <filesystem>
 #include <ostream>
+#include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
 #include <CLI/CLI.hpp>
 
