@@ -20,6 +20,7 @@ It includes:
 
 - CMake 3.18 or newer
 - A C++17 compiler
+
 On Linux, `cmake`, `g++` or `clang++`, and `ctest` are enough for the normal build and test flow.
 On Windows, use Visual Studio, Build Tools for Visual Studio, or another CMake-supported C++ toolchain.
 
@@ -229,6 +230,7 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 
 - CMake 3.18 이상
 - C++17 컴파일러
+
 Linux에서는 보통 `cmake`, `g++` 또는 `clang++`, `ctest`만 있으면 빌드와 테스트가
 가능합니다. Windows에서는 Visual Studio, Visual Studio Build Tools, 또는 CMake가 지원하는
 C++ 툴체인을 사용하면 됩니다.

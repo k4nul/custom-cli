@@ -1,6 +1,5 @@
 #include "starter/commands/registrars.hpp"
 
-#include <filesystem>
 #include <ostream>
 
 namespace starter {
@@ -27,4 +26,3 @@ void register_about_command(
 }
 
 }  // namespace starter
-
