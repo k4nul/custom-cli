@@ -1,7 +1,8 @@
 #include "starter/app/application.hpp"
 
 #include <algorithm>
-#include <iostream>
+#include <exception>
+#include <ostream>
 #include <utility>
 
 #include <CLI/CLI.hpp>

@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <memory>
 #include <ostream>
+#include <string>
 
 #include "starter/core/config.hpp"
 
@@ -43,7 +44,8 @@ void register_config_command(
         config_template.prompt = project_info.prompt_label;
         config_template.notes = "Rename values and trim sample commands once you start customizing the starter.";
 
-        const auto output_path = std::filesystem::path(init_options->output_path.empty() ? config_path : init_options->output_path);
+        const auto output_path = std::filesystem::path(
+            init_options->output_path.empty() ? config_path : init_options->output_path);
         write_config_template(output_path, config_template);
         out << "Wrote config template to " << output_path.generic_string() << '\n';
     });
@@ -59,4 +61,3 @@ void register_config_command(
 }
 
 }  // namespace starter
-
