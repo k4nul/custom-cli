@@ -109,6 +109,14 @@ The default config template is [config/cli-starter.json](config/cli-starter.json
 ```
 
 Use `config init` to write a config file, then edit the generated JSON for your project.
+Pass `--config <path>` before the command to use a non-default config file. `config init` writes
+to that path unless `--output <path>` is supplied:
+
+```bash
+./build/cli-starter --config ./config/local.json config init
+./build/cli-starter --config ./config/local.json hello
+./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
+```
 
 ## Customizing The Starter
 
@@ -293,6 +301,14 @@ starter> exit
 ```
 
 `config init`으로 설정 파일을 만든 뒤, 프로젝트에 맞게 JSON 값을 수정하면 됩니다.
+기본 경로가 아닌 설정 파일을 쓰려면 명령 앞에 `--config <path>`를 전달합니다.
+`config init`은 `--output <path>`가 없을 때 이 경로에 설정 파일을 씁니다.
+
+```bash
+./build/cli-starter --config ./config/local.json config init
+./build/cli-starter --config ./config/local.json hello
+./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
+```
 
 ## 스타터 커스터마이징
 

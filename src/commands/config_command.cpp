@@ -30,7 +30,6 @@ void register_config_command(
     config_command->require_subcommand(1);
 
     auto init_options = std::make_shared<ConfigInitOptions>();
-    init_options->output_path = config_path;
 
     auto* init_command = config_command->add_subcommand("init", "Write a starter config template.");
     init_command->add_option(

@@ -2,8 +2,12 @@
 #include <doctest/doctest.h>
 
 #include <algorithm>
+#include <chrono>
+#include <cstddef>
+#include <filesystem>
 #include <sstream>
 #include <string>
+#include <system_error>
 #include <vector>
 
 #include <CLI/CLI.hpp>
@@ -17,8 +21,83 @@
 
 namespace {
 
+namespace fs = std::filesystem;
+
 bool contains(const std::vector<std::string>& values, const std::string& expected) {
     return std::find(values.begin(), values.end(), expected) != values.end();
+}
+
+std::size_t next_temp_directory_id() {
+    static std::size_t counter = 0;
+    return ++counter;
+}
+
+class TemporaryDirectory {
+public:
+    TemporaryDirectory() {
+        const auto timestamp = std::chrono::steady_clock::now().time_since_epoch().count();
+        path_ = fs::temp_directory_path()
+            / ("cli-starter-tests-" + std::to_string(timestamp) + "-" + std::to_string(next_temp_directory_id()));
+        fs::create_directories(path_);
+    }
+
+    TemporaryDirectory(const TemporaryDirectory&) = delete;
+    TemporaryDirectory& operator=(const TemporaryDirectory&) = delete;
+
+    ~TemporaryDirectory() {
+        std::error_code ignored;
+        fs::remove_all(path_, ignored);
+    }
+
+    const fs::path& path() const {
+        return path_;
+    }
+
+private:
+    fs::path path_;
+};
+
+class CurrentPathGuard {
+public:
+    explicit CurrentPathGuard(const fs::path& path) : original_path_(fs::current_path()) {
+        fs::current_path(path);
+    }
+
+    CurrentPathGuard(const CurrentPathGuard&) = delete;
+    CurrentPathGuard& operator=(const CurrentPathGuard&) = delete;
+
+    ~CurrentPathGuard() {
+        std::error_code ignored;
+        fs::current_path(original_path_, ignored);
+    }
+
+private:
+    fs::path original_path_;
+};
+
+struct ApplicationRunResult {
+    int exit_code = 0;
+    std::string out;
+    std::string err;
+};
+
+ApplicationRunResult run_application(std::vector<std::string> arguments) {
+    std::ostringstream out;
+    std::ostringstream err;
+    const auto project_info = starter::load_project_info();
+    starter::Application application(project_info, out, err);
+
+    std::vector<std::string> arg_storage = {project_info.binary_name};
+    arg_storage.insert(arg_storage.end(), arguments.begin(), arguments.end());
+
+    std::vector<char*> argv;
+    argv.reserve(arg_storage.size());
+    for (auto& arg : arg_storage) {
+        argv.push_back(arg.data());
+    }
+
+    const int exit_code = application.run(static_cast<int>(argv.size()), argv.data());
+    return {exit_code, out.str(), err.str()};
 }
 
 void configure_starter_app(
@@ -72,23 +151,59 @@ TEST_CASE("config can round-trip through JSON") {
 }
 
 TEST_CASE("application accepts hello subcommand options from argv order") {
-    std::ostringstream out;
-    std::ostringstream err;
-    const auto project_info = starter::load_project_info();
-    starter::Application application(project_info, out, err);
+    const auto result = run_application({"hello", "--name", "starter user"});
 
-    std::vector<std::string> arg_storage = {project_info.binary_name, "hello", "--name", "starter user"};
-    std::vector<char*> argv;
-    argv.reserve(arg_storage.size());
-    for (auto& arg : arg_storage) {
-        argv.push_back(arg.data());
-    }
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, starter user.\n");
+    CHECK(result.err.empty());
+}
 
-    const int result = application.run(static_cast<int>(argv.size()), argv.data());
+TEST_CASE("application reads custom config path for config-backed commands") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
 
-    CHECK(result == 0);
-    CHECK(out.str() == "Hello, starter user.\n");
-    CHECK(err.str().empty());
+    starter::AppConfig config;
+    config.default_name = "Ada";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"--config", config_path.string(), "hello"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, Ada.\n");
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("config init honors global config path by default") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "profiles" / "custom.json";
+
+    const auto result = run_application({"--config", config_path.string(), "config", "init"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Wrote config template to " + config_path.generic_string() + '\n');
+    CHECK(result.err.empty());
+    CHECK(fs::exists(config_path));
+    CHECK_FALSE(fs::exists(temporary_directory.path() / "config" / "cli-starter.json"));
+
+    const auto config = starter::load_config_or_throw(config_path);
+    CHECK(config.prompt == starter::load_project_info().prompt_label);
+}
+
+TEST_CASE("config init explicit output overrides global config path") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "profiles" / "custom.json";
+    const auto output_path = temporary_directory.path() / "explicit" / "starter.json";
+
+    const auto result =
+        run_application({"--config", config_path.string(), "config", "init", "--output", output_path.string()});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Wrote config template to " + output_path.generic_string() + '\n');
+    CHECK(result.err.empty());
+    CHECK(fs::exists(output_path));
+    CHECK_FALSE(fs::exists(config_path));
 }
 
 TEST_CASE("tab completion filters root command prefixes") {
