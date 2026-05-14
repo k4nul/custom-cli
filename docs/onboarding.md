@@ -18,8 +18,14 @@ The command parser, JSON library, and test framework are vendored under
 
 ## First Build
 
-Use an out-of-source build directory. The repository ignores `build/`,
-`build-linux/`, `out/`, and `cmake-build-*` for local build products.
+Use an out-of-source build directory. Prefer `build/` for normal local work; the
+repository ignores `build/`, `build-linux/`, `out/`, and `cmake-build-*` for
+local build products.
+
+Do not treat generated `build-local-*` or `.sandbox-user/` directories as
+source inputs. If they appear in a checkout, rebuild into a fresh ignored build
+directory before validating behavior and avoid adding new generated files under
+those paths.
 
 ```bash
 cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
@@ -120,4 +126,5 @@ tool's purpose.
 - `docs/architecture.md`: component layout and command flow
 - `docs/testing.md`: test targets, validation commands, and coverage notes
 - `docs/troubleshooting.md`: common local build and runtime issues
+- `docs/maintenance.md`: maintainer checklist for command, config, dependency, and documentation changes
 - `docs/migration-from-legacy.md`: historical migration notes
