@@ -46,7 +46,7 @@ int Application::dispatch(std::vector<std::string> args, bool interactive_mode) 
         std::reverse(args.begin(), args.end());
         app.parse(args);
     } catch (const CLI::ParseError& error) {
-        return app.exit(error);
+        return app.exit(error, out_, err_);
     } catch (const std::exception& error) {
         err_ << "error: " << error.what() << '\n';
         return to_int(ExitCode::runtime_error);

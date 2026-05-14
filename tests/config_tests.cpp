@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <filesystem>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <system_error>
 #include <vector>
@@ -25,6 +26,10 @@ namespace fs = std::filesystem;
 
 bool contains(const std::vector<std::string>& values, const std::string& expected) {
     return std::find(values.begin(), values.end(), expected) != values.end();
+}
+
+bool contains_text(const std::string& value, const std::string& expected) {
+    return value.find(expected) != std::string::npos;
 }
 
 std::size_t next_temp_directory_id() {
@@ -121,6 +126,13 @@ void configure_starter_app(
     starter::register_builtin_commands(app, project_info, config_path, out, err, command_executed);
 }
 
+void create_recommended_starter_layout(const fs::path& root) {
+    const std::vector<std::string> directories = {"src", "include", "docs", "config", "third_party"};
+    for (const auto& directory : directories) {
+        fs::create_directories(root / directory);
+    }
+}
+
 }  // namespace
 
 TEST_CASE("tokenizer preserves quoted groups") {
@@ -131,6 +143,17 @@ TEST_CASE("tokenizer preserves quoted groups") {
     CHECK(tokens[1] == "--name");
     CHECK(tokens[2] == "starter user");
     CHECK(tokens[3] == "quoted value");
+}
+
+TEST_CASE("tokenizer reports malformed shell input") {
+    CHECK_THROWS_WITH_AS(
+        starter::tokenize_command_line("hello --name \"starter user"),
+        "unterminated quote in command line",
+        std::runtime_error);
+    CHECK_THROWS_WITH_AS(
+        starter::tokenize_command_line("hello --name starter\\"),
+        "trailing escape character in command line",
+        std::runtime_error);
 }
 
 TEST_CASE("config can round-trip through JSON") {
@@ -190,6 +213,48 @@ TEST_CASE("application echoes uppercase numbered positional text") {
     CHECK(result.err.empty());
 }
 
+TEST_CASE("application routes version output through configured stream") {
+    const auto project_info = starter::load_project_info();
+    const auto result = run_application({"--version"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == project_info.display_name + " " + project_info.version + "\n");
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("application routes help output through configured stream") {
+    const auto result = run_application({"--help"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Usage:"));
+    CHECK(contains_text(result.out, "hello"));
+    CHECK(contains_text(result.out, "--help-all"));
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("application routes parse errors through configured stream") {
+    const auto result = run_application({"missing-command"});
+
+    CHECK(result.exit_code != 0);
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "missing-command"));
+    CHECK(contains_text(result.err, "Run with --help"));
+}
+
+TEST_CASE("about command reports starter metadata") {
+    const auto project_info = starter::load_project_info();
+    const auto result = run_application({"about"});
+    const std::string expected = project_info.display_name + " " + project_info.version
+        + "\nBinary name: " + project_info.binary_name
+        + "\nDefault config: " + starter::default_config_path(project_info).generic_string()
+        + "\nThis repository is a neutral CLI starter with one-shot commands,\n"
+          "an interactive shell, JSON config scaffolding, and sample commands.\n";
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == expected);
+    CHECK(result.err.empty());
+}
+
 TEST_CASE("application reads custom config path for config-backed commands") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "custom.json";
@@ -203,6 +268,20 @@ TEST_CASE("application reads custom config path for config-backed commands") {
     CHECK(result.exit_code == 0);
     CHECK(result.out == "Hello, Ada.\n");
     CHECK(result.err.empty());
+}
+
+TEST_CASE("application explains missing config defaults for hello") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "missing.json";
+
+    const auto result = run_application({"--config", config_path.string(), "hello"});
+    const std::string expected = "Hello, world.\nTip: run `config init` to generate "
+        + config_path.generic_string() + " and customize the default name.\n";
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == expected);
+    CHECK(result.err.empty());
+    CHECK_FALSE(fs::exists(config_path));
 }
 
 TEST_CASE("config init honors global config path by default") {
@@ -236,6 +315,49 @@ TEST_CASE("config init explicit output overrides global config path") {
     CHECK(result.err.empty());
     CHECK(fs::exists(output_path));
     CHECK_FALSE(fs::exists(config_path));
+}
+
+TEST_CASE("config show describes built-in defaults when config is missing") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "missing.json";
+    const starter::AppConfig defaults;
+
+    const auto result = run_application({"--config", config_path.string(), "config", "show"});
+    std::ostringstream expected;
+    expected << "Config path: " << config_path.generic_string() << '\n';
+    expected << "Source: built-in defaults\n";
+    expected << "Prompt: " << defaults.prompt << '\n';
+    expected << "Default name: " << defaults.default_name << '\n';
+    expected << "Enabled commands: about, hello, echo, config, doctor\n";
+    expected << "Notes: " << defaults.notes << '\n';
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == expected.str());
+    CHECK(result.err.empty());
+    CHECK_FALSE(fs::exists(config_path));
+}
+
+TEST_CASE("doctor reports healthy starter layout with missing config warning") {
+    TemporaryDirectory temporary_directory;
+    create_recommended_starter_layout(temporary_directory.path());
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "config" / "local.json";
+
+    const auto result = run_application({"--config", config_path.string(), "doctor"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "[ok] source directory: src\n"));
+    CHECK(contains_text(result.out, "[ok] public headers: include\n"));
+    CHECK(contains_text(result.out, "[ok] docs directory: docs\n"));
+    CHECK(contains_text(result.out, "[ok] config directory: config\n"));
+    CHECK(contains_text(result.out, "[ok] third-party directory: third_party\n"));
+    CHECK(contains_text(
+        result.out,
+        "[warn] config: " + config_path.generic_string() + " missing; built-in defaults are active\n"));
+    CHECK(contains_text(result.out, "[info] prompt: starter\n"));
+    CHECK(contains_text(result.out, "[info] default name: world\n"));
+    CHECK(contains_text(result.out, "Starter layout looks healthy.\n"));
+    CHECK(result.err.empty());
 }
 
 TEST_CASE("tab completion filters root command prefixes") {
