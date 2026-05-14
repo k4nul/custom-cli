@@ -1,6 +1,7 @@
 #include "starter/commands/registrars.hpp"
 
 #include <ostream>
+#include <string>
 
 namespace starter {
 

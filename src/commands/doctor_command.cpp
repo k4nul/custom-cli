@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <ostream>
+#include <string>
 
 #include "starter/core/config.hpp"
 
@@ -50,4 +51,3 @@ void register_doctor_command(
 }
 
 }  // namespace starter
-
