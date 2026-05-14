@@ -17,5 +17,12 @@ This directory vendors small header-only dependencies so the starter does not de
 ## Update Guidance
 
 - Prefer official release tags over random commits.
-- Record version changes in `docs/management/decisions.yaml` or `docs/management/handoff.yaml`.
-- Re-run starter verification after dependency updates.
+- Record version changes in this file and update the matching license file under `licenses/`.
+- Update starter docs when a dependency change affects build, test, or user-facing CLI behavior.
+- Re-run starter verification after dependency updates:
+
+```bash
+cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build -R starter_tests --output-on-failure
+```

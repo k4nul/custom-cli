@@ -22,7 +22,11 @@
 - Add a new command file under `src/commands/`
 - Declare its registrar in `include/starter/commands/registrars.hpp`
 - Register it from `src/commands/register_commands.cpp`
-- If the command adds new config needs, update `AppConfig` and `config/`
+- If the command adds new config needs, update `AppConfig`, `config/`, JSON parsing and serialization,
+  and `describe_config`
+
+Command availability is controlled by compile-time registration. The `enabled_commands` config field is
+currently serialized and displayed, but it is not used as a runtime allowlist.
 
 ## Command Flow
 

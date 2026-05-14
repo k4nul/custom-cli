@@ -85,10 +85,16 @@ Examples:
 
 ## Built-In Commands
 
+Global options are available before any command:
+
+- `--version`: print the configured display name and project version
+- `--help-all`: show help for all subcommands
+- `-c, --config <path>`: use a non-default JSON config path
+
 - `about`: describe the starter project
-- `hello`: print a greeting and demonstrate command options
-- `echo`: echo positional arguments, with formatting flags
-- `config init`: write a JSON config template
+- `hello`: print a greeting; supports `--name <value>` and `-e, --enthusiastic`
+- `echo`: echo required positional `text...`; supports `--uppercase` and `--numbered`
+- `config init`: write a JSON config template; supports `-o, --output <path>`
 - `config show`: show the effective config
 - `doctor`: check basic starter layout assumptions
 - `shell`: start the interactive shell explicitly
@@ -118,6 +124,10 @@ to that path unless `--output <path>` is supplied:
 ./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
 ```
 
+`enabled_commands` is currently serialized and shown by `config show`; it is not a runtime
+allowlist and does not disable command registration. Command availability comes from the
+compile-time registrars in `src/commands/register_commands.cpp`.
+
 ## Customizing The Starter
 
 The main naming knobs are CMake cache variables:
@@ -133,6 +143,7 @@ Example:
 cmake -S . -B build \
   -DCLI_STARTER_BINARY_NAME=my-cli \
   -DCLI_STARTER_DISPLAY_NAME="My CLI" \
+  -DCLI_STARTER_CONFIG_FILE=my-cli.json \
   -DCLI_STARTER_PROMPT_LABEL=mycli
 ```
 
@@ -143,7 +154,8 @@ After renaming, replace the sample commands with your own application behavior.
 1. Add a command implementation under `src/commands/`.
 2. Declare its registrar in [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp).
 3. Register it from [src/commands/register_commands.cpp](src/commands/register_commands.cpp).
-4. Add tests in [tests/config_tests.cpp](tests/config_tests.cpp) or a new test file.
+4. Add tests in [tests/config_tests.cpp](tests/config_tests.cpp), or add a new test file and include
+   it in the `starter_tests` target in [CMakeLists.txt](CMakeLists.txt).
 5. Document user-facing behavior in this README or [docs/architecture.md](docs/architecture.md).
 
 The command parser is CLI11, so commands can use CLI11 options, flags, positional arguments, and
@@ -158,7 +170,7 @@ nested subcommands.
 - `config/`: checked-in config template
 - `tests/`: starter behavior tests
 - `third_party/`: vendored header-only dependencies and license files
-- `docs/`: architecture and migration notes
+- `docs/`: onboarding, architecture, testing, troubleshooting, and migration notes
 
 ## Testing
 
@@ -169,6 +181,9 @@ cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build -R starter_tests --output-on-failure
 ```
+
+No CI workflow is tracked yet, so this local CMake/CTest flow is the repository's authoritative
+validation path until CI is added.
 
 With multi-config generators, add the configuration:
 
@@ -187,7 +202,10 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 ## More Documentation
 
 - [docs/project-overview.md](docs/project-overview.md): project purpose and scope
+- [docs/onboarding.md](docs/onboarding.md): first local build, smoke test, and customization loop
 - [docs/architecture.md](docs/architecture.md): structure and extension points
+- [docs/testing.md](docs/testing.md): CTest/doctest validation flow and coverage notes
+- [docs/troubleshooting.md](docs/troubleshooting.md): common local setup and runtime issues
 - [docs/migration-from-legacy.md](docs/migration-from-legacy.md): migration notes
 - [third_party/README.md](third_party/README.md): dependency source notes
 
@@ -277,10 +295,16 @@ starter> exit
 
 ## 기본 명령
 
+전역 옵션은 명령 앞에서 사용할 수 있습니다.
+
+- `--version`: 설정된 표시 이름과 프로젝트 버전 출력
+- `--help-all`: 모든 하위명령 도움말 출력
+- `-c, --config <path>`: 기본값이 아닌 JSON 설정 경로 사용
+
 - `about`: 스타터 프로젝트 설명 출력
-- `hello`: 옵션 사용 예시를 보여주는 인사 명령
-- `echo`: 위치 인자와 출력 옵션 예시
-- `config init`: JSON 설정 템플릿 작성
+- `hello`: 인사 출력, `--name <value>`와 `-e, --enthusiastic` 지원
+- `echo`: 필수 위치 인자 `text...` 출력, `--uppercase`와 `--numbered` 지원
+- `config init`: JSON 설정 템플릿 작성, `-o, --output <path>` 지원
 - `config show`: 현재 적용되는 설정 출력
 - `doctor`: 기본 스타터 구조 점검
 - `shell`: 인터랙티브 셸 명시적 시작
@@ -310,6 +334,10 @@ starter> exit
 ./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
 ```
 
+`enabled_commands`는 현재 직렬화되고 `config show`에서 표시되지만, 런타임 allowlist가 아니며
+명령 등록을 비활성화하지 않습니다. 명령 사용 가능 여부는 `src/commands/register_commands.cpp`의
+컴파일 타임 registrar가 결정합니다.
+
 ## 스타터 커스터마이징
 
 주요 이름 설정은 CMake cache 변수로 바꿀 수 있습니다.
@@ -325,6 +353,7 @@ starter> exit
 cmake -S . -B build \
   -DCLI_STARTER_BINARY_NAME=my-cli \
   -DCLI_STARTER_DISPLAY_NAME="My CLI" \
+  -DCLI_STARTER_CONFIG_FILE=my-cli.json \
   -DCLI_STARTER_PROMPT_LABEL=mycli
 ```
 
@@ -335,7 +364,8 @@ cmake -S . -B build \
 1. `src/commands/` 아래에 명령 구현 파일을 추가합니다.
 2. [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp)에 registrar를 선언합니다.
 3. [src/commands/register_commands.cpp](src/commands/register_commands.cpp)에서 명령을 등록합니다.
-4. [tests/config_tests.cpp](tests/config_tests.cpp) 또는 새 테스트 파일에 테스트를 추가합니다.
+4. [tests/config_tests.cpp](tests/config_tests.cpp)에 테스트를 추가하거나, 새 테스트 파일을 만들고
+   [CMakeLists.txt](CMakeLists.txt)의 `starter_tests` target에 포함합니다.
 5. 사용자에게 보이는 동작을 이 README나 [docs/architecture.md](docs/architecture.md)에 문서화합니다.
 
 명령 파서는 CLI11을 사용하므로 CLI11의 옵션, 플래그, 위치 인자, 중첩 하위명령 기능을
@@ -350,7 +380,7 @@ cmake -S . -B build \
 - `config/`: 체크인된 설정 템플릿
 - `tests/`: 스타터 동작 테스트
 - `third_party/`: vendored header-only 의존성과 라이선스 파일
-- `docs/`: 아키텍처와 마이그레이션 노트
+- `docs/`: 온보딩, 아키텍처, 테스트, 문제 해결, 마이그레이션 노트
 
 ## 테스트
 
@@ -361,6 +391,9 @@ cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build -R starter_tests --output-on-failure
 ```
+
+아직 추적되는 CI workflow가 없으므로, CI가 추가되기 전까지는 이 로컬 CMake/CTest 흐름이
+저장소의 기준 검증 경로입니다.
 
 multi-config 생성기를 사용하면 설정 이름을 추가합니다.
 
@@ -379,6 +412,9 @@ ctest --test-dir build -C Debug -R starter_tests --output-on-failure
 ## 추가 문서
 
 - [docs/project-overview.md](docs/project-overview.md): 프로젝트 목적과 범위
+- [docs/onboarding.md](docs/onboarding.md): 첫 로컬 빌드, smoke test, 커스터마이징 흐름
 - [docs/architecture.md](docs/architecture.md): 구조와 확장 지점
+- [docs/testing.md](docs/testing.md): CTest/doctest 검증 흐름과 테스트 범위
+- [docs/troubleshooting.md](docs/troubleshooting.md): 로컬 설정과 실행 중 자주 겪는 문제
 - [docs/migration-from-legacy.md](docs/migration-from-legacy.md): 마이그레이션 노트
 - [third_party/README.md](third_party/README.md): 의존성 출처 정보
