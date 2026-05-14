@@ -4,6 +4,7 @@
 #include <cctype>
 #include <exception>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <CLI/CLI.hpp>

@@ -1,9 +1,11 @@
 #include "starter/core/shell_line_reader.hpp"
 
-#include <algorithm>
+#include <cstddef>
 #include <cstdio>
 #include <iostream>
+#include <optional>
 #include <string>
+#include <vector>
 
 #ifdef _WIN32
 #include <conio.h>

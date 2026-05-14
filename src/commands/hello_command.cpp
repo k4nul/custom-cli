@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <memory>
 #include <ostream>
+#include <string>
 
 #include "starter/core/config.hpp"
 
@@ -47,4 +48,3 @@ void register_hello_command(
 }
 
 }  // namespace starter
-
