@@ -47,4 +47,6 @@ currently serialized and displayed, but it is not used as a runtime allowlist.
 
 ## Why There Is No Runtime Plugin Layer
 
-The legacy runtime plugin loader was tightly coupled to unavailable infrastructure and product-specific commands. For a starter repository, compile-time command registration is easier to understand, easier to build, and easier to copy into a new project.
+The legacy runtime plugin loader was tightly coupled to unavailable infrastructure and product-specific
+commands. For a starter repository, compile-time command registration is easier to understand, easier
+to build, and easier to copy into a new project.

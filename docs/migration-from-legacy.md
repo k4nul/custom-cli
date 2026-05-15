@@ -58,4 +58,5 @@ Observed responsibilities in the removed shared utility layer:
 
 ## Important Design Shift
 
-The new repository is intentionally not a drop-in clone of the old runtime behavior. It is a reusable starter that keeps reusable CLI patterns and discards environment-specific operations.
+The new repository is intentionally not a drop-in clone of the old runtime behavior. It is a reusable
+starter that keeps reusable CLI patterns and discards environment-specific operations.
