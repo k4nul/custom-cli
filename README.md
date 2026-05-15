@@ -217,7 +217,8 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 - [docs/architecture.md](docs/architecture.md): structure and extension points
 - [docs/testing.md](docs/testing.md): CTest/doctest validation flow and coverage notes
 - [docs/troubleshooting.md](docs/troubleshooting.md): common local setup and runtime issues
-- [docs/maintenance.md](docs/maintenance.md): maintainer checklist for command, config, dependency, and documentation changes
+- [docs/maintenance.md](docs/maintenance.md): maintainer checklist for command, config, dependency, and
+  documentation changes
 - [docs/migration-from-legacy.md](docs/migration-from-legacy.md): migration notes
 - [third_party/README.md](third_party/README.md): dependency source notes
 

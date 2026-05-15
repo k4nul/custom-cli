@@ -2,7 +2,8 @@
 
 ## Purpose
 
-This repository is a reusable C++ CLI starter, not a product-specific operations console. Its job is to provide a clean base for building custom command-line tools with:
+This repository is a reusable C++ CLI starter, not a product-specific operations console. Its job is
+to provide a clean base for building custom command-line tools with:
 
 - a simple build entry point,
 - consistent command registration,
@@ -18,7 +19,8 @@ The legacy repository mixed three concerns:
 - a plugin framework,
 - and organization-specific operational commands.
 
-The new direction intentionally narrows scope. This starter keeps the reusable CLI experience and removes domain-specific operational behavior.
+The new direction intentionally narrows scope. This starter keeps the reusable CLI experience and
+removes domain-specific operational behavior.
 
 ## What Was Removed
 
