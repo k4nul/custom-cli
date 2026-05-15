@@ -1,6 +1,8 @@
 build/
 build-linux/
+build-local-*/
 out/
+.sandbox-user/
 .vs/
 .idea/
 cmake-build-*/

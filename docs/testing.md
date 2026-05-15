@@ -107,9 +107,9 @@ Use the configuration-specific executable path on multi-config generators.
 ## Expected Local Files
 
 Keep generated build trees and local configs out of commits. Prefer ignored
-build directories such as `build/` or `cmake-build-*`, and keep local config
-experiments in `config/local.json` or `config/*.local.json`.
+build directories such as `build/`, `build-local-*`, or `cmake-build-*`, and
+keep local config experiments in `config/local.json` or `config/*.local.json`.
 
-If generated `build-local-*` or `.sandbox-user/` paths appear in a checkout,
-do not use them as validation evidence. Rebuild into a fresh ignored directory
-before reporting test results.
+If generated `build-local-*` or `.sandbox-user/` paths appear from an older
+checkout, do not use them as validation evidence. Rebuild into a fresh ignored
+directory before reporting test results.
