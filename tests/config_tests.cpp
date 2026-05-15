@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
+#include <exception>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -177,6 +178,20 @@ TEST_CASE("config can round-trip through JSON") {
     CHECK(parsed.default_name == "engineer");
     CHECK(parsed.enabled_commands == expected_commands);
     CHECK(parsed.notes == "Round-trip test");
+}
+
+TEST_CASE("config parsing rejects wrong-type fields") {
+    const std::vector<std::string> invalid_configs = {
+        R"({"prompt":123})",
+        R"({"default_name":true})",
+        R"({"enabled_commands":"hello"})",
+        R"({"enabled_commands":["hello",7]})",
+        R"({"notes":{"text":"bad"}})",
+    };
+
+    for (const auto& invalid_config : invalid_configs) {
+        CHECK_THROWS_AS(starter::parse_config(invalid_config), std::exception);
+    }
 }
 
 TEST_CASE("application accepts hello subcommand options from argv order") {
@@ -376,6 +391,19 @@ TEST_CASE("config show reports malformed disk config through stderr") {
     CHECK(contains_text(result.err, "parse error"));
 }
 
+TEST_CASE("config show reports wrong-type disk config through stderr") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "wrong-type.json";
+    write_text_file(config_path, R"({"enabled_commands":"hello"})");
+
+    const auto result = run_application({"--config", config_path.string(), "config", "show"});
+
+    CHECK(result.exit_code != 0);
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "type must be array"));
+}
+
 TEST_CASE("config-backed hello reports malformed disk config through stderr") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "bad.json";
@@ -387,6 +415,19 @@ TEST_CASE("config-backed hello reports malformed disk config through stderr") {
     CHECK(result.out.empty());
     CHECK(contains_text(result.err, "error: "));
     CHECK(contains_text(result.err, "parse error"));
+}
+
+TEST_CASE("config-backed hello reports wrong-type disk config through stderr") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "wrong-type.json";
+    write_text_file(config_path, R"({"default_name":42})");
+
+    const auto result = run_application({"--config", config_path.string(), "hello"});
+
+    CHECK(result.exit_code != 0);
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "type must be string"));
 }
 
 TEST_CASE("doctor reports healthy starter layout with missing config warning") {
