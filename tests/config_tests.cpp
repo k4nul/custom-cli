@@ -253,12 +253,56 @@ TEST_CASE("application routes help output through configured stream") {
     CHECK(result.err.empty());
 }
 
+TEST_CASE("application routes help-all output through configured stream") {
+    const auto result = run_application({"--help-all"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Usage:"));
+    CHECK(contains_text(result.out, "Start the interactive shell."));
+    CHECK(contains_text(result.out, "Sample command that uses options plus config defaults."));
+    CHECK(contains_text(result.out, "--enthusiastic"));
+    CHECK(contains_text(result.out, "Echo text to demonstrate positional arguments."));
+    CHECK(contains_text(result.out, "--uppercase"));
+    CHECK(contains_text(result.out, "Write or inspect starter configuration."));
+    CHECK(contains_text(result.out, "init"));
+    CHECK(contains_text(result.out, "show"));
+    CHECK(result.err.empty());
+}
+
 TEST_CASE("application routes parse errors through configured stream") {
     const auto result = run_application({"missing-command"});
 
     CHECK(result.exit_code != 0);
     CHECK(result.out.empty());
     CHECK(contains_text(result.err, "missing-command"));
+    CHECK(contains_text(result.err, "Run with --help"));
+}
+
+TEST_CASE("application reports missing echo text through stderr") {
+    const auto result = run_application({"echo"});
+
+    CHECK(result.exit_code != 0);
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "text is required"));
+    CHECK(contains_text(result.err, "Run with --help"));
+}
+
+TEST_CASE("application reports unknown options through stderr") {
+    const auto result = run_application({"hello", "--unknown"});
+
+    CHECK(result.exit_code != 0);
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "not expected"));
+    CHECK(contains_text(result.err, "--unknown"));
+    CHECK(contains_text(result.err, "Run with --help"));
+}
+
+TEST_CASE("application reports missing config subcommand through stderr") {
+    const auto result = run_application({"config"});
+
+    CHECK(result.exit_code != 0);
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "A subcommand is required"));
     CHECK(contains_text(result.err, "Run with --help"));
 }
 
