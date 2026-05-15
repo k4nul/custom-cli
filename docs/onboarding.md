@@ -19,13 +19,13 @@ The command parser, JSON library, and test framework are vendored under
 ## First Build
 
 Use an out-of-source build directory. Prefer `build/` for normal local work; the
-repository ignores `build/`, `build-linux/`, `out/`, and `cmake-build-*` for
-local build products.
+repository ignores `build/`, `build-linux/`, `build-local-*`, `out/`,
+`cmake-build-*`, and `.sandbox-user/` for local build products and sandbox
+telemetry.
 
-Do not treat generated `build-local-*` or `.sandbox-user/` directories as
-source inputs. If they appear in a checkout, rebuild into a fresh ignored build
-directory before validating behavior and avoid adding new generated files under
-those paths.
+Do not treat generated `build-local-*` or `.sandbox-user/` directories as source
+inputs. If they appear from an older checkout, rebuild into a fresh ignored build
+directory before validating behavior.
 
 ```bash
 cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON

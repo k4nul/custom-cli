@@ -81,15 +81,14 @@ package-manager bootstrap for normal builds. When updating a dependency:
 
 ## Local Artifact Hygiene
 
-Use ignored build directories such as `build/` or `cmake-build-*` for new local
-work. Avoid adding generated build output, IDE telemetry, or machine-specific
-state to future changes.
+Use ignored build directories such as `build/`, `build-local-*`, or
+`cmake-build-*` for new local work. `.sandbox-user/` is also ignored for local
+sandbox and IDE telemetry. Avoid adding generated build output, IDE telemetry,
+or machine-specific state to future changes.
 
-If a checkout contains generated `build-local-*` or `.sandbox-user/` paths, treat
-them as historical local artifacts rather than source evidence. Reconfigure into
-a fresh ignored build directory before validating behavior. Removing tracked
-generated artifacts should be handled as a separate cleanup package because it
-touches non-documentation files.
+If an older checkout contains tracked `build-local-*` or `.sandbox-user/` paths,
+treat them as historical local artifacts rather than source evidence. Reconfigure
+into a fresh ignored build directory before validating behavior.
 
 ## Documentation Changes
 
