@@ -4,6 +4,8 @@
 #include <ostream>
 #include <string>
 
+#include <CLI/CLI.hpp>
+
 #include "starter/core/config.hpp"
 
 namespace starter {
