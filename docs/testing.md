@@ -70,7 +70,7 @@ For Visual Studio-style layouts:
 - `config init` output-path behavior,
 - `config show` fallback output when no config file exists,
 - `config show` defaults for omitted disk config fields,
-- malformed disk config errors for `config show` and config-backed `hello`,
+- malformed and wrong-type disk config errors for `config show` and config-backed `hello`,
 - `hello` command dispatch through `Application`, including missing-config guidance,
 - `echo` command dispatch for positional text, uppercase output, numbered output,
   and combined uppercase numbered output,
@@ -86,7 +86,6 @@ Add focused coverage when work touches these areas:
 
 - full interactive shell lifecycle with real input/output,
 - `--help-all` output content,
-- wrong-type config fields,
 - config read/write failures,
 - missing required `echo` text and other CLI11 validation errors, and
 - future CI behavior once workflow files are added.

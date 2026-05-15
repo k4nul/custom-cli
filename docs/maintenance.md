@@ -114,10 +114,13 @@ Keep the documentation set internally consistent:
 - `docs/architecture.md`: component layout, command flow, and extension points.
 - `docs/testing.md`: validation commands, current coverage, and test gaps.
 - `docs/troubleshooting.md`: known build, config, and runtime failures.
+- `docs/maintenance.md`: maintainer validation, change checklists, artifact
+  hygiene, and CI bootstrap expectations.
 - `docs/migration-from-legacy.md`: historical migration context.
 
 When a command, config field, CMake cache variable, or validation path changes,
-update the nearest docs in the same change.
+update the nearest docs in the same change. When a known test gap is closed,
+move it from `docs/testing.md`'s gap list into the current coverage summary.
 
 ## CI Bootstrap Expectations
 
