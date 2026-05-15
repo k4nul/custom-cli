@@ -91,6 +91,7 @@ Examples:
 Global options are available before any command:
 
 - `--version`: print the configured display name and project version
+- `--help`: show top-level command help
 - `--help-all`: show help for all subcommands
 - `-c, --config <path>`: use a non-default JSON config path
 
@@ -151,6 +152,11 @@ cmake -S . -B build \
 ```
 
 After renaming, replace the sample commands with your own application behavior.
+If you change `CLI_STARTER_CONFIG_FILE`, copy or rename the JSON template to
+`config/<configured-name>` or pass `--config <path>` while you are migrating. If
+you change `CLI_STARTER_PROMPT_LABEL`, update the JSON `prompt` field too when
+you want disk-backed shell sessions to use the same prompt; a config file's
+`prompt` value overrides the CMake fallback.
 
 ## Adding A Command
 
@@ -170,6 +176,7 @@ nested subcommands.
 - `src/commands/`: built-in command implementations
 - `src/core/`: shared helpers such as config loading, tokenization, and completion
 - `include/starter/`: public headers for the starter
+- `cmake/`: templates for generated project metadata
 - `config/`: checked-in config template
 - `tests/`: starter behavior tests
 - `third_party/`: vendored header-only dependencies and license files
@@ -188,9 +195,10 @@ ctest --test-dir build -R starter_tests --output-on-failure
 No CI workflow is tracked yet, so this local CMake/CTest flow is the repository's authoritative
 validation path until CI is added.
 
-With multi-config generators, add the configuration:
+With multi-config generators, build and test the same configuration:
 
 ```powershell
+cmake --build build --config Debug
 ctest --test-dir build -C Debug -R starter_tests --output-on-failure
 ```
 
@@ -305,6 +313,7 @@ starter> exit
 전역 옵션은 명령 앞에서 사용할 수 있습니다.
 
 - `--version`: 설정된 표시 이름과 프로젝트 버전 출력
+- `--help`: 최상위 명령 도움말 출력
 - `--help-all`: 모든 하위명령 도움말 출력
 - `-c, --config <path>`: 기본값이 아닌 JSON 설정 경로 사용
 
@@ -365,6 +374,10 @@ cmake -S . -B build \
 ```
 
 이름을 바꾼 뒤에는 예제 명령을 실제 애플리케이션 동작으로 교체하면 됩니다.
+`CLI_STARTER_CONFIG_FILE`을 바꾸면 JSON 템플릿도 `config/<설정한-이름>`으로 복사하거나
+이름을 바꾸고, 전환 중에는 `--config <path>`를 사용합니다. `CLI_STARTER_PROMPT_LABEL`을
+바꾼 뒤 디스크 설정을 사용하는 셸에서도 같은 프롬프트를 쓰려면 JSON의 `prompt` 값도 함께
+바꿉니다. 설정 파일의 `prompt` 값은 CMake fallback보다 우선합니다.
 
 ## 명령 추가하기
 
@@ -384,6 +397,7 @@ cmake -S . -B build \
 - `src/commands/`: 기본 명령 구현
 - `src/core/`: 설정 로딩, 토큰화, 자동완성 같은 공통 helper
 - `include/starter/`: 스타터용 public header
+- `cmake/`: 생성되는 프로젝트 metadata용 템플릿
 - `config/`: 체크인된 설정 템플릿
 - `tests/`: 스타터 동작 테스트
 - `third_party/`: vendored header-only 의존성과 라이선스 파일
@@ -402,9 +416,10 @@ ctest --test-dir build -R starter_tests --output-on-failure
 아직 추적되는 CI workflow가 없으므로, CI가 추가되기 전까지는 이 로컬 CMake/CTest 흐름이
 저장소의 기준 검증 경로입니다.
 
-multi-config 생성기를 사용하면 설정 이름을 추가합니다.
+multi-config 생성기를 사용하면 같은 설정으로 빌드하고 테스트합니다.
 
 ```powershell
+cmake --build build --config Debug
 ctest --test-dir build -C Debug -R starter_tests --output-on-failure
 ```
 

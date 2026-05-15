@@ -90,6 +90,19 @@ If an older checkout contains tracked `build-local-*` or `.sandbox-user/` paths,
 treat them as historical local artifacts rather than source evidence. Reconfigure
 into a fresh ignored build directory before validating behavior.
 
+Use this check when preparing maintenance reports or reviewing unexpected build
+evidence:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
+If the command returns paths, keep documentation and test reports anchored to
+fresh validation from `build/`. Removing those tracked generated files is a
+repository cleanup package: delete the artifacts, keep `.gitignore` coverage in
+place, rerun the baseline validation flow, and mention the cleanup explicitly in
+the change summary.
+
 ## Documentation Changes
 
 Keep the documentation set internally consistent:
