@@ -3,6 +3,8 @@
 #include <ostream>
 #include <string>
 
+#include <CLI/CLI.hpp>
+
 namespace starter {
 
 void register_about_command(

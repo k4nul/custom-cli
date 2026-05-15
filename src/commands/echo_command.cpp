@@ -2,10 +2,13 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <memory>
 #include <ostream>
 #include <string>
 #include <vector>
+
+#include <CLI/CLI.hpp>
 
 #include "starter/core/tokenize.hpp"
 
@@ -67,4 +70,3 @@ void register_echo_command(
 }
 
 }  // namespace starter
-
