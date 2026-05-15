@@ -18,22 +18,29 @@ The command parser, JSON library, and test framework are vendored under
 
 ## First Build
 
-Use an out-of-source build directory. Prefer `build/` for normal local work; the
-repository ignores `build/`, `build-linux/`, `build-local-*`, `out/`,
-`cmake-build-*`, and `.sandbox-user/` for local build products and sandbox
+Use an out-of-source build directory. Prefer `build/` for normal local work. The
+ignore rules cover `build/`, `build-linux/`, `build-local-*`, `out/`,
+`cmake-build-*`, and `.sandbox-user/` for new local build products and sandbox
 telemetry.
 
-Do not treat generated `build-local-*` or `.sandbox-user/` directories as source
-inputs. If they appear from an older checkout, rebuild into a fresh ignored build
-directory before validating behavior.
+Ignore rules do not remove files that were already committed, so a checkout may
+still contain historical `build-local-*` or `.sandbox-user/` paths. Treat those
+paths as legacy local artifacts, not source inputs or validation evidence. If
+they are present, rebuild into a fresh ignored build directory before validating
+behavior:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
 
 ```bash
 cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
+ctest --test-dir build -R starter_tests --output-on-failure
 ```
 
 The default executable name is `cli-starter`. With single-config generators,
-run it from the build directory root:
+run the executable under `build/` from the repository root:
 
 ```bash
 ./build/cli-starter --version
@@ -45,6 +52,7 @@ configuration:
 
 ```powershell
 cmake --build build --config Debug
+ctest --test-dir build -C Debug -R starter_tests --output-on-failure
 .\build\Debug\cli-starter.exe --version
 .\build\Debug\cli-starter.exe about
 ```
@@ -103,6 +111,13 @@ cmake -S . -B build \
 Those values are written into the generated project config header in the build
 tree. The checked-in JSON template remains in `config/cli-starter.json` until
 you intentionally rename or replace it.
+
+`CLI_STARTER_CONFIG_FILE` changes the default runtime path under `config/`. If
+you set it to `my-cli.json`, copy or rename the template to
+`config/my-cli.json`, or pass `--config <path>` while the copied project is in
+transition. `CLI_STARTER_PROMPT_LABEL` is the fallback shell prompt, but a disk
+config's `prompt` field wins when the config file exists, so update both when
+you want the prompt to stay consistent.
 
 ## Adding The First Real Command
 

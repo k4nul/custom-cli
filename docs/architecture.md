@@ -6,6 +6,7 @@
 - `src/commands/`: command implementations and registrar wiring
 - `src/core/`: shared helpers such as config loading, tokenization, and completion
 - `include/starter/`: public headers for the starter
+- `cmake/`: generated project metadata templates
 - `config/`: default config template location
 - `tests/`: starter behavior tests
 - `third_party/`: vendored header-only dependencies and license texts

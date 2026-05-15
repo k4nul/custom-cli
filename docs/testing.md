@@ -28,6 +28,18 @@ No CI workflow is tracked in this repository yet, so this local CMake/CTest flow
 is the authoritative validation path until CI is added. See
 `docs/maintenance.md` for the expected first CI shape.
 
+Report test results from a build tree created for the current validation pass.
+Do not use existing `build-local-*` executables or cached CTest files as proof
+that the current source still builds, even when those paths appear in the
+checkout. The ignore rules prevent new local artifacts from being added, but
+they do not make historical tracked artifacts authoritative.
+
+Check for those paths when validation evidence looks suspicious:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
 For multi-config generators, build and test the same configuration:
 
 ```powershell
@@ -57,6 +69,8 @@ For Visual Studio-style layouts:
 - custom config paths for config-backed commands,
 - `config init` output-path behavior,
 - `config show` fallback output when no config file exists,
+- `config show` defaults for omitted disk config fields,
+- malformed disk config errors for `config show` and config-backed `hello`,
 - `hello` command dispatch through `Application`, including missing-config guidance,
 - `echo` command dispatch for positional text, uppercase output, numbered output,
   and combined uppercase numbered output,
@@ -72,7 +86,7 @@ Add focused coverage when work touches these areas:
 
 - full interactive shell lifecycle with real input/output,
 - `--help-all` output content,
-- malformed JSON config files,
+- wrong-type config fields,
 - config read/write failures,
 - missing required `echo` text and other CLI11 validation errors, and
 - future CI behavior once workflow files are added.
@@ -112,4 +126,5 @@ keep local config experiments in `config/local.json` or `config/*.local.json`.
 
 If generated `build-local-*` or `.sandbox-user/` paths appear from an older
 checkout, do not use them as validation evidence. Rebuild into a fresh ignored
-directory before reporting test results.
+directory before reporting test results, and leave actual artifact removal to a
+separate non-documentation cleanup change.

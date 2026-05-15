@@ -42,6 +42,30 @@ such as `.\build\Debug\cli-starter.exe`.
 If you changed `CLI_STARTER_BINARY_NAME`, the output file uses that configured
 name instead of `cli-starter`.
 
+## Tracked Local Artifacts Appear In `git ls-files`
+
+The repository ignore rules cover new `build/`, `build-local-*`,
+`cmake-build-*`, `.sandbox-user/`, and local config files, but ignore rules do
+not untrack files that were already committed. If `git ls-files` reports
+historical build or sandbox files, treat them as legacy artifacts:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
+Do not run old binaries or cite old CTest files from those paths as current
+validation. Reconfigure into a fresh ignored build directory and run the normal
+CMake/CTest flow before reporting results:
+
+```bash
+cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build -R starter_tests --output-on-failure
+```
+
+Removing tracked generated files changes repository contents and should be done
+as a separate cleanup task, not as part of routine docs or test-result updates.
+
 ## `hello` Prints A Config Tip
 
 When no config file exists and `hello` is run without `--name`, the command uses
