@@ -677,6 +677,64 @@ TEST_CASE("doctor reports healthy starter layout with missing config warning") {
     CHECK(result.err.empty());
 }
 
+TEST_CASE("doctor reports disk config and missing recommended layout") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "config" / "local.json";
+
+    starter::AppConfig config;
+    config.prompt = "project";
+    config.default_name = "Ada";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"--config", config_path.string(), "doctor"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "[missing] source directory: src\n"));
+    CHECK(contains_text(result.out, "[missing] public headers: include\n"));
+    CHECK(contains_text(result.out, "[missing] docs directory: docs\n"));
+    CHECK(contains_text(result.out, "[ok] config directory: config\n"));
+    CHECK(contains_text(result.out, "[missing] third-party directory: third_party\n"));
+    CHECK(contains_text(result.out, "[ok] config: " + config_path.generic_string() + " loaded from disk\n"));
+    CHECK(contains_text(result.out, "[info] prompt: project\n"));
+    CHECK(contains_text(result.out, "[info] default name: Ada\n"));
+    CHECK(contains_text(result.out, "Starter layout is missing recommended files.\n"));
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("doctor reports malformed disk config through stderr") {
+    TemporaryDirectory temporary_directory;
+    create_recommended_starter_layout(temporary_directory.path());
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "config" / "bad.json";
+    write_text_file(config_path, R"({"default_name":)");
+
+    const auto result = run_application({"--config", config_path.string(), "doctor"});
+
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
+    CHECK(contains_text(result.out, "[ok] source directory: src\n"));
+    CHECK(contains_text(result.out, "[ok] third-party directory: third_party\n"));
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "parse error"));
+    CHECK_FALSE(contains_text(result.out, "Starter layout looks healthy."));
+}
+
+TEST_CASE("doctor reports wrong-type disk config through stderr") {
+    TemporaryDirectory temporary_directory;
+    create_recommended_starter_layout(temporary_directory.path());
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "config" / "wrong-type.json";
+    write_text_file(config_path, R"({"prompt":7})");
+
+    const auto result = run_application({"--config", config_path.string(), "doctor"});
+
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
+    CHECK(contains_text(result.out, "[ok] config directory: config\n"));
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "type must be string"));
+    CHECK_FALSE(contains_text(result.out, "[info] prompt:"));
+}
+
 TEST_CASE("tab completion filters root command prefixes") {
     const std::vector<std::string> commands = {"abcd", "efgh", "abab"};
 
