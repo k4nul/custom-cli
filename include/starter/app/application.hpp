@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "starter/core/project_info.hpp"
+#include "starter/core/shell_line_reader.hpp"
 
 namespace CLI {
 class App;
@@ -15,7 +16,7 @@ namespace starter {
 
 class Application {
 public:
-    Application(ProjectInfo project_info, std::ostream& out, std::ostream& err);
+    Application(ProjectInfo project_info, std::ostream& out, std::ostream& err, ShellLineReader shell_line_reader = {});
 
     int run(int argc, char** argv);
 
@@ -28,6 +29,7 @@ private:
     ProjectInfo project_info_;
     std::ostream& out_;
     std::ostream& err_;
+    ShellLineReader shell_line_reader_;
     std::string active_shell_config_path_;
 };
 

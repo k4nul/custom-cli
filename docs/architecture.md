@@ -14,6 +14,8 @@
 ## Core Components
 
 - `Application`: owns one-shot execution, interactive shell mode, and global options
+- Shell line reader: handles interactive input and completion; `Application` can receive a scripted
+  reader for deterministic lifecycle tests
 - Command registrars: add subcommands to the root parser in one place
 - `AppConfig`: starter configuration object serialized as JSON
 - Tokenizer: shell-mode command-line splitter for quoted input
