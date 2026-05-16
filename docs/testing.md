@@ -65,16 +65,17 @@ For Visual Studio-style layouts:
 `tests/config_tests.cpp` covers the starter's reusable behavior:
 
 - tokenizing quoted shell input and reporting malformed shell input,
-- JSON config serialization and parsing,
+- JSON config serialization, parsing, strict top-level object validation, and typed read/write failures,
 - custom config paths for config-backed commands,
-- `config init` output-path behavior,
+- `config init` output-path behavior and write failure reporting,
 - `config show` fallback output when no config file exists,
 - `config show` defaults for omitted disk config fields,
-- malformed and wrong-type disk config errors for `config show` and config-backed `hello`,
+- malformed, non-object, and wrong-type disk config errors for `config show` and config-backed `hello`,
 - `hello` command dispatch through `Application`, including missing-config guidance,
 - `echo` command dispatch for positional text, uppercase output, numbered output,
   and combined uppercase numbered output,
-- top-level `--version`, `--help`, and parse-error stream routing,
+- top-level `--version`, `--help`, `--help-all`, and parse-error stream routing,
+- CLI11 validation errors for missing `echo` text, unknown options, and missing `config` subcommands,
 - `about` and `doctor` smoke behavior,
 - root command completion,
 - subcommand completion for `config init` and `config show`, and
@@ -85,9 +86,7 @@ For Visual Studio-style layouts:
 Add focused coverage when work touches these areas:
 
 - full interactive shell lifecycle with real input/output,
-- `--help-all` output content,
-- config read/write failures,
-- missing required `echo` text and other CLI11 validation errors, and
+- platform-specific config permission or locked-file failures that need OS-specific setup, and
 - future CI behavior once workflow files are added.
 
 ## Adding Tests

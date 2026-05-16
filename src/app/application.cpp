@@ -52,6 +52,15 @@ int Application::dispatch(std::vector<std::string> args, bool interactive_mode) 
         app.parse(args);
     } catch (const CLI::ParseError& error) {
         return app.exit(error, out_, err_);
+    } catch (const ConfigWriteError& error) {
+        err_ << "error: " << error.what() << '\n';
+        return to_int(ExitCode::io_error);
+    } catch (const ConfigReadError& error) {
+        err_ << "error: " << error.what() << '\n';
+        return to_int(ExitCode::config_error);
+    } catch (const ConfigParseError& error) {
+        err_ << "error: " << error.what() << '\n';
+        return to_int(ExitCode::config_error);
     } catch (const std::exception& error) {
         err_ << "error: " << error.what() << '\n';
         return to_int(ExitCode::runtime_error);

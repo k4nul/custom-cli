@@ -19,6 +19,7 @@
 #include "starter/commands/registrars.hpp"
 #include "starter/core/completion.hpp"
 #include "starter/core/config.hpp"
+#include "starter/core/exit_code.hpp"
 #include "starter/core/project_info.hpp"
 #include "starter/core/tokenize.hpp"
 
@@ -192,6 +193,58 @@ TEST_CASE("config parsing rejects wrong-type fields") {
     for (const auto& invalid_config : invalid_configs) {
         CHECK_THROWS_AS(starter::parse_config(invalid_config), std::exception);
     }
+}
+
+TEST_CASE("config parsing rejects non-object documents") {
+    const std::vector<std::string> invalid_configs = {
+        "[]",
+        "42",
+        "null",
+        R"("hello")",
+    };
+
+    for (const auto& invalid_config : invalid_configs) {
+        CHECK_THROWS_WITH_AS(
+            starter::parse_config(invalid_config),
+            "config root must be a JSON object",
+            starter::ConfigParseError);
+    }
+}
+
+TEST_CASE("config read failures use typed errors") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "missing.json";
+    bool caught = false;
+
+    try {
+        (void)starter::load_config_or_throw(config_path);
+    } catch (const starter::ConfigReadError& error) {
+        caught = true;
+        CHECK(contains_text(error.what(), "failed to open config file"));
+        CHECK(contains_text(error.what(), config_path.generic_string()));
+    }
+
+    CHECK(caught);
+}
+
+TEST_CASE("config write failures use typed errors") {
+    TemporaryDirectory temporary_directory;
+    const auto blocking_parent = temporary_directory.path() / "config-parent";
+    write_text_file(blocking_parent, "not a directory");
+    const auto config_path = blocking_parent / "starter.json";
+    bool caught = false;
+
+    try {
+        starter::write_config_template(config_path, starter::AppConfig{});
+    } catch (const starter::ConfigWriteError& error) {
+        caught = true;
+        CHECK(contains_text(error.what(), "failed"));
+        CHECK(contains_text(error.what(), config_path.generic_string()));
+    }
+
+    CHECK(caught);
+    std::error_code ignored;
+    CHECK_FALSE(fs::exists(config_path, ignored));
 }
 
 TEST_CASE("application accepts hello subcommand options from argv order") {
@@ -382,6 +435,21 @@ TEST_CASE("config init explicit output overrides global config path") {
     CHECK_FALSE(fs::exists(config_path));
 }
 
+TEST_CASE("config init reports write failures through stderr") {
+    TemporaryDirectory temporary_directory;
+    const auto blocking_parent = temporary_directory.path() / "config-parent";
+    write_text_file(blocking_parent, "not a directory");
+    const auto config_path = blocking_parent / "custom.json";
+
+    const auto result = run_application({"--config", config_path.string(), "config", "init"});
+
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::io_error));
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "failed"));
+    CHECK(contains_text(result.err, config_path.generic_string()));
+}
+
 TEST_CASE("config show describes built-in defaults when config is missing") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "missing.json";
@@ -429,10 +497,23 @@ TEST_CASE("config show reports malformed disk config through stderr") {
 
     const auto result = run_application({"--config", config_path.string(), "config", "show"});
 
-    CHECK(result.exit_code != 0);
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
     CHECK(result.out.empty());
     CHECK(contains_text(result.err, "error: "));
     CHECK(contains_text(result.err, "parse error"));
+}
+
+TEST_CASE("config show reports non-object disk config through stderr") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "array.json";
+    write_text_file(config_path, R"(["hello"])");
+
+    const auto result = run_application({"--config", config_path.string(), "config", "show"});
+
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "config root must be a JSON object"));
 }
 
 TEST_CASE("config show reports wrong-type disk config through stderr") {
@@ -442,7 +523,7 @@ TEST_CASE("config show reports wrong-type disk config through stderr") {
 
     const auto result = run_application({"--config", config_path.string(), "config", "show"});
 
-    CHECK(result.exit_code != 0);
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
     CHECK(result.out.empty());
     CHECK(contains_text(result.err, "error: "));
     CHECK(contains_text(result.err, "type must be array"));
@@ -455,7 +536,7 @@ TEST_CASE("config-backed hello reports malformed disk config through stderr") {
 
     const auto result = run_application({"--config", config_path.string(), "hello"});
 
-    CHECK(result.exit_code != 0);
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
     CHECK(result.out.empty());
     CHECK(contains_text(result.err, "error: "));
     CHECK(contains_text(result.err, "parse error"));
@@ -468,7 +549,7 @@ TEST_CASE("config-backed hello reports wrong-type disk config through stderr") {
 
     const auto result = run_application({"--config", config_path.string(), "hello"});
 
-    CHECK(result.exit_code != 0);
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
     CHECK(result.out.empty());
     CHECK(contains_text(result.err, "error: "));
     CHECK(contains_text(result.err, "type must be string"));
