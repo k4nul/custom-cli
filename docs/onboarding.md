@@ -34,10 +34,13 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
 ```bash
-cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build -R starter_tests --output-on-failure
 ```
+
+The explicit `BUILD_TESTING=ON` flag keeps CTest registration enabled even if a
+previous cache or preset disabled CMake's default test support.
 
 The default executable name is `cli-starter`. With single-config generators,
 run the executable under `build/` from the repository root:
@@ -105,6 +108,7 @@ cmake -S . -B build \
   -DCLI_STARTER_DISPLAY_NAME="My CLI" \
   -DCLI_STARTER_CONFIG_FILE=my-cli.json \
   -DCLI_STARTER_PROMPT_LABEL=mycli \
+  -DBUILD_TESTING=ON \
   -DCLI_STARTER_BUILD_TESTS=ON
 ```
 

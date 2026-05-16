@@ -29,7 +29,7 @@ On Windows, use Visual Studio, Build Tools for Visual Studio, or another CMake-s
 Configure and build:
 
 ```bash
-cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ```
 
@@ -187,13 +187,16 @@ nested subcommands.
 For normal starter behavior tests:
 
 ```bash
-cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build -R starter_tests --output-on-failure
 ```
 
 No CI workflow is tracked yet, so this local CMake/CTest flow is the repository's authoritative
 validation path until CI is added.
+
+Use a fresh ignored `build/` tree for validation. Do not cite historical `build-local-*` or
+`.sandbox-user/` artifacts as proof that the current source still builds or tests cleanly.
 
 With multi-config generators, build and test the same configuration:
 
@@ -252,7 +255,7 @@ C++ 툴체인을 사용하면 됩니다.
 설정하고 빌드합니다.
 
 ```bash
-cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ```
 
@@ -409,13 +412,16 @@ cmake -S . -B build \
 일반적인 스타터 동작 테스트는 다음 명령으로 실행합니다.
 
 ```bash
-cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build -R starter_tests --output-on-failure
 ```
 
 아직 추적되는 CI workflow가 없으므로, CI가 추가되기 전까지는 이 로컬 CMake/CTest 흐름이
 저장소의 기준 검증 경로입니다.
+
+검증에는 새로 만든 무시 대상 `build/` 트리를 사용하세요. 과거의 `build-local-*` 또는
+`.sandbox-user/` 산출물을 현재 소스가 빌드되거나 테스트된 증거로 인용하지 마세요.
 
 multi-config 생성기를 사용하면 같은 설정으로 빌드하고 테스트합니다.
 
