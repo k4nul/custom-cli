@@ -43,7 +43,7 @@ public:
         }
 
         auto raw = original_;
-        raw.c_lflag &= static_cast<unsigned>(~(ICANON | ECHO));
+        raw.c_lflag &= static_cast<tcflag_t>(~(ICANON | ECHO));
         raw.c_cc[VMIN] = 1;
         raw.c_cc[VTIME] = 0;
         active_ = tcsetattr(STDIN_FILENO, TCSANOW, &raw) == 0;
@@ -172,7 +172,10 @@ std::optional<std::string> read_shell_line(
             const auto action = choose_tab_completion(completion, line, line.size(), tab_state);
             if (action.kind == CompletionActionKind::replace) {
                 const auto previous_size = line.size();
-                line.replace(action.replace_begin, action.replace_end - action.replace_begin, action.replacement);
+                line.replace(
+                    action.replace_begin,
+                    action.replace_end - action.replace_begin,
+                    action.replacement);
                 redraw_line(prompt, line, out, previous_size);
             } else if (action.kind == CompletionActionKind::list) {
                 out << '\n';
