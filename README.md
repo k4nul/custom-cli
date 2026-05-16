@@ -71,7 +71,10 @@ starter> exit
 
 ## Interactive Completion
 
-The interactive shell supports command, subcommand, and option completion.
+The interactive shell supports command, subcommand, and option completion when
+it is attached to an interactive terminal. If stdin is redirected, or terminal
+raw mode is unavailable, the shell still accepts commands but reads plain lines
+without `Tab` completion.
 
 - Press `Tab` when there is one match to complete it.
 - Press `Tab` when several matches share a longer prefix to complete that shared prefix.
@@ -165,7 +168,9 @@ you want disk-backed shell sessions to use the same prompt; a config file's
 3. Register it from [src/commands/register_commands.cpp](src/commands/register_commands.cpp).
 4. Add tests in [tests/config_tests.cpp](tests/config_tests.cpp), or add a new test file and include
    it in the `starter_tests` target in [CMakeLists.txt](CMakeLists.txt).
-5. Document user-facing behavior in this README or [docs/architecture.md](docs/architecture.md).
+5. Document user-facing behavior in this README and the nearest relevant docs, such as
+   [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md), or
+   [docs/troubleshooting.md](docs/troubleshooting.md).
 
 The command parser is CLI11, so commands can use CLI11 options, flags, positional arguments, and
 nested subcommands.
@@ -297,7 +302,9 @@ starter> exit
 
 ## 인터랙티브 자동완성
 
-인터랙티브 셸은 명령, 하위명령, 옵션 자동완성을 지원합니다.
+인터랙티브 셸이 interactive terminal에 연결되어 있을 때 명령, 하위명령, 옵션 자동완성을
+지원합니다. stdin이 redirect되었거나 terminal raw mode를 사용할 수 없으면 셸은 계속 명령을
+받지만 `Tab` 자동완성 없이 일반 줄 입력으로 동작합니다.
 
 - 후보가 하나뿐이면 `Tab`으로 완성합니다.
 - 후보가 여러 개라도 더 긴 공통 prefix가 있으면 `Tab`으로 그 지점까지 완성합니다.
@@ -390,7 +397,9 @@ cmake -S . -B build \
 3. [src/commands/register_commands.cpp](src/commands/register_commands.cpp)에서 명령을 등록합니다.
 4. [tests/config_tests.cpp](tests/config_tests.cpp)에 테스트를 추가하거나, 새 테스트 파일을 만들고
    [CMakeLists.txt](CMakeLists.txt)의 `starter_tests` target에 포함합니다.
-5. 사용자에게 보이는 동작을 이 README나 [docs/architecture.md](docs/architecture.md)에 문서화합니다.
+5. 사용자에게 보이는 동작을 이 README와 관련 문서에 맞춰 문서화합니다. 예를 들어
+   [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md),
+   [docs/troubleshooting.md](docs/troubleshooting.md)를 함께 확인합니다.
 
 명령 파서는 CLI11을 사용하므로 CLI11의 옵션, 플래그, 위치 인자, 중첩 하위명령 기능을
 그대로 활용할 수 있습니다.

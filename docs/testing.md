@@ -87,10 +87,11 @@ For Visual Studio-style multi-config layouts:
 - CLI11 validation errors for missing `echo` text, unknown options, and missing `config` subcommands,
 - `about` and `doctor` smoke behavior,
 - scripted interactive shell lifecycle coverage for no-argv shell entry, disk-backed prompts,
-  shell-only help/exit handling, malformed input recovery, and command dispatch reuse,
-- root command completion,
-- subcommand completion for `config init` and `config show`, and
-- option completion for `hello --name`, `hello -e`, and `hello --enthusiastic`.
+  shell-only `help`, `exit`, and `quit` handling, malformed input recovery, and command dispatch reuse,
+- root command completion, including registered CLI commands plus shell-only `help`, `exit`, and `quit`,
+- subcommand completion for `config init` and `config show`,
+- scoped option completion for root options, `hello`, and `config init`, and
+- completion fallback to root options when earlier shell context is malformed.
 
 ## Known Gaps
 
@@ -109,6 +110,20 @@ starter validation target.
 
 Prefer tests that call the same application dispatch path as real CLI usage
 when the behavior is user-facing. For pure helpers, test the helper directly.
+
+## Focused Doctest Iteration
+
+After building `starter_tests`, run the whole suite through CTest for reportable
+validation. While iterating on one behavior, the doctest executable can list and
+filter registered test cases directly:
+
+```bash
+./build/starter_tests --list-test-cases
+./build/starter_tests --test-case="application reports unknown options through stderr"
+```
+
+Use the configuration-specific executable path on multi-config generators, such
+as `.\build\Debug\starter_tests.exe`.
 
 ## CLI Smoke Checks
 
