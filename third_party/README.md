@@ -22,7 +22,7 @@ This directory vendors small header-only dependencies so the starter does not de
 - Re-run starter verification after dependency updates:
 
 ```bash
-cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build -R starter_tests --output-on-failure
 ```

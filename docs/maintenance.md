@@ -10,10 +10,14 @@ Use the local CMake/CTest flow as the authoritative validation path until a CI
 workflow is added:
 
 ```bash
-cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build -R starter_tests --output-on-failure
 ```
+
+Keep both test flags explicit in maintenance reports. `CLI_STARTER_BUILD_TESTS`
+controls whether `starter_tests` is built, while `BUILD_TESTING` keeps CTest
+registration enabled through the repository's `include(CTest)` setup.
 
 For multi-config generators, build and test the same configuration:
 

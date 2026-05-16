@@ -8,14 +8,15 @@ checked-in CMake, config, and command behavior.
 Make sure tests were enabled at configure time and the build completed:
 
 ```bash
-cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build -R starter_tests --output-on-failure
 ```
 
-`CLI_STARTER_BUILD_TESTS` defaults to `BUILD_TESTING`, so a toolchain or preset
-that disables `BUILD_TESTING` also disables the `starter_tests` target unless
-you pass `-DCLI_STARTER_BUILD_TESTS=ON`.
+`CLI_STARTER_BUILD_TESTS` defaults to `BUILD_TESTING`, and `BUILD_TESTING`
+also controls CTest registration through `include(CTest)`. If a previous cache,
+toolchain, or preset disabled `BUILD_TESTING`, reconfigure with both flags set
+to `ON` instead of only rebuilding the old tree.
 
 ## Multi-Config Tests Fail To Start
 
@@ -58,7 +59,7 @@ validation. Reconfigure into a fresh ignored build directory and run the normal
 CMake/CTest flow before reporting results:
 
 ```bash
-cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build -R starter_tests --output-on-failure
 ```

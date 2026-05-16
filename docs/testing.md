@@ -12,14 +12,16 @@ exercise command behavior without spawning the built executable.
 
 The target is created only when `CLI_STARTER_BUILD_TESTS` is enabled. That
 option defaults to CMake's `BUILD_TESTING` value because the project includes
-`CTest`.
+`CTest`. Keep `BUILD_TESTING` enabled too; a cache or preset that turns it off
+can prevent CTest from registering the executable even if the test target is
+compiled.
 
 ## Standard Validation
 
 Use this flow for the normal local validation pass:
 
 ```bash
-cmake -S . -B build -DCLI_STARTER_BUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build -R starter_tests --output-on-failure
 ```
@@ -54,7 +56,13 @@ name, but the generated test executable can also be useful while iterating:
 ./build/starter_tests
 ```
 
-For Visual Studio-style layouts:
+For Windows single-config generators:
+
+```powershell
+.\build\starter_tests.exe
+```
+
+For Visual Studio-style multi-config layouts:
 
 ```powershell
 .\build\Debug\starter_tests.exe
