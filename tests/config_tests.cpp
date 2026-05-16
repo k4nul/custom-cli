@@ -129,6 +129,21 @@ void configure_starter_app(
     starter::register_builtin_commands(app, project_info, config_path, out, err, command_executed);
 }
 
+struct CompletionAppFixture {
+    starter::ProjectInfo project_info = starter::load_project_info();
+    std::string config_path = "cli-starter.json";
+    std::ostringstream out;
+    std::ostringstream err;
+    bool command_executed = false;
+    bool shell_requested = false;
+    CLI::App app{project_info.display_name + " - generic C++ CLI starter"};
+    std::vector<std::string> shell_commands = {"help", "exit", "quit"};
+
+    CompletionAppFixture() {
+        configure_starter_app(app, project_info, config_path, out, err, command_executed, shell_requested);
+    }
+};
+
 void create_recommended_starter_layout(const fs::path& root) {
     const std::vector<std::string> directories = {"src", "include", "docs", "config", "third_party"};
     for (const auto& directory : directories) {
@@ -626,17 +641,9 @@ TEST_CASE("tab completion expands shared candidate prefixes") {
 }
 
 TEST_CASE("tab completion reflects starter commands subcommands and options") {
-    std::ostringstream out;
-    std::ostringstream err;
-    const auto project_info = starter::load_project_info();
-    std::string config_path = "cli-starter.json";
-    bool command_executed = false;
-    bool shell_requested = false;
-    CLI::App app(project_info.display_name + " - generic C++ CLI starter");
-    configure_starter_app(app, project_info, config_path, out, err, command_executed, shell_requested);
-    const std::vector<std::string> shell_commands = {"help", "exit", "quit"};
+    CompletionAppFixture fixture;
 
-    const auto root = starter::resolve_completion("", 0, app, shell_commands);
+    const auto root = starter::resolve_completion("", 0, fixture.app, fixture.shell_commands);
     CHECK(contains(root.candidates, "about"));
     CHECK(contains(root.candidates, "hello"));
     CHECK(contains(root.candidates, "echo"));
@@ -647,23 +654,61 @@ TEST_CASE("tab completion reflects starter commands subcommands and options") {
     CHECK(contains(root.candidates, "exit"));
     CHECK(contains(root.candidates, "quit"));
 
-    const auto config_init = starter::resolve_completion("config i", 8, app, shell_commands);
+    const auto config_init = starter::resolve_completion("config i", 8, fixture.app, fixture.shell_commands);
     REQUIRE(config_init.candidates.size() == 1);
     CHECK(config_init.candidates.front() == "init");
 
-    const auto config_show = starter::resolve_completion("config s", 8, app, shell_commands);
+    const auto config_show = starter::resolve_completion("config s", 8, fixture.app, fixture.shell_commands);
     REQUIRE(config_show.candidates.size() == 1);
     CHECK(config_show.candidates.front() == "show");
 
-    const auto hello_name = starter::resolve_completion("hello --n", 9, app, shell_commands);
+    const auto hello_name = starter::resolve_completion("hello --n", 9, fixture.app, fixture.shell_commands);
     REQUIRE(hello_name.candidates.size() == 1);
     CHECK(hello_name.candidates.front() == "--name");
 
-    const auto hello_short_enthusiastic = starter::resolve_completion("hello -e", 8, app, shell_commands);
+    const auto hello_short_enthusiastic =
+        starter::resolve_completion("hello -e", 8, fixture.app, fixture.shell_commands);
     REQUIRE(hello_short_enthusiastic.candidates.size() == 1);
     CHECK(hello_short_enthusiastic.candidates.front() == "-e");
 
-    const auto hello_long_enthusiastic = starter::resolve_completion("hello --e", 9, app, shell_commands);
+    const auto hello_long_enthusiastic =
+        starter::resolve_completion("hello --e", 9, fixture.app, fixture.shell_commands);
     REQUIRE(hello_long_enthusiastic.candidates.size() == 1);
     CHECK(hello_long_enthusiastic.candidates.front() == "--enthusiastic");
+}
+
+TEST_CASE("tab completion keeps option candidates scoped to the active command") {
+    CompletionAppFixture fixture;
+
+    const auto root_options = starter::resolve_completion("--", 2, fixture.app, fixture.shell_commands);
+    CHECK(contains(root_options.candidates, "--config"));
+    CHECK(contains(root_options.candidates, "--help"));
+    CHECK(contains(root_options.candidates, "--help-all"));
+    CHECK(contains(root_options.candidates, "--version"));
+    CHECK_FALSE(contains(root_options.candidates, "--name"));
+    CHECK_FALSE(contains(root_options.candidates, "--output"));
+
+    const auto hello_options = starter::resolve_completion("hello --", 8, fixture.app, fixture.shell_commands);
+    CHECK(contains(hello_options.candidates, "--name"));
+    CHECK(contains(hello_options.candidates, "--enthusiastic"));
+    CHECK_FALSE(contains(hello_options.candidates, "--config"));
+    CHECK_FALSE(contains(hello_options.candidates, "--output"));
+
+    const auto config_init_options =
+        starter::resolve_completion("config init --", 14, fixture.app, fixture.shell_commands);
+    CHECK(contains(config_init_options.candidates, "--output"));
+    CHECK_FALSE(contains(config_init_options.candidates, "--config"));
+    CHECK_FALSE(contains(config_init_options.candidates, "--name"));
+}
+
+TEST_CASE("tab completion falls back to root options when prior context is malformed") {
+    CompletionAppFixture fixture;
+    const std::string line = "hello \"unterminated --";
+
+    const auto completion = starter::resolve_completion(line, line.size(), fixture.app, fixture.shell_commands);
+
+    CHECK(completion.prefix == "--");
+    CHECK(contains(completion.candidates, "--config"));
+    CHECK(contains(completion.candidates, "--help"));
+    CHECK_FALSE(contains(completion.candidates, "--name"));
 }
