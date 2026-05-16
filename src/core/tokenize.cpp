@@ -15,11 +15,13 @@ std::vector<std::string> tokenize_command_line(std::string_view line) {
     std::string current;
     char quote_character = '\0';
     bool escaping = false;
+    bool token_started = false;
 
     for (char character : line) {
         if (escaping) {
             current.push_back(character);
             escaping = false;
+            token_started = true;
             continue;
         }
 
@@ -39,18 +41,21 @@ std::vector<std::string> tokenize_command_line(std::string_view line) {
 
         if (character == '"' || character == '\'') {
             quote_character = character;
+            token_started = true;
             continue;
         }
 
         if (std::isspace(static_cast<unsigned char>(character)) != 0) {
-            if (!current.empty()) {
+            if (token_started) {
                 tokens.push_back(current);
                 current.clear();
+                token_started = false;
             }
             continue;
         }
 
         current.push_back(character);
+        token_started = true;
     }
 
     if (escaping) {
@@ -61,7 +66,7 @@ std::vector<std::string> tokenize_command_line(std::string_view line) {
         throw std::runtime_error("unterminated quote in command line");
     }
 
-    if (!current.empty()) {
+    if (token_started) {
         tokens.push_back(current);
     }
 

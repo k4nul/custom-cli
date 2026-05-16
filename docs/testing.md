@@ -73,6 +73,7 @@ For Visual Studio-style multi-config layouts:
 `tests/config_tests.cpp` covers the starter's reusable behavior:
 
 - tokenizing quoted shell input and reporting malformed shell input,
+- preserving empty quoted shell arguments so interactive input matches normal argv behavior,
 - JSON config serialization, parsing, strict top-level object validation, and typed read/write failures,
 - custom config paths for config-backed commands,
 - `config init` output-path behavior and write failure reporting,
@@ -85,6 +86,8 @@ For Visual Studio-style multi-config layouts:
 - top-level `--version`, `--help`, `--help-all`, and parse-error stream routing,
 - CLI11 validation errors for missing `echo` text, unknown options, and missing `config` subcommands,
 - `about` and `doctor` smoke behavior,
+- scripted interactive shell lifecycle coverage for no-argv shell entry, disk-backed prompts,
+  shell-only help/exit handling, malformed input recovery, and command dispatch reuse,
 - root command completion,
 - subcommand completion for `config init` and `config show`, and
 - option completion for `hello --name`, `hello -e`, and `hello --enthusiastic`.
@@ -93,7 +96,7 @@ For Visual Studio-style multi-config layouts:
 
 Add focused coverage when work touches these areas:
 
-- full interactive shell lifecycle with real input/output,
+- raw terminal line editing behavior that depends on platform TTY APIs,
 - platform-specific config permission or locked-file failures that need OS-specific setup, and
 - future CI behavior once workflow files are added.
 

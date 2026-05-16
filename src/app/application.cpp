@@ -21,8 +21,15 @@
 
 namespace starter {
 
-Application::Application(ProjectInfo project_info, std::ostream& out, std::ostream& err)
-    : project_info_(std::move(project_info)), out_(out), err_(err) {}
+Application::Application(ProjectInfo project_info, std::ostream& out, std::ostream& err, ShellLineReader shell_line_reader)
+    : project_info_(std::move(project_info)),
+      out_(out),
+      err_(err),
+      shell_line_reader_(std::move(shell_line_reader)) {
+    if (!shell_line_reader_) {
+        shell_line_reader_ = read_shell_line;
+    }
+}
 
 int Application::run(int argc, char** argv) {
     if (argc > 1) {
@@ -132,7 +139,7 @@ int Application::run_shell(const std::filesystem::path& config_path) {
 
     std::string line;
     while (true) {
-        const auto next_line = read_shell_line(prompt_text, out_, completion_provider);
+        const auto next_line = shell_line_reader_(prompt_text, out_, completion_provider);
         if (!next_line.has_value()) {
             out_ << '\n';
             break;

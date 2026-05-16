@@ -7,10 +7,12 @@
 #include <exception>
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <system_error>
+#include <utility>
 #include <vector>
 
 #include <CLI/CLI.hpp>
@@ -87,6 +89,7 @@ struct ApplicationRunResult {
     int exit_code = 0;
     std::string out;
     std::string err;
+    std::vector<std::string> prompts;
 };
 
 ApplicationRunResult run_application(std::vector<std::string> arguments) {
@@ -105,7 +108,43 @@ ApplicationRunResult run_application(std::vector<std::string> arguments) {
     }
 
     const int exit_code = application.run(static_cast<int>(argv.size()), argv.data());
-    return {exit_code, out.str(), err.str()};
+    return {exit_code, out.str(), err.str(), {}};
+}
+
+ApplicationRunResult run_application_with_scripted_shell(
+    std::vector<std::string> arguments,
+    std::vector<std::string> shell_lines) {
+    std::ostringstream out;
+    std::ostringstream err;
+    std::vector<std::string> prompts;
+    const auto project_info = starter::load_project_info();
+
+    starter::ShellLineReader shell_reader =
+        [shell_lines = std::move(shell_lines), &prompts, next_line = std::size_t{0}](
+            const std::string& prompt,
+            std::ostream& shell_out,
+            const starter::CompletionProvider&) mutable -> std::optional<std::string> {
+            prompts.push_back(prompt);
+            shell_out << prompt;
+            if (next_line >= shell_lines.size()) {
+                return std::nullopt;
+            }
+            return shell_lines[next_line++];
+        };
+
+    starter::Application application(project_info, out, err, std::move(shell_reader));
+
+    std::vector<std::string> arg_storage = {project_info.binary_name};
+    arg_storage.insert(arg_storage.end(), arguments.begin(), arguments.end());
+
+    std::vector<char*> argv;
+    argv.reserve(arg_storage.size());
+    for (auto& arg : arg_storage) {
+        argv.push_back(arg.data());
+    }
+
+    const int exit_code = application.run(static_cast<int>(argv.size()), argv.data());
+    return {exit_code, out.str(), err.str(), prompts};
 }
 
 void configure_starter_app(
@@ -166,6 +205,13 @@ TEST_CASE("tokenizer preserves quoted groups") {
     CHECK(tokens[1] == "--name");
     CHECK(tokens[2] == "starter user");
     CHECK(tokens[3] == "quoted value");
+}
+
+TEST_CASE("tokenizer preserves empty quoted arguments") {
+    const auto tokens = starter::tokenize_command_line("echo \"\" '' bare\"\" \"two words\"");
+    const std::vector<std::string> expected = {"echo", "", "", "bare", "two words"};
+
+    CHECK(tokens == expected);
 }
 
 TEST_CASE("tokenizer reports malformed shell input") {
@@ -372,6 +418,44 @@ TEST_CASE("application reports missing config subcommand through stderr") {
     CHECK(result.out.empty());
     CHECK(contains_text(result.err, "A subcommand is required"));
     CHECK(contains_text(result.err, "Run with --help"));
+}
+
+TEST_CASE("interactive shell runs no-argv sessions through the normal dispatch path") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto project_info = starter::load_project_info();
+
+    const auto result = run_application_with_scripted_shell({}, {"help", "hello --name Ada", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, project_info.display_name + " " + project_info.version + "\n"));
+    CHECK(contains_text(result.out, "Interactive mode. Type 'help' to inspect commands or 'exit' to quit.\n"));
+    CHECK(contains_text(result.out, "Using built-in defaults until config/cli-starter.json exists.\n"));
+    CHECK(contains_text(result.out, "Usage:"));
+    CHECK(contains_text(result.out, "Hello, Ada.\n"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> ", "starter> "});
+}
+
+TEST_CASE("interactive shell reuses disk config and recovers from malformed input") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+    starter::AppConfig config;
+    config.prompt = "custom";
+    config.default_name = "Grace";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"hello", "hello --name \"broken", "echo --numbered \"\" two", "quit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK_FALSE(contains_text(result.out, "Using built-in defaults"));
+    CHECK(contains_text(result.out, "Hello, Grace.\n"));
+    CHECK(contains_text(result.out, "1. \n2. two\n"));
+    CHECK(contains_text(result.err, "input error: unterminated quote in command line\n"));
+    CHECK_FALSE(contains_text(result.err, "command finished with exit code"));
+    CHECK(result.prompts == std::vector<std::string>{"custom> ", "custom> ", "custom> ", "custom> "});
 }
 
 TEST_CASE("about command reports starter metadata") {

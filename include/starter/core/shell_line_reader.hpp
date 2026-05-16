@@ -12,6 +12,10 @@
 namespace starter {
 
 using CompletionProvider = std::function<CompletionResult(std::string_view line, std::size_t cursor)>;
+using ShellLineReader = std::function<std::optional<std::string>(
+    const std::string&,
+    std::ostream&,
+    const CompletionProvider&)>;
 
 std::optional<std::string> read_shell_line(
     const std::string& prompt,
