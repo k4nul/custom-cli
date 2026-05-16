@@ -95,7 +95,9 @@ starter> exit
 
 The shell reuses the same command dispatch path as one-shot execution. It also
 adds shell-only `help`, `exit`, and `quit` commands and provides `Tab`
-completion for root commands, subcommands, and options.
+completion for root commands, subcommands, and options when stdin is an
+interactive terminal. Redirected shell input still works, but it uses plain line
+reading without interactive completion.
 
 ## Customization Loop
 
@@ -132,7 +134,8 @@ loader. To add a command:
 2. Declare the registrar in `include/starter/commands/registrars.hpp`.
 3. Register it from `src/commands/register_commands.cpp`.
 4. Add or extend tests under `tests/`.
-5. Update user-facing docs for the command.
+5. Update user-facing docs for the command, including README, architecture,
+   testing, and troubleshooting notes when the behavior changes those areas.
 
 Keep sample commands only as long as they help the copied project. Once real
 commands exist, remove or rewrite the samples that no longer match the new

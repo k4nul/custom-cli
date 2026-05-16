@@ -67,6 +67,28 @@ ctest --test-dir build -R starter_tests --output-on-failure
 Removing tracked generated files changes repository contents and should be done
 as a separate cleanup task, not as part of routine docs or test-result updates.
 
+## A Command Prints `Run with --help`
+
+CLI11 reports parse and validation failures through stderr. Common examples are
+an unknown command, a missing required positional argument, an unknown option, or
+running a command group without choosing a subcommand:
+
+```bash
+./build/cli-starter missing-command
+./build/cli-starter echo
+./build/cli-starter hello --unknown
+./build/cli-starter config
+```
+
+Use `--help` for top-level usage, `--help-all` to include subcommand help, or
+append `--help` after the command path you are debugging:
+
+```bash
+./build/cli-starter --help
+./build/cli-starter --help-all
+./build/cli-starter config init --help
+```
+
 ## `hello` Prints A Config Tip
 
 When no config file exists and `hello` is run without `--name`, the command uses
@@ -142,3 +164,17 @@ Re-enter the command with matching quotes:
 ```text
 starter> hello --name "Ada Lovelace"
 ```
+
+## Exit Status Reference
+
+The starter reserves these application-level exit statuses:
+
+- `0`: success, including help and version output
+- `2`: starter usage error outside CLI11's parse-error handling
+- `3`: config write or filesystem I/O failure
+- `4`: config read or parse failure
+- `5`: unexpected runtime error
+
+CLI11 parse errors, such as missing required arguments or unknown options, can
+return CLI11-specific parse-error statuses while still printing the same
+stderr-oriented usage guidance.

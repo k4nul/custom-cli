@@ -20,6 +20,38 @@
 - `AppConfig`: starter configuration object serialized as JSON
 - Tokenizer: shell-mode command-line splitter for quoted input
 
+## Interactive Shell And Completion
+
+`Application::run` starts the interactive shell when no argv command is
+provided. The `shell` subcommand starts the same mode explicitly, which lets a
+caller provide global options first, such as `--config ./config/local.json shell`.
+
+Shell startup loads the active config path once to choose the prompt. If the
+file does not exist, the shell uses built-in defaults and tells the user which
+config path would be used. Inside the shell:
+
+- `help` dispatches to top-level `--help`.
+- `help <command...>` dispatches to that command path with `--help` appended.
+- `exit` and `quit` leave the shell without going through CLI11 command
+  parsing.
+- All other input is tokenized and dispatched through the same command path as
+  one-shot argv execution.
+
+Malformed shell input, such as an unterminated quote, is reported as an input
+error and the shell keeps running. If a dispatched command returns a non-zero
+exit code, the shell reports that exit code and then prompts for the next
+command.
+
+Completion is derived from a fresh CLI11 parser configured with the same
+commands and global options as normal dispatch. Root completion includes the
+registered CLI commands plus shell-only `help`, `exit`, and `quit`. Subcommand
+completion follows the current command context, while option completion is
+scoped to the active command when the current token starts with `-`.
+
+The line reader performs completion only for an interactive terminal. If stdin
+is not interactive, or raw terminal mode cannot be enabled on POSIX systems, it
+falls back to ordinary line reads without interactive completion.
+
 ## Extension Points
 
 - Add a new command file under `src/commands/`
