@@ -21,7 +21,11 @@
 
 namespace starter {
 
-Application::Application(ProjectInfo project_info, std::ostream& out, std::ostream& err, ShellLineReader shell_line_reader)
+Application::Application(
+    ProjectInfo project_info,
+    std::ostream& out,
+    std::ostream& err,
+    ShellLineReader shell_line_reader)
     : project_info_(std::move(project_info)),
       out_(out),
       err_(err),

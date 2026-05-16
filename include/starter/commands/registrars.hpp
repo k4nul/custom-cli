@@ -3,9 +3,11 @@
 #include <iosfwd>
 #include <string>
 
-#include <CLI/CLI.hpp>
-
 #include "starter/core/project_info.hpp"
+
+namespace CLI {
+class App;
+}
 
 namespace starter {
 
@@ -58,4 +60,3 @@ void register_hello_command(
     bool& command_executed);
 
 }  // namespace starter
-
