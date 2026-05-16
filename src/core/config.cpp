@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -55,6 +56,15 @@ std::string join_commands(const std::vector<std::string>& commands) {
     return stream.str();
 }
 
+bool config_file_exists(const std::filesystem::path& path) {
+    std::error_code error;
+    const bool exists = std::filesystem::exists(path, error);
+    if (error) {
+        throw ConfigReadError("failed to inspect config file: " + path.generic_string() + ": " + error.message());
+    }
+    return exists;
+}
+
 }  // namespace
 
 std::string serialize_config(const AppConfig& config) {
@@ -63,25 +73,38 @@ std::string serialize_config(const AppConfig& config) {
 }
 
 AppConfig parse_config(std::string_view text) {
-    const json document = json::parse(text.begin(), text.end());
-    AppConfig config;
-    from_json(document, config);
-    return config;
+    try {
+        const json document = json::parse(text.begin(), text.end());
+        if (!document.is_object()) {
+            throw ConfigParseError("config root must be a JSON object");
+        }
+
+        AppConfig config;
+        from_json(document, config);
+        return config;
+    } catch (const ConfigParseError&) {
+        throw;
+    } catch (const json::exception& error) {
+        throw ConfigParseError(error.what());
+    }
 }
 
 AppConfig load_config_or_throw(const std::filesystem::path& path) {
     std::ifstream input(path);
     if (!input) {
-        throw std::runtime_error("failed to open config file: " + path.generic_string());
+        throw ConfigReadError("failed to open config file: " + path.generic_string());
     }
 
     std::ostringstream buffer;
     buffer << input.rdbuf();
+    if (input.bad()) {
+        throw ConfigReadError("failed to read config file: " + path.generic_string());
+    }
     return parse_config(buffer.str());
 }
 
 AppConfig load_config_or_default(const std::filesystem::path& path, bool* loaded) {
-    if (!std::filesystem::exists(path)) {
+    if (!config_file_exists(path)) {
         if (loaded != nullptr) {
             *loaded = false;
         }
@@ -95,16 +118,24 @@ AppConfig load_config_or_default(const std::filesystem::path& path, bool* loaded
 }
 
 void write_config_template(const std::filesystem::path& path, const AppConfig& config) {
-    if (path.has_parent_path() && !path.parent_path().empty()) {
-        std::filesystem::create_directories(path.parent_path());
+    try {
+        if (path.has_parent_path() && !path.parent_path().empty()) {
+            std::filesystem::create_directories(path.parent_path());
+        }
+    } catch (const std::filesystem::filesystem_error& error) {
+        throw ConfigWriteError("failed to prepare config directory for " + path.generic_string() + ": "
+            + error.what());
     }
 
     std::ofstream output(path, std::ios::trunc);
     if (!output) {
-        throw std::runtime_error("failed to write config file: " + path.generic_string());
+        throw ConfigWriteError("failed to write config file: " + path.generic_string());
     }
 
     output << serialize_config(config);
+    if (!output) {
+        throw ConfigWriteError("failed to write config file: " + path.generic_string());
+    }
 }
 
 std::string describe_config(const std::filesystem::path& path, const AppConfig& config, bool loaded_from_disk) {
