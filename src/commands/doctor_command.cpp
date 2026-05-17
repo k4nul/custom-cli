@@ -12,14 +12,11 @@ namespace starter {
 
 void register_doctor_command(
     CLI::App& root,
-    const ProjectInfo& project_info,
+    const ProjectInfo&,
     std::string& config_path,
     std::ostream& out,
-    std::ostream& err,
+    std::ostream&,
     bool& command_executed) {
-    (void)project_info;
-    (void)err;
-
     auto* command = root.add_subcommand("doctor", "Check starter layout and configuration assumptions.");
     command->callback([&]() {
         command_executed = true;

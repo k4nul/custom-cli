@@ -33,15 +33,11 @@ std::string uppercase_copy(std::string value) {
 
 void register_echo_command(
     CLI::App& root,
-    const ProjectInfo& project_info,
-    std::string& config_path,
+    const ProjectInfo&,
+    std::string&,
     std::ostream& out,
-    std::ostream& err,
+    std::ostream&,
     bool& command_executed) {
-    (void)project_info;
-    (void)config_path;
-    (void)err;
-
     auto options = std::make_shared<EchoOptions>();
     auto* command = root.add_subcommand("echo", "Echo text to demonstrate positional arguments.");
     command->add_flag("--uppercase", options->uppercase, "Render the output in uppercase.");

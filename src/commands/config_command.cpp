@@ -24,10 +24,8 @@ void register_config_command(
     const ProjectInfo& project_info,
     std::string& config_path,
     std::ostream& out,
-    std::ostream& err,
+    std::ostream&,
     bool& command_executed) {
-    (void)err;
-
     auto* config_command = root.add_subcommand("config", "Write or inspect starter configuration.");
     config_command->require_subcommand(1);
 
