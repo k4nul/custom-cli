@@ -458,6 +458,61 @@ TEST_CASE("interactive shell reuses disk config and recovers from malformed inpu
     CHECK(result.prompts == std::vector<std::string>{"custom> ", "custom> ", "custom> ", "custom> "});
 }
 
+TEST_CASE("interactive shell routes command-specific help through normal dispatch") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "missing.json";
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"help hello", "help config init", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Sample command that uses options plus config defaults."));
+    CHECK(contains_text(result.out, "--name"));
+    CHECK(contains_text(result.out, "--enthusiastic"));
+    CHECK(contains_text(result.out, "Write a starter config template."));
+    CHECK(contains_text(result.out, "--output"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> ", "starter> "});
+}
+
+TEST_CASE("interactive shell reports parse failures and keeps the session alive") {
+    const auto result = run_application_with_scripted_shell(
+        {},
+        {"missing-command", "hello --name Ada", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Hello, Ada.\n"));
+    CHECK(contains_text(result.err, "missing-command"));
+    CHECK(contains_text(result.err, "Run with --help"));
+    CHECK(contains_text(result.err, "command finished with exit code "));
+    CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> ", "starter> "});
+}
+
+TEST_CASE("interactive shell reports command failures and keeps the session alive") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "missing.json";
+    const auto blocking_parent = temporary_directory.path() / "config-parent";
+    write_text_file(blocking_parent, "not a directory");
+    const auto output_path = blocking_parent / "custom.json";
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"config init --output " + output_path.string(), "hello --name Ada", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Hello, Ada.\n"));
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "failed to prepare config directory"));
+    CHECK(contains_text(
+        result.err,
+        "command finished with exit code " + std::to_string(starter::to_int(starter::ExitCode::io_error))));
+    CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> ", "starter> "});
+
+    std::error_code ignored;
+    CHECK_FALSE(fs::exists(output_path, ignored));
+}
+
 TEST_CASE("about command reports starter metadata") {
     const auto project_info = starter::load_project_info();
     const auto result = run_application({"about"});
