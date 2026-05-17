@@ -131,10 +131,11 @@ The starter uses compile-time command registration instead of a runtime plugin
 loader. To add a command:
 
 1. Add a command implementation under `src/commands/`.
-2. Declare the registrar in `include/starter/commands/registrars.hpp`.
-3. Register it from `src/commands/register_commands.cpp`.
-4. Add or extend tests under `tests/`.
-5. Update user-facing docs for the command, including README, architecture,
+2. Add the command `.cpp` file to the `starter_core` source list in `CMakeLists.txt`.
+3. Declare the registrar in `include/starter/commands/registrars.hpp`.
+4. Register it from `src/commands/register_commands.cpp`.
+5. Add or extend tests under `tests/`.
+6. Update user-facing docs for the command, including README, architecture,
    testing, and troubleshooting notes when the behavior changes those areas.
 
 Keep sample commands only as long as they help the copied project. Once real

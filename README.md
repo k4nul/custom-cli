@@ -131,6 +131,10 @@ to that path unless `--output <path>` is supplied:
 ./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
 ```
 
+`config init` generates a template from the current `AppConfig` defaults and project metadata. It is
+not a byte-for-byte copy of the checked-in template, so keep `config/cli-starter.json`, config
+defaults, and generated template behavior aligned when the schema changes.
+
 `enabled_commands` is currently serialized and shown by `config show`; it is not a runtime
 allowlist and does not disable command registration. Command availability comes from the
 compile-time registrars in `src/commands/register_commands.cpp`.
@@ -164,11 +168,12 @@ you want disk-backed shell sessions to use the same prompt; a config file's
 ## Adding A Command
 
 1. Add a command implementation under `src/commands/`.
-2. Declare its registrar in [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp).
-3. Register it from [src/commands/register_commands.cpp](src/commands/register_commands.cpp).
-4. Add tests in [tests/config_tests.cpp](tests/config_tests.cpp), or add a new test file and include
+2. Add the command `.cpp` file to the `starter_core` source list in [CMakeLists.txt](CMakeLists.txt).
+3. Declare its registrar in [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp).
+4. Register it from [src/commands/register_commands.cpp](src/commands/register_commands.cpp).
+5. Add tests in [tests/config_tests.cpp](tests/config_tests.cpp), or add a new test file and include
    it in the `starter_tests` target in [CMakeLists.txt](CMakeLists.txt).
-5. Document user-facing behavior in this README and the nearest relevant docs, such as
+6. Document user-facing behavior in this README and the nearest relevant docs, such as
    [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md), or
    [docs/troubleshooting.md](docs/troubleshooting.md).
 
@@ -197,7 +202,9 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-The tracked GitHub Actions workflow runs the same CMake/CTest validation on Linux and Windows.
+This unfiltered CTest run covers both registered entries: `starter_tests` and `cli_starter_smoke`.
+The tracked GitHub Actions workflow at [.github/workflows/ci.yml](.github/workflows/ci.yml) runs the
+same CMake/CTest validation on Linux and Windows.
 Use the local flow above before reporting source changes.
 
 Use a fresh ignored `build/` tree for validation. Do not cite historical `build-local-*` or
@@ -361,6 +368,10 @@ starter> exit
 ./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
 ```
 
+`config init`은 현재 `AppConfig` 기본값과 프로젝트 metadata에서 템플릿을 생성합니다.
+체크인된 템플릿을 byte-for-byte로 복사하는 방식이 아니므로 schema를 바꿀 때는
+`config/cli-starter.json`, 설정 기본값, 생성되는 템플릿 동작을 함께 맞춥니다.
+
 `enabled_commands`는 현재 직렬화되고 `config show`에서 표시되지만, 런타임 allowlist가 아니며
 명령 등록을 비활성화하지 않습니다. 명령 사용 가능 여부는 `src/commands/register_commands.cpp`의
 컴파일 타임 registrar가 결정합니다.
@@ -393,11 +404,12 @@ cmake -S . -B build \
 ## 명령 추가하기
 
 1. `src/commands/` 아래에 명령 구현 파일을 추가합니다.
-2. [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp)에 registrar를 선언합니다.
-3. [src/commands/register_commands.cpp](src/commands/register_commands.cpp)에서 명령을 등록합니다.
-4. [tests/config_tests.cpp](tests/config_tests.cpp)에 테스트를 추가하거나, 새 테스트 파일을 만들고
+2. 명령 `.cpp` 파일을 [CMakeLists.txt](CMakeLists.txt)의 `starter_core` source list에 추가합니다.
+3. [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp)에 registrar를 선언합니다.
+4. [src/commands/register_commands.cpp](src/commands/register_commands.cpp)에서 명령을 등록합니다.
+5. [tests/config_tests.cpp](tests/config_tests.cpp)에 테스트를 추가하거나, 새 테스트 파일을 만들고
    [CMakeLists.txt](CMakeLists.txt)의 `starter_tests` target에 포함합니다.
-5. 사용자에게 보이는 동작을 이 README와 관련 문서에 맞춰 문서화합니다. 예를 들어
+6. 사용자에게 보이는 동작을 이 README와 관련 문서에 맞춰 문서화합니다. 예를 들어
    [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md),
    [docs/troubleshooting.md](docs/troubleshooting.md)를 함께 확인합니다.
 
@@ -426,7 +438,9 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-추적되는 GitHub Actions workflow는 Linux와 Windows에서 같은 CMake/CTest 검증을 실행합니다.
+필터를 걸지 않은 이 CTest 실행은 등록된 `starter_tests`와 `cli_starter_smoke`를 모두 포함합니다.
+추적되는 GitHub Actions workflow인 [.github/workflows/ci.yml](.github/workflows/ci.yml)은 Linux와
+Windows에서 같은 CMake/CTest 검증을 실행합니다.
 소스 변경 결과를 보고하기 전에는 위의 로컬 흐름을 사용하세요.
 
 검증에는 새로 만든 무시 대상 `build/` 트리를 사용하세요. 과거의 `build-local-*` 또는

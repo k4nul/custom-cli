@@ -55,6 +55,7 @@ falls back to ordinary line reads without interactive completion.
 ## Extension Points
 
 - Add a new command file under `src/commands/`
+- Add the command source to the manually maintained `starter_core` source list in `CMakeLists.txt`
 - Declare its registrar in `include/starter/commands/registrars.hpp`
 - Register it from `src/commands/register_commands.cpp`
 - If the command adds new config needs, update `AppConfig`, `config/`, JSON parsing and serialization,
@@ -74,10 +75,11 @@ currently serialized and displayed, but it is not used as a runtime allowlist.
 ## Adding A Command
 
 1. Create `src/commands/example_command.cpp`.
-2. Define a small registrar function that adds a `CLI11` subcommand.
-3. Keep option state local to the command via owned state objects.
-4. Register the command centrally.
-5. Add docs and at least one test when the command changes user-facing behavior.
+2. Add the new `.cpp` file to the `starter_core` source list in `CMakeLists.txt`.
+3. Define a small registrar function that adds a `CLI11` subcommand.
+4. Keep option state local to the command via owned state objects.
+5. Register the command centrally.
+6. Add docs and at least one test when the command changes user-facing behavior.
 
 ## Why There Is No Runtime Plugin Layer
 

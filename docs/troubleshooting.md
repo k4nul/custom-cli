@@ -116,6 +116,11 @@ Use `config init` to create one:
 ./build/cli-starter --config ./config/local.json doctor
 ```
 
+`doctor` is advisory for layout findings: `[warn]` config output and `[missing]`
+recommended layout paths still exit successfully so maintainers can inspect the
+report. Malformed JSON or wrong field types in an existing config file are
+config errors. Use the full CMake/CTest flow when you need validation evidence.
+
 ## `config init` Writes Somewhere Unexpected
 
 The global `--config <path>` option sets the default config path for
@@ -129,6 +134,9 @@ config-backed commands. `config init` writes to that path unless an explicit
 
 Use `--output` when you want to create a template without changing the active
 config path for the command.
+
+The generated file comes from the current `AppConfig` defaults and project
+metadata. It is not a byte-for-byte copy of `config/cli-starter.json`.
 
 ## A Config-Backed Command Reports A JSON Error
 
