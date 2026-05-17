@@ -22,14 +22,11 @@ struct HelloOptions {
 
 void register_hello_command(
     CLI::App& root,
-    const ProjectInfo& project_info,
+    const ProjectInfo&,
     std::string& config_path,
     std::ostream& out,
-    std::ostream& err,
+    std::ostream&,
     bool& command_executed) {
-    (void)project_info;
-    (void)err;
-
     auto options = std::make_shared<HelloOptions>();
     auto* command = root.add_subcommand("hello", "Sample command that uses options plus config defaults.");
     command->add_option("--name", options->name, "Name to greet.");

@@ -10,13 +10,10 @@ namespace starter {
 void register_about_command(
     CLI::App& root,
     const ProjectInfo& project_info,
-    std::string& config_path,
+    std::string&,
     std::ostream& out,
-    std::ostream& err,
+    std::ostream&,
     bool& command_executed) {
-    (void)config_path;
-    (void)err;
-
     auto* command = root.add_subcommand("about", "Describe what this starter provides.");
     command->callback([&]() {
         command_executed = true;
