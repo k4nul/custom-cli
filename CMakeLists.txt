@@ -61,4 +61,12 @@ if(CLI_STARTER_BUILD_TESTS)
     endif()
 
     add_test(NAME starter_tests COMMAND starter_tests)
+    add_test(
+        NAME cli_starter_smoke
+        COMMAND ${CMAKE_COMMAND}
+            -DCLI_STARTER_EXECUTABLE=$<TARGET_FILE:${CLI_STARTER_BINARY_NAME}>
+            -DCLI_STARTER_SMOKE_DIR=${CMAKE_CURRENT_BINARY_DIR}/ctest-smoke
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cli_smoke_test.cmake
+    )
+    set_tests_properties(cli_starter_smoke PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()

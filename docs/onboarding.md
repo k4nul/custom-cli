@@ -36,7 +36,7 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build -R starter_tests --output-on-failure
+ctest --test-dir build --output-on-failure
 ```
 
 The explicit `BUILD_TESTING=ON` flag keeps CTest registration enabled even if a
@@ -55,7 +55,7 @@ configuration:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug -R starter_tests --output-on-failure
+ctest --test-dir build -C Debug --output-on-failure
 .\build\Debug\cli-starter.exe --version
 .\build\Debug\cli-starter.exe about
 ```
