@@ -40,6 +40,10 @@ behavior, these commands are useful for manual inspection too:
 ./build/cli-starter --config ./config/local.json config show
 ```
 
+`doctor` is an advisory layout and config probe. A missing local config or
+missing recommended layout path is reported in stdout, but CMake/CTest remains
+the validation gate for reportable source changes.
+
 Use the configuration-specific executable path on Visual Studio-style builds.
 
 ## Command Changes
@@ -48,10 +52,11 @@ Command availability is compile-time registration, not a runtime plugin system.
 When adding, renaming, or removing a command:
 
 1. Add or update the implementation under `src/commands/`.
-2. Update the registrar declaration in `include/starter/commands/registrars.hpp`.
-3. Update central registration in `src/commands/register_commands.cpp`.
-4. Add or update doctest coverage under `tests/`.
-5. Update `README.md`, `docs/architecture.md`, `docs/testing.md`, and
+2. Add new command source files to the `starter_core` source list in `CMakeLists.txt`.
+3. Update the registrar declaration in `include/starter/commands/registrars.hpp`.
+4. Update central registration in `src/commands/register_commands.cpp`.
+5. Add or update doctest coverage under `tests/`.
+6. Update `README.md`, `docs/architecture.md`, `docs/testing.md`, and
    `docs/troubleshooting.md` when user-facing behavior changes.
 
 The `enabled_commands` field in config is serialized and shown by `config show`;
@@ -71,6 +76,10 @@ When changing config behavior:
 3. Add tests for default fallback, disk-loaded config, and error cases.
 4. Document command examples with `--config ./config/local.json` when the example
    writes a local file.
+
+`config init` writes a generated template from `AppConfig` defaults and project
+metadata, not a byte-for-byte copy of `config/cli-starter.json`. Keep both paths
+aligned when changing defaults, prompt naming, or generated notes.
 
 `config/local.json` and `config/*.local.json` are ignored for local experiments.
 
