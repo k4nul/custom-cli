@@ -909,3 +909,88 @@ TEST_CASE("tab completion falls back to root options when prior context is malfo
     CHECK(contains(completion.candidates, "--help"));
     CHECK_FALSE(contains(completion.candidates, "--name"));
 }
+
+TEST_CASE("tab completion uses cursor position for replacement ranges") {
+    CompletionAppFixture fixture;
+    const std::string line = "config i --later";
+    const auto cursor = std::string("config i").size();
+
+    const auto completion = starter::resolve_completion(line, cursor, fixture.app, fixture.shell_commands);
+
+    CHECK(completion.prefix == "i");
+    CHECK(completion.replace_begin == std::string("config ").size());
+    CHECK(completion.replace_end == cursor);
+    REQUIRE(completion.candidates.size() == 1);
+    CHECK(completion.candidates.front() == "init");
+
+    starter::TabCompletionState state;
+    const auto action = starter::choose_tab_completion(completion, line, cursor, state);
+    CHECK(action.kind == starter::CompletionActionKind::replace);
+    CHECK(action.replacement == "init");
+    CHECK(action.replace_begin == std::string("config ").size());
+    CHECK(action.replace_end == cursor);
+    CHECK_FALSE(state.primed);
+}
+
+TEST_CASE("tab completion offers subcommands after a trailing space") {
+    CompletionAppFixture fixture;
+    const std::string line = "config ";
+
+    const auto completion = starter::resolve_completion(line, line.size(), fixture.app, fixture.shell_commands);
+
+    CHECK(completion.prefix.empty());
+    CHECK(completion.replace_begin == line.size());
+    CHECK(completion.replace_end == line.size());
+    CHECK(contains(completion.candidates, "init"));
+    CHECK(contains(completion.candidates, "show"));
+    CHECK_FALSE(contains(completion.candidates, "hello"));
+    CHECK_FALSE(contains(completion.candidates, "help"));
+}
+
+TEST_CASE("tab completion tracks shared-prefix edits in primed state") {
+    starter::TabCompletionState state;
+    const std::vector<std::string> commands = {"help", "hello"};
+    const std::string line = "h trailing";
+
+    const auto completion = starter::resolve_completion(line, 1, commands);
+    const auto action = starter::choose_tab_completion(completion, line, 1, state);
+
+    CHECK(action.kind == starter::CompletionActionKind::replace);
+    CHECK(action.replacement == "hel");
+    CHECK(action.replace_begin == 0);
+    CHECK(action.replace_end == 1);
+    CHECK(state.primed);
+    CHECK(state.line == "hel trailing");
+    CHECK(state.cursor == 3);
+    CHECK(state.replace_begin == 0);
+    CHECK(state.replace_end == 3);
+    CHECK(state.prefix == "hel");
+}
+
+TEST_CASE("tab completion resets primed state after replace and list actions") {
+    const std::vector<std::string> commands = {"help", "hello"};
+    starter::TabCompletionState state;
+
+    const auto h_completion = starter::resolve_completion("h", 1, commands);
+    const auto h_action = starter::choose_tab_completion(h_completion, "h", 1, state);
+    CHECK(h_action.kind == starter::CompletionActionKind::replace);
+    CHECK(state.primed);
+
+    const auto help_completion = starter::resolve_completion("help", 4, commands);
+    const auto help_action = starter::choose_tab_completion(help_completion, "help", 4, state);
+    CHECK(help_action.kind == starter::CompletionActionKind::replace);
+    CHECK_FALSE(state.primed);
+    CHECK(state.line.empty());
+    CHECK(state.cursor == 0);
+
+    const auto hel_completion = starter::resolve_completion("hel", 3, commands);
+    const auto first_hel_action = starter::choose_tab_completion(hel_completion, "hel", 3, state);
+    CHECK(first_hel_action.kind == starter::CompletionActionKind::no_change);
+    CHECK(state.primed);
+
+    const auto second_hel_action = starter::choose_tab_completion(hel_completion, "hel", 3, state);
+    CHECK(second_hel_action.kind == starter::CompletionActionKind::list);
+    CHECK_FALSE(state.primed);
+    CHECK(state.line.empty());
+    CHECK(state.cursor == 0);
+}
