@@ -3,20 +3,21 @@
 These notes cover local setup issues that can be diagnosed from the starter's
 checked-in CMake, config, and command behavior.
 
-## CTest Cannot Find `starter_tests`
+## CTest Cannot Find Starter Tests
 
 Make sure tests were enabled at configure time and the build completed:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build -R starter_tests --output-on-failure
+ctest --test-dir build --output-on-failure
 ```
 
 `CLI_STARTER_BUILD_TESTS` defaults to `BUILD_TESTING`, and `BUILD_TESTING`
 also controls CTest registration through `include(CTest)`. If a previous cache,
 toolchain, or preset disabled `BUILD_TESTING`, reconfigure with both flags set
-to `ON` instead of only rebuilding the old tree.
+to `ON` instead of only rebuilding the old tree. A healthy tree registers
+`starter_tests` and `cli_starter_smoke`.
 
 ## Multi-Config Tests Fail To Start
 
@@ -25,7 +26,7 @@ configuration directory. Build and test the same configuration:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug -R starter_tests --output-on-failure
+ctest --test-dir build -C Debug --output-on-failure
 ```
 
 The same rule applies when running the executable directly:
@@ -61,7 +62,7 @@ CMake/CTest flow before reporting results:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build -R starter_tests --output-on-failure
+ctest --test-dir build --output-on-failure
 ```
 
 Removing tracked generated files changes repository contents and should be done

@@ -6,28 +6,30 @@ evidence.
 
 ## Baseline Validation
 
-Use the local CMake/CTest flow as the authoritative validation path until a CI
-workflow is added:
+Use the local CMake/CTest flow before reporting source changes. The tracked CI
+workflow runs the same validation on Linux and Windows:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build -R starter_tests --output-on-failure
+ctest --test-dir build --output-on-failure
 ```
 
 Keep both test flags explicit in maintenance reports. `CLI_STARTER_BUILD_TESTS`
-controls whether `starter_tests` is built, while `BUILD_TESTING` keeps CTest
-registration enabled through the repository's `include(CTest)` setup.
+controls whether `starter_tests` and the CLI smoke test are registered, while
+`BUILD_TESTING` keeps CTest registration enabled through the repository's
+`include(CTest)` setup.
 
 For multi-config generators, build and test the same configuration:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug -R starter_tests --output-on-failure
+ctest --test-dir build -C Debug --output-on-failure
 ```
 
-After changes that affect the executable name, command registration, config
-paths, or user-facing command behavior, also run a short CLI smoke pass:
+CTest includes a short built-executable smoke pass. After changes that affect
+the executable name, command registration, config paths, or user-facing command
+behavior, these commands are useful for manual inspection too:
 
 ```bash
 ./build/cli-starter --version
@@ -119,17 +121,15 @@ Keep the documentation set internally consistent:
 - `docs/testing.md`: validation commands, current coverage, and test gaps.
 - `docs/troubleshooting.md`: known build, config, and runtime failures.
 - `docs/maintenance.md`: maintainer validation, change checklists, artifact
-  hygiene, and CI bootstrap expectations.
+  hygiene, and CI workflow expectations.
 - `docs/migration-from-legacy.md`: historical migration context.
 
 When a command, config field, CMake cache variable, or validation path changes,
 update the nearest docs in the same change. When a known test gap is closed,
 move it from `docs/testing.md`'s gap list into the current coverage summary.
 
-## CI Bootstrap Expectations
+## CI Workflow
 
-No workflow file is tracked yet, so local CMake/CTest remains authoritative. A
-future CI package should start with the same configure, build, and CTest commands
-used locally. A practical first matrix is one Linux compiler job plus one
-Windows Visual Studio-style multi-config job so both executable layouts stay
-documented and tested.
+The tracked GitHub Actions workflow mirrors the baseline validation flow. It
+runs one Linux single-config CMake job and one Windows Visual Studio-style
+multi-config job so both executable layouts stay documented and tested.

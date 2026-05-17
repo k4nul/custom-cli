@@ -1,20 +1,22 @@
 # Testing
 
-The starter uses CTest for test discovery and doctest for assertions. Both the
-application and tests link through the `starter_core` library, so tests can
-exercise command behavior without spawning the built executable.
+The starter uses CTest for test discovery and doctest for assertions. Most
+behavior tests link through the `starter_core` library, and a CTest smoke case
+also runs the built executable to catch packaging and command-wiring regressions.
 
 ## Test Targets
 
-`CMakeLists.txt` defines one test executable:
+`CMakeLists.txt` defines one test executable and two CTest entries:
 
 - `starter_tests`: builds from `tests/config_tests.cpp`
+- `cli_starter_smoke`: runs the built CLI through version, about, doctor,
+  config, hello, and echo smoke checks
 
-The target is created only when `CLI_STARTER_BUILD_TESTS` is enabled. That
-option defaults to CMake's `BUILD_TESTING` value because the project includes
-`CTest`. Keep `BUILD_TESTING` enabled too; a cache or preset that turns it off
-can prevent CTest from registering the executable even if the test target is
-compiled.
+The test target and smoke entry are created only when `CLI_STARTER_BUILD_TESTS`
+is enabled. That option defaults to CMake's `BUILD_TESTING` value because the
+project includes `CTest`. Keep `BUILD_TESTING` enabled too; a cache or preset
+that turns it off can prevent CTest from registering tests even if the test
+target is compiled.
 
 ## Standard Validation
 
@@ -23,12 +25,12 @@ Use this flow for the normal local validation pass:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build -R starter_tests --output-on-failure
+ctest --test-dir build --output-on-failure
 ```
 
-No CI workflow is tracked in this repository yet, so this local CMake/CTest flow
-is the authoritative validation path until CI is added. See
-`docs/maintenance.md` for the expected first CI shape.
+The tracked GitHub Actions workflow runs the same CMake/CTest validation on
+Linux and Windows. Report local results from the flow above before publishing
+source changes.
 
 Report test results from a build tree created for the current validation pass.
 Do not use existing `build-local-*` executables or cached CTest files as proof
@@ -46,11 +48,11 @@ For multi-config generators, build and test the same configuration:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug -R starter_tests --output-on-failure
+ctest --test-dir build -C Debug --output-on-failure
 ```
 
-Running through CTest is preferred because it matches the CMake-registered test
-name, but the generated test executable can also be useful while iterating:
+Running through CTest is preferred because it exercises the registered suite,
+but the generated test executable can also be useful while iterating:
 
 ```bash
 ./build/starter_tests
@@ -93,20 +95,23 @@ For Visual Studio-style multi-config layouts:
 - scoped option completion for root options, `hello`, and `config init`, and
 - completion fallback to root options when earlier shell context is malformed.
 
+The `cli_starter_smoke` CTest entry covers the built executable path for
+`--version`, `about`, `doctor`, config initialization and display, `hello`, and
+numbered `echo`.
+
 ## Known Gaps
 
 Add focused coverage when work touches these areas:
 
-- raw terminal line editing behavior that depends on platform TTY APIs,
-- platform-specific config permission or locked-file failures that need OS-specific setup, and
-- future CI behavior once workflow files are added.
+- raw terminal line editing behavior that depends on platform TTY APIs, and
+- platform-specific config permission or locked-file failures that need OS-specific setup.
 
 ## Adding Tests
 
 For a small command or helper change, add a focused doctest case to
 `tests/config_tests.cpp`. If a new test file is clearer, add it to the
-`starter_tests` target in `CMakeLists.txt` so CTest continues to expose a single
-starter validation target.
+`starter_tests` target in `CMakeLists.txt`. If a built-executable smoke case
+needs to change, update `cmake/cli_smoke_test.cmake` in the same package.
 
 Prefer tests that call the same application dispatch path as real CLI usage
 when the behavior is user-facing. For pure helpers, test the helper directly.
@@ -127,8 +132,9 @@ as `.\build\Debug\starter_tests.exe`.
 
 ## CLI Smoke Checks
 
-CTest covers reusable internals and command dispatch. A manual CLI smoke pass
-is still useful after renaming the starter or changing command registration:
+CTest covers reusable internals, command dispatch, and a short built-executable
+smoke pass. A manual CLI pass is still useful after renaming the starter or
+changing command registration:
 
 ```bash
 ./build/cli-starter --version
