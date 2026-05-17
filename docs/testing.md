@@ -28,9 +28,13 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-The tracked GitHub Actions workflow runs the same CMake/CTest validation on
-Linux and Windows. Report local results from the flow above before publishing
-source changes.
+Leave the CTest command unfiltered for reportable validation so both
+`starter_tests` and `cli_starter_smoke` run. Use focused doctest filters only
+for local iteration.
+
+The tracked GitHub Actions workflow at `.github/workflows/ci.yml` runs the same
+CMake/CTest validation on Linux and Windows. Report local results from the flow
+above before publishing source changes.
 
 Report test results from a build tree created for the current validation pass.
 Do not use existing `build-local-*` executables or cached CTest files as proof

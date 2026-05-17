@@ -7,7 +7,8 @@ evidence.
 ## Baseline Validation
 
 Use the local CMake/CTest flow before reporting source changes. The tracked CI
-workflow runs the same validation on Linux and Windows:
+workflow at `.github/workflows/ci.yml` runs the same validation on Linux and
+Windows:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
@@ -81,7 +82,8 @@ package-manager bootstrap for normal builds. When updating a dependency:
 1. Prefer an official release tag or release archive.
 2. Update the vendored header files and the matching license file.
 3. Update `third_party/README.md` with the exact version and source.
-4. Re-run the baseline validation flow.
+4. Re-run the unfiltered baseline validation flow so both `starter_tests` and
+   `cli_starter_smoke` cover the update.
 5. Update user-facing docs only when dependency behavior changes build, test, or
    CLI usage.
 
@@ -130,6 +132,7 @@ move it from `docs/testing.md`'s gap list into the current coverage summary.
 
 ## CI Workflow
 
-The tracked GitHub Actions workflow mirrors the baseline validation flow. It
-runs one Linux single-config CMake job and one Windows Visual Studio-style
-multi-config job so both executable layouts stay documented and tested.
+The tracked GitHub Actions workflow lives at `.github/workflows/ci.yml` and
+mirrors the baseline validation flow. It runs one Linux single-config CMake job
+and one Windows Visual Studio-style multi-config job so both executable layouts
+stay documented and tested.
