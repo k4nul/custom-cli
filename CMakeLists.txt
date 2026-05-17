@@ -10,6 +10,14 @@ set(CLI_STARTER_CONFIG_FILE "cli-starter.json" CACHE STRING "Default configurati
 set(CLI_STARTER_PROMPT_LABEL "starter" CACHE STRING "Default interactive prompt label")
 option(CLI_STARTER_BUILD_TESTS "Build the starter test target" ${BUILD_TESTING})
 
+function(cli_starter_enable_warnings target_name)
+    if(MSVC)
+        target_compile_options(${target_name} PRIVATE /W4 /permissive-)
+    else()
+        target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+endfunction()
+
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/project_config.hpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/generated/starter/project_config.hpp
@@ -40,25 +48,18 @@ target_include_directories(starter_core
         ${CMAKE_CURRENT_BINARY_DIR}/generated
 )
 
-if(MSVC)
-    target_compile_options(starter_core PRIVATE /W4 /permissive-)
-else()
-    target_compile_options(starter_core PRIVATE -Wall -Wextra -Wpedantic)
-endif()
+cli_starter_enable_warnings(starter_core)
 
 add_executable(${CLI_STARTER_BINARY_NAME} src/main.cpp)
 target_link_libraries(${CLI_STARTER_BINARY_NAME} PRIVATE starter_core)
 set_target_properties(${CLI_STARTER_BINARY_NAME} PROPERTIES OUTPUT_NAME "${CLI_STARTER_BINARY_NAME}")
+cli_starter_enable_warnings(${CLI_STARTER_BINARY_NAME})
 
 if(CLI_STARTER_BUILD_TESTS)
     add_executable(starter_tests tests/config_tests.cpp)
     target_link_libraries(starter_tests PRIVATE starter_core)
     target_compile_features(starter_tests PRIVATE cxx_std_17)
-    if(MSVC)
-        target_compile_options(starter_tests PRIVATE /W4 /permissive-)
-    else()
-        target_compile_options(starter_tests PRIVATE -Wall -Wextra -Wpedantic)
-    endif()
+    cli_starter_enable_warnings(starter_tests)
 
     add_test(NAME starter_tests COMMAND starter_tests)
     add_test(
