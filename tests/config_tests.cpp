@@ -649,6 +649,37 @@ TEST_CASE("explicit hello name suppresses missing config guidance") {
     CHECK_FALSE(fs::exists(config_path));
 }
 
+TEST_CASE("enabled commands remains informational for config-backed hello") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+
+    starter::AppConfig config;
+    config.default_name = "Ada";
+    config.enabled_commands = {"about", "doctor"};
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"--config", config_path.string(), "hello"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, Ada.\n");
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("enabled commands does not gate commands that ignore config") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+
+    starter::AppConfig config;
+    config.enabled_commands = {"hello"};
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"--config", config_path.string(), "echo", "--uppercase", "still", "runs"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "STILL RUNS\n");
+    CHECK(result.err.empty());
+}
+
 TEST_CASE("config init honors global config path by default") {
     TemporaryDirectory temporary_directory;
     const CurrentPathGuard current_path(temporary_directory.path());
@@ -731,6 +762,31 @@ TEST_CASE("config show applies defaults for omitted disk config fields") {
     expected << "Default name: Grace\n";
     expected << "Enabled commands: about, hello, echo, config, doctor\n";
     expected << "Notes: " << defaults.notes << '\n';
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == expected.str());
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("config show reports disk enabled command list verbatim") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+
+    starter::AppConfig config;
+    config.prompt = "project";
+    config.default_name = "Grace";
+    config.enabled_commands = {"doctor", "about"};
+    config.notes = "custom notes";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"--config", config_path.string(), "config", "show"});
+    std::ostringstream expected;
+    expected << "Config path: " << config_path.generic_string() << '\n';
+    expected << "Source: disk\n";
+    expected << "Prompt: project\n";
+    expected << "Default name: Grace\n";
+    expected << "Enabled commands: doctor, about\n";
+    expected << "Notes: custom notes\n";
 
     CHECK(result.exit_code == 0);
     CHECK(result.out == expected.str());
