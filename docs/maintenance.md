@@ -28,9 +28,10 @@ cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure
 ```
 
-CTest includes a short built-executable smoke pass. After changes that affect
-the executable name, command registration, config paths, or user-facing command
-behavior, these commands are useful for manual inspection too:
+CTest includes a short built-executable smoke pass and a repository hygiene
+check for ignored local artifacts. After changes that affect the executable
+name, command registration, config paths, or user-facing command behavior,
+these commands are useful for manual inspection too:
 
 ```bash
 ./build/cli-starter --version
@@ -91,8 +92,8 @@ package-manager bootstrap for normal builds. When updating a dependency:
 1. Prefer an official release tag or release archive.
 2. Update the vendored header files and the matching license file.
 3. Update `third_party/README.md` with the exact version and source.
-4. Re-run the unfiltered baseline validation flow so both `starter_tests` and
-   `cli_starter_smoke` cover the update.
+4. Re-run the unfiltered baseline validation flow so `starter_tests`,
+   `cli_starter_smoke`, and `repository_hygiene` cover the update.
 5. Update user-facing docs only when dependency behavior changes build, test, or
    CLI usage.
 
@@ -117,8 +118,8 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 If the command returns paths, keep documentation and test reports anchored to
 fresh validation from `build/`. Removing those tracked generated files is a
 repository cleanup package: delete the artifacts, keep `.gitignore` coverage in
-place, rerun the baseline validation flow, and mention the cleanup explicitly in
-the change summary.
+place, keep the `repository_hygiene` CTest entry passing, rerun the baseline
+validation flow, and mention the cleanup explicitly in the change summary.
 
 ## Documentation Changes
 
