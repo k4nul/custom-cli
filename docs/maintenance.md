@@ -17,9 +17,10 @@ ctest --test-dir build --output-on-failure
 ```
 
 Keep both test flags explicit in maintenance reports. `CLI_STARTER_BUILD_TESTS`
-controls whether `starter_tests` and the CLI smoke test are registered, while
-`BUILD_TESTING` keeps CTest registration enabled through the repository's
-`include(CTest)` setup.
+controls whether the project-specific CTest entries are registered:
+`starter_tests`, `cli_starter_smoke`, and `repository_hygiene`. `BUILD_TESTING`
+keeps CTest registration enabled through the repository's `include(CTest)`
+setup.
 
 For multi-config generators, build and test the same configuration:
 
@@ -44,6 +45,12 @@ these commands are useful for manual inspection too:
 `doctor` is an advisory layout and config probe. A missing local config or
 missing recommended layout path is reported in stdout, but CMake/CTest remains
 the validation gate for reportable source changes.
+
+If `git ls-files 'build-local-*' '.sandbox-user/*'` returns paths, the full
+unfiltered CTest run is expected to fail in `repository_hygiene` until those
+tracked generated artifacts are removed. Record that state as blocked
+validation; do not use old build output or a filtered CTest run as a passing
+substitute.
 
 Use the configuration-specific executable path on Visual Studio-style builds.
 
@@ -116,10 +123,11 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
 If the command returns paths, keep documentation and test reports anchored to
-fresh validation from `build/`. Removing those tracked generated files is a
-repository cleanup package: delete the artifacts, keep `.gitignore` coverage in
-place, keep the `repository_hygiene` CTest entry passing, rerun the baseline
-validation flow, and mention the cleanup explicitly in the change summary.
+fresh validation from `build/`, and report full validation as blocked until the
+paths are removed. Removing those tracked generated files is a repository
+cleanup package: delete the artifacts, keep `.gitignore` coverage in place,
+keep the `repository_hygiene` CTest entry passing, rerun the baseline validation
+flow, and mention the cleanup explicitly in the change summary.
 
 ## Documentation Changes
 

@@ -33,6 +33,12 @@ behavior:
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
+If that command prints paths, the unfiltered CTest run is expected to fail in
+`repository_hygiene` until those tracked generated artifacts are removed in a
+separate cleanup change. You can still rebuild into `build/` to inspect current
+source behavior, but report full validation as blocked by artifact hygiene
+instead of treating a filtered run or old artifact output as authoritative.
+
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
