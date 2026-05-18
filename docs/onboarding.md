@@ -33,11 +33,12 @@ behavior:
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
-If that command prints paths, the unfiltered CTest run is expected to fail in
-`repository_hygiene` until those tracked generated artifacts are removed in a
-separate cleanup change. You can still rebuild into `build/` to inspect current
-source behavior, but report full validation as blocked by artifact hygiene
-instead of treating a filtered run or old artifact output as authoritative.
+If that command prints paths that still exist in the checkout, the unfiltered
+CTest run is expected to fail in `repository_hygiene` until those tracked
+generated artifacts are removed in a separate cleanup change. You can still
+rebuild into `build/` to inspect current source behavior, but report full
+validation as blocked by artifact hygiene instead of treating a filtered run or
+old artifact output as authoritative.
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
@@ -152,6 +153,8 @@ tool's purpose.
 
 - `README.md`: quick start, command list, configuration, and extension summary
 - `docs/project-overview.md`: repository purpose and scope
+- `docs/command-reference.md`: global options, built-in commands, config
+  fields, shell behavior, and exit statuses
 - `docs/architecture.md`: component layout and command flow
 - `docs/testing.md`: test targets, validation commands, and coverage notes
 - `docs/troubleshooting.md`: common local build and runtime issues

@@ -51,11 +51,11 @@ Check for those paths when validation evidence looks suspicious:
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
-If that command returns paths, full unfiltered validation is blocked because
-`repository_hygiene` is expected to fail until the tracked generated artifacts
-are removed. Build and focused test runs can still help diagnose source changes,
-but report them as partial evidence and keep the artifact cleanup as a separate
-repository hygiene task.
+If that command returns paths that still exist in the checkout, full unfiltered
+validation is blocked because `repository_hygiene` is expected to fail until the
+tracked generated artifacts are removed. Build and focused test runs can still
+help diagnose source changes, but report them as partial evidence and keep the
+artifact cleanup as a separate repository hygiene task.
 
 For multi-config generators, build and test the same configuration:
 
@@ -87,8 +87,9 @@ For Visual Studio-style multi-config layouts:
 
 `tests/config_tests.cpp` covers the starter's reusable behavior:
 
-- tokenizing quoted shell input and reporting malformed shell input,
-- preserving empty quoted shell arguments so interactive input matches normal argv behavior,
+- tokenizing shell input, including quoted groups, empty quoted arguments, mixed
+  whitespace, escaped characters, adjacent quoted and unquoted fragments,
+  malformed input, and shared token joining helpers,
 - JSON config serialization, parsing, strict top-level object validation, and typed read/write failures,
 - custom config paths for config-backed commands,
 - `config init` output-path behavior and write failure reporting,
