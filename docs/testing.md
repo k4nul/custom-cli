@@ -179,4 +179,16 @@ keep local config experiments in `config/local.json` or `config/*.local.json`.
 If generated `build-local-*` or `.sandbox-user/` paths appear from an older
 checkout, do not use them as validation evidence. Rebuild into a fresh ignored
 directory before reporting test results, and leave actual artifact removal to a
-separate non-documentation cleanup change.
+separate repository cleanup change.
+
+For that cleanup change, the success condition is mechanical and should be easy
+to report:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
+The command should print no paths after the cleanup. Then run the standard
+unfiltered CTest flow from a fresh ignored `build/` tree so
+`repository_hygiene` proves that tracked generated artifacts no longer block
+validation.
