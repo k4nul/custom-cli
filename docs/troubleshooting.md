@@ -74,6 +74,36 @@ but it does not replace the full unfiltered validation gate.
 Removing tracked generated files changes repository contents and should be done
 as a separate cleanup task, not as part of routine docs or test-result updates.
 
+When that cleanup task is intentionally selected, use a fresh branch or change
+set and make the removal explicit. Start by confirming that the worktree has no
+unrelated edits:
+
+```bash
+git status --short
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
+Remove only the tracked generated artifact paths that the hygiene check reports:
+
+```bash
+git rm -r --ignore-unmatch -- build-local-* .sandbox-user
+git status --short
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
+After cleanup, the final `git ls-files` command should print nothing. Then run
+the normal unfiltered validation from a fresh ignored build tree:
+
+```bash
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+The cleanup change should contain the removed generated files and any directly
+related documentation update only; it should not mix in command, config, or test
+behavior changes.
+
 ## A Command Prints `Run with --help`
 
 CLI11 reports parse and validation failures through stderr. Common examples are

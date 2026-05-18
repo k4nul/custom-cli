@@ -220,6 +220,8 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 If that command returns paths, `repository_hygiene` is expected to fail until those tracked generated
 artifacts are removed in a cleanup change. In that state, report full validation as blocked by
 artifact hygiene instead of replacing it with historical build output or a filtered test run.
+Use the cleanup sequence in [docs/troubleshooting.md](docs/troubleshooting.md) only when that
+separate repository cleanup change is intentionally selected.
 
 With multi-config generators, build and test the same configuration:
 
@@ -467,6 +469,8 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 때까지 `repository_hygiene`가 실패하는 것이 정상입니다. 이 상태에서는 과거 build output이나
 필터링된 test run으로 대체하지 말고, 전체 검증이 artifact hygiene 때문에 blocked되었다고
 보고합니다.
+[docs/troubleshooting.md](docs/troubleshooting.md)의 cleanup 순서는 별도 repository cleanup
+change를 의도적으로 선택했을 때만 사용합니다.
 
 multi-config 생성기를 사용하면 같은 설정으로 빌드하고 테스트합니다.
 

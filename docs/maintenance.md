@@ -129,6 +129,25 @@ cleanup package: delete the artifacts, keep `.gitignore` coverage in place,
 keep the `repository_hygiene` CTest entry passing, rerun the baseline validation
 flow, and mention the cleanup explicitly in the change summary.
 
+Use this sequence for that cleanup package:
+
+1. Confirm the worktree has no unrelated edits with `git status --short`.
+2. List the exact tracked artifacts with
+   `git ls-files 'build-local-*' '.sandbox-user/*'`.
+3. Remove only those tracked generated paths:
+
+   ```bash
+   git rm -r --ignore-unmatch -- build-local-* .sandbox-user
+   ```
+
+4. Re-run `git ls-files 'build-local-*' '.sandbox-user/*'`; it should print
+   nothing.
+5. Run the baseline CMake/CTest flow from a fresh ignored `build/` tree.
+
+Do not combine this cleanup with behavior changes. If validation still fails
+after the tracked artifacts are gone, treat the remaining failure as a separate
+build, test, or source issue.
+
 ## Documentation Changes
 
 Keep the documentation set internally consistent:
