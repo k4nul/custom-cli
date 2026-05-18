@@ -61,8 +61,11 @@ falls back to ordinary line reads without interactive completion.
 - If the command adds new config needs, update `AppConfig`, `config/`, JSON parsing and serialization,
   and `describe_config`
 
-Command availability is controlled by compile-time registration. The `enabled_commands` config field is
-currently serialized and displayed, but it is not used as a runtime allowlist.
+Command availability is controlled by compile-time CLI wiring. `Application`
+registers the root `shell` command directly, and `register_builtin_commands`
+registers the sample commands from `src/commands/`. The `enabled_commands`
+config field is currently serialized and displayed, but it is not used as a
+runtime allowlist.
 
 ## Command Flow
 

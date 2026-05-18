@@ -49,7 +49,8 @@ name instead of `cli-starter`.
 The repository ignore rules cover new `build/`, `build-local-*`,
 `cmake-build-*`, `.sandbox-user/`, and local config files, but ignore rules do
 not untrack files that were already committed. If `git ls-files` reports
-historical build or sandbox files, treat them as legacy artifacts:
+historical build or sandbox paths that still exist in the checkout, treat them
+as legacy artifacts:
 
 ```bash
 git ls-files 'build-local-*' '.sandbox-user/*'

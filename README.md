@@ -98,6 +98,8 @@ Global options are available before any command:
 - `--help-all`: show help for all subcommands
 - `-c, --config <path>`: use a non-default JSON config path
 
+Built-in commands:
+
 - `about`: describe the starter project
 - `hello`: print a greeting; supports `--name <value>` and `-e, --enthusiastic`
 - `echo`: echo required positional `text...`; supports `--uppercase` and `--numbered`
@@ -136,8 +138,9 @@ not a byte-for-byte copy of the checked-in template, so keep `config/cli-starter
 defaults, and generated template behavior aligned when the schema changes.
 
 `enabled_commands` is currently serialized and shown by `config show`; it is not a runtime
-allowlist and does not disable command registration. Command availability comes from the
-compile-time registrars in `src/commands/register_commands.cpp`.
+allowlist and does not disable command registration. Command availability comes from compile-time
+CLI wiring: `shell` is registered by `Application`, and sample commands are registered through
+`src/commands/register_commands.cpp`.
 
 ## Customizing The Starter
 
@@ -190,7 +193,8 @@ nested subcommands.
 - `config/`: checked-in config template
 - `tests/`: starter behavior tests
 - `third_party/`: vendored header-only dependencies and license files
-- `docs/`: onboarding, architecture, testing, troubleshooting, maintenance, and migration notes
+- `docs/`: onboarding, command reference, architecture, testing, troubleshooting, maintenance, and
+  migration notes
 
 ## Testing
 
@@ -217,9 +221,10 @@ Before treating the unfiltered CTest result as passing, check for tracked ignore
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
-If that command returns paths, `repository_hygiene` is expected to fail until those tracked generated
-artifacts are removed in a cleanup change. In that state, report full validation as blocked by
-artifact hygiene instead of replacing it with historical build output or a filtered test run.
+If that command returns paths that still exist in the checkout, `repository_hygiene` is expected to
+fail until those tracked generated artifacts are removed in a cleanup change. In that state, report
+full validation as blocked by artifact hygiene instead of replacing it with historical build output
+or a filtered test run.
 Use the cleanup sequence in [docs/troubleshooting.md](docs/troubleshooting.md) only when that
 separate repository cleanup change is intentionally selected.
 
@@ -241,6 +246,8 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 ## More Documentation
 
 - [docs/project-overview.md](docs/project-overview.md): project purpose and scope
+- [docs/command-reference.md](docs/command-reference.md): global options, built-in commands, config fields,
+  shell behavior, and exit statuses
 - [docs/onboarding.md](docs/onboarding.md): first local build, smoke test, and customization loop
 - [docs/architecture.md](docs/architecture.md): structure and extension points
 - [docs/testing.md](docs/testing.md): CTest/doctest validation flow and coverage notes
@@ -348,6 +355,8 @@ starter> exit
 - `--help-all`: 모든 하위명령 도움말 출력
 - `-c, --config <path>`: 기본값이 아닌 JSON 설정 경로 사용
 
+기본 명령:
+
 - `about`: 스타터 프로젝트 설명 출력
 - `hello`: 인사 출력, `--name <value>`와 `-e, --enthusiastic` 지원
 - `echo`: 필수 위치 인자 `text...` 출력, `--uppercase`와 `--numbered` 지원
@@ -386,8 +395,9 @@ starter> exit
 `config/cli-starter.json`, 설정 기본값, 생성되는 템플릿 동작을 함께 맞춥니다.
 
 `enabled_commands`는 현재 직렬화되고 `config show`에서 표시되지만, 런타임 allowlist가 아니며
-명령 등록을 비활성화하지 않습니다. 명령 사용 가능 여부는 `src/commands/register_commands.cpp`의
-컴파일 타임 registrar가 결정합니다.
+명령 등록을 비활성화하지 않습니다. 명령 사용 가능 여부는 compile-time CLI wiring이 결정합니다.
+`shell`은 `Application`에서 등록되고, sample command는 `src/commands/register_commands.cpp`를 통해
+등록됩니다.
 
 ## 스타터 커스터마이징
 
@@ -439,7 +449,7 @@ cmake -S . -B build \
 - `config/`: 체크인된 설정 템플릿
 - `tests/`: 스타터 동작 테스트
 - `third_party/`: vendored header-only 의존성과 라이선스 파일
-- `docs/`: 온보딩, 아키텍처, 테스트, 문제 해결, 유지보수, 마이그레이션 노트
+- `docs/`: 온보딩, command reference, 아키텍처, 테스트, 문제 해결, 유지보수, 마이그레이션 노트
 
 ## 테스트
 
@@ -465,10 +475,10 @@ Windows에서 같은 CMake/CTest 검증을 실행합니다.
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
-이 명령이 경로를 출력하면 해당 tracked generated artifact를 별도 cleanup change에서 제거할
-때까지 `repository_hygiene`가 실패하는 것이 정상입니다. 이 상태에서는 과거 build output이나
-필터링된 test run으로 대체하지 말고, 전체 검증이 artifact hygiene 때문에 blocked되었다고
-보고합니다.
+이 명령이 checkout에 실제로 남아 있는 경로를 출력하면 해당 tracked generated artifact를 별도
+cleanup change에서 제거할 때까지 `repository_hygiene`가 실패하는 것이 정상입니다. 이 상태에서는
+과거 build output이나 필터링된 test run으로 대체하지 말고, 전체 검증이 artifact hygiene 때문에
+blocked되었다고 보고합니다.
 [docs/troubleshooting.md](docs/troubleshooting.md)의 cleanup 순서는 별도 repository cleanup
 change를 의도적으로 선택했을 때만 사용합니다.
 
@@ -490,6 +500,7 @@ ctest --test-dir build -C Debug --output-on-failure
 ## 추가 문서
 
 - [docs/project-overview.md](docs/project-overview.md): 프로젝트 목적과 범위
+- [docs/command-reference.md](docs/command-reference.md): 전역 옵션, 기본 명령, 설정 필드, 셸 동작, 종료 상태
 - [docs/onboarding.md](docs/onboarding.md): 첫 로컬 빌드, smoke test, 커스터마이징 흐름
 - [docs/architecture.md](docs/architecture.md): 구조와 확장 지점
 - [docs/testing.md](docs/testing.md): CTest/doctest 검증 흐름과 테스트 범위

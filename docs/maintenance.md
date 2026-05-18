@@ -46,18 +46,20 @@ these commands are useful for manual inspection too:
 missing recommended layout path is reported in stdout, but CMake/CTest remains
 the validation gate for reportable source changes.
 
-If `git ls-files 'build-local-*' '.sandbox-user/*'` returns paths, the full
-unfiltered CTest run is expected to fail in `repository_hygiene` until those
-tracked generated artifacts are removed. Record that state as blocked
-validation; do not use old build output or a filtered CTest run as a passing
-substitute.
+If `git ls-files 'build-local-*' '.sandbox-user/*'` returns paths that still
+exist in the checkout, the full unfiltered CTest run is expected to fail in
+`repository_hygiene` until those tracked generated artifacts are removed. Record
+that state as blocked validation; do not use old build output or a filtered
+CTest run as a passing substitute.
 
 Use the configuration-specific executable path on Visual Studio-style builds.
 
 ## Command Changes
 
-Command availability is compile-time registration, not a runtime plugin system.
-When adding, renaming, or removing a command:
+Command availability is compile-time CLI wiring, not a runtime plugin system.
+`Application` registers the root `shell` command directly, while sample commands
+under `src/commands/` use central registration. When adding, renaming, or
+removing a sample command:
 
 1. Add or update the implementation under `src/commands/`.
 2. Add new command source files to the `starter_core` source list in `CMakeLists.txt`.
@@ -122,12 +124,13 @@ evidence:
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
-If the command returns paths, keep documentation and test reports anchored to
-fresh validation from `build/`, and report full validation as blocked until the
-paths are removed. Removing those tracked generated files is a repository
-cleanup package: delete the artifacts, keep `.gitignore` coverage in place,
-keep the `repository_hygiene` CTest entry passing, rerun the baseline validation
-flow, and mention the cleanup explicitly in the change summary.
+If the command returns paths that still exist in the checkout, keep
+documentation and test reports anchored to fresh validation from `build/`, and
+report full validation as blocked until the paths are removed. Removing those
+tracked generated files is a repository cleanup package: delete the artifacts,
+keep `.gitignore` coverage in place, keep the `repository_hygiene` CTest entry
+passing, rerun the baseline validation flow, and mention the cleanup explicitly
+in the change summary.
 
 Use this sequence for that cleanup package:
 
@@ -154,6 +157,8 @@ Keep the documentation set internally consistent:
 
 - `README.md`: quick start, built-in commands, config, customization, and docs
   map.
+- `docs/command-reference.md`: global options, built-in commands, config
+  fields, shell behavior, and exit statuses.
 - `docs/onboarding.md`: first local build, smoke test, shell use, and first
   customization loop.
 - `docs/architecture.md`: component layout, command flow, and extension points.
