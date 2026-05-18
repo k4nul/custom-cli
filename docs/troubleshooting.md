@@ -17,7 +17,7 @@ ctest --test-dir build --output-on-failure
 also controls CTest registration through `include(CTest)`. If a previous cache,
 toolchain, or preset disabled `BUILD_TESTING`, reconfigure with both flags set
 to `ON` instead of only rebuilding the old tree. A healthy tree registers
-`starter_tests` and `cli_starter_smoke`.
+`starter_tests`, `cli_starter_smoke`, and `repository_hygiene`.
 
 ## Multi-Config Tests Fail To Start
 

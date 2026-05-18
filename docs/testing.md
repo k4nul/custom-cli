@@ -1,22 +1,25 @@
 # Testing
 
 The starter uses CTest for test discovery and doctest for assertions. Most
-behavior tests link through the `starter_core` library, and a CTest smoke case
-also runs the built executable to catch packaging and command-wiring regressions.
+behavior tests link through the `starter_core` library, a CTest smoke case runs
+the built executable to catch packaging and command-wiring regressions, and a
+repository hygiene case blocks tracked local artifacts.
 
 ## Test Targets
 
-`CMakeLists.txt` defines one test executable and two CTest entries:
+`CMakeLists.txt` defines one test executable and three CTest entries:
 
 - `starter_tests`: builds from `tests/config_tests.cpp`
 - `cli_starter_smoke`: runs the built CLI through version, about, doctor,
   config, hello, and echo smoke checks
+- `repository_hygiene`: fails when tracked ignored local artifact paths such as
+  `build-local-*` or `.sandbox-user/*` are present in the repository checkout
 
-The test target and smoke entry are created only when `CLI_STARTER_BUILD_TESTS`
-is enabled. That option defaults to CMake's `BUILD_TESTING` value because the
-project includes `CTest`. Keep `BUILD_TESTING` enabled too; a cache or preset
-that turns it off can prevent CTest from registering tests even if the test
-target is compiled.
+The test target and CTest entries are created only when
+`CLI_STARTER_BUILD_TESTS` is enabled. That option defaults to CMake's
+`BUILD_TESTING` value because the project includes `CTest`. Keep
+`BUILD_TESTING` enabled too; a cache or preset that turns it off can prevent
+CTest from registering tests even if the test target is compiled.
 
 ## Standard Validation
 
@@ -28,9 +31,9 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-Leave the CTest command unfiltered for reportable validation so both
-`starter_tests` and `cli_starter_smoke` run. Use focused doctest filters only
-for local iteration.
+Leave the CTest command unfiltered for reportable validation so
+`starter_tests`, `cli_starter_smoke`, and `repository_hygiene` run. Use focused
+doctest filters only for local iteration.
 
 The tracked GitHub Actions workflow at `.github/workflows/ci.yml` runs the same
 CMake/CTest validation on Linux and Windows. Report local results from the flow
@@ -103,6 +106,10 @@ For Visual Studio-style multi-config layouts:
 The `cli_starter_smoke` CTest entry covers the built executable path for
 `--version`, `about`, `doctor`, config initialization and display, `hello`, and
 numbered `echo`.
+
+The `repository_hygiene` CTest entry checks the Git checkout for tracked
+ignored local artifact paths such as `build-local-*` and `.sandbox-user/*`, so
+old generated files do not become source or validation evidence again.
 
 ## Known Gaps
 

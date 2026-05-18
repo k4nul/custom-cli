@@ -194,7 +194,8 @@ nested subcommands.
 
 ## Testing
 
-For normal starter behavior tests, including the doctest suite and built-executable smoke checks:
+For normal starter behavior tests, including the doctest suite, built-executable smoke checks, and
+repository hygiene checks:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
@@ -202,7 +203,8 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-This unfiltered CTest run covers both registered entries: `starter_tests` and `cli_starter_smoke`.
+This unfiltered CTest run covers the registered entries: `starter_tests`, `cli_starter_smoke`, and
+`repository_hygiene`.
 The tracked GitHub Actions workflow at [.github/workflows/ci.yml](.github/workflows/ci.yml) runs the
 same CMake/CTest validation on Linux and Windows.
 Use the local flow above before reporting source changes.
@@ -430,7 +432,7 @@ cmake -S . -B build \
 
 ## 테스트
 
-doctest suite와 빌드된 실행 파일 smoke check를 포함한 일반적인 스타터 동작 테스트는 다음 명령으로 실행합니다.
+doctest suite, 빌드된 실행 파일 smoke check, repository hygiene check를 포함한 일반적인 스타터 동작 테스트는 다음 명령으로 실행합니다.
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
@@ -438,7 +440,7 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-필터를 걸지 않은 이 CTest 실행은 등록된 `starter_tests`와 `cli_starter_smoke`를 모두 포함합니다.
+필터를 걸지 않은 이 CTest 실행은 등록된 `starter_tests`, `cli_starter_smoke`, `repository_hygiene`를 포함합니다.
 추적되는 GitHub Actions workflow인 [.github/workflows/ci.yml](.github/workflows/ci.yml)은 Linux와
 Windows에서 같은 CMake/CTest 검증을 실행합니다.
 소스 변경 결과를 보고하기 전에는 위의 로컬 흐름을 사용하세요.
