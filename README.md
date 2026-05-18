@@ -211,6 +211,15 @@ Use the local flow above before reporting source changes.
 
 Use a fresh ignored `build/` tree for validation. Do not cite historical `build-local-*` or
 `.sandbox-user/` artifacts as proof that the current source still builds or tests cleanly.
+Before treating the unfiltered CTest result as passing, check for tracked ignored artifacts:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
+If that command returns paths, `repository_hygiene` is expected to fail until those tracked generated
+artifacts are removed in a cleanup change. In that state, report full validation as blocked by
+artifact hygiene instead of replacing it with historical build output or a filtered test run.
 
 With multi-config generators, build and test the same configuration:
 
@@ -447,6 +456,17 @@ Windows에서 같은 CMake/CTest 검증을 실행합니다.
 
 검증에는 새로 만든 무시 대상 `build/` 트리를 사용하세요. 과거의 `build-local-*` 또는
 `.sandbox-user/` 산출물을 현재 소스가 빌드되거나 테스트된 증거로 인용하지 마세요.
+필터를 걸지 않은 CTest 결과를 성공으로 간주하기 전에 추적 중인 ignored artifact가 있는지
+확인합니다.
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
+이 명령이 경로를 출력하면 해당 tracked generated artifact를 별도 cleanup change에서 제거할
+때까지 `repository_hygiene`가 실패하는 것이 정상입니다. 이 상태에서는 과거 build output이나
+필터링된 test run으로 대체하지 말고, 전체 검증이 artifact hygiene 때문에 blocked되었다고
+보고합니다.
 
 multi-config 생성기를 사용하면 같은 설정으로 빌드하고 테스트합니다.
 

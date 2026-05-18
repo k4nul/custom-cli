@@ -51,6 +51,12 @@ Check for those paths when validation evidence looks suspicious:
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
+If that command returns paths, full unfiltered validation is blocked because
+`repository_hygiene` is expected to fail until the tracked generated artifacts
+are removed. Build and focused test runs can still help diagnose source changes,
+but report them as partial evidence and keep the artifact cleanup as a separate
+repository hygiene task.
+
 For multi-config generators, build and test the same configuration:
 
 ```powershell
@@ -101,7 +107,11 @@ For Visual Studio-style multi-config layouts:
 - root command completion, including registered CLI commands plus shell-only `help`, `exit`, and `quit`,
 - subcommand completion for `config init` and `config show`,
 - scoped option completion for root options, `hello`, and `config init`, and
-- completion fallback to root options when earlier shell context is malformed.
+- completion fallback to root options when earlier shell context is malformed,
+- completion replacement ranges based on cursor position,
+- trailing-space subcommand suggestions,
+- shared-prefix completion priming, and
+- primed-state reset after replacement and listing actions.
 
 The `cli_starter_smoke` CTest entry covers the built executable path for
 `--version`, `about`, `doctor`, config initialization and display, `hello`, and
