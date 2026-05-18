@@ -316,6 +316,14 @@ TEST_CASE("application accepts hello subcommand options from argv order") {
     CHECK(result.err.empty());
 }
 
+TEST_CASE("application supports enthusiastic hello flag") {
+    const auto result = run_application({"hello", "--enthusiastic", "--name", "Ada"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, Ada!\n");
+    CHECK(result.err.empty());
+}
+
 TEST_CASE("application echoes positional text") {
     const auto result = run_application({"echo", "one", "two words", "three"});
 
@@ -542,6 +550,36 @@ TEST_CASE("application reads custom config path for config-backed commands") {
     CHECK(result.err.empty());
 }
 
+TEST_CASE("config-backed hello supports enthusiastic default name") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+
+    starter::AppConfig config;
+    config.default_name = "Grace";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"--config", config_path.string(), "hello", "-e"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, Grace!\n");
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("explicit hello name overrides disk config default") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+
+    starter::AppConfig config;
+    config.default_name = "Grace";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"--config", config_path.string(), "hello", "--name", "Ada"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, Ada.\n");
+    CHECK(result.err.empty());
+}
+
 TEST_CASE("application explains missing config defaults for hello") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "missing.json";
@@ -552,6 +590,18 @@ TEST_CASE("application explains missing config defaults for hello") {
 
     CHECK(result.exit_code == 0);
     CHECK(result.out == expected);
+    CHECK(result.err.empty());
+    CHECK_FALSE(fs::exists(config_path));
+}
+
+TEST_CASE("explicit hello name suppresses missing config guidance") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "missing.json";
+
+    const auto result = run_application({"--config", config_path.string(), "hello", "--name", "Ada"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, Ada.\n");
     CHECK(result.err.empty());
     CHECK_FALSE(fs::exists(config_path));
 }
