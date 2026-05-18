@@ -225,6 +225,49 @@ TEST_CASE("tokenizer reports malformed shell input") {
         std::runtime_error);
 }
 
+TEST_CASE("tokenizer ignores surrounding whitespace and splits mixed whitespace") {
+    CHECK(starter::tokenize_command_line("") == std::vector<std::string>{});
+    CHECK(starter::tokenize_command_line(" \t\r\n  ") == std::vector<std::string>{});
+
+    const auto tokens = starter::tokenize_command_line("  hello\tworld\n\"two words\"  ");
+    const std::vector<std::string> expected = {"hello", "world", "two words"};
+
+    CHECK(tokens == expected);
+}
+
+TEST_CASE("tokenizer handles escaped characters inside and outside quotes") {
+    const auto tokens =
+        starter::tokenize_command_line(R"(echo one\ two "quoted \"name\"" 'single \'quote\'' path\\tail)");
+    const std::vector<std::string> expected = {
+        "echo",
+        "one two",
+        "quoted \"name\"",
+        "single 'quote'",
+        "path\\tail",
+    };
+
+    CHECK(tokens == expected);
+}
+
+TEST_CASE("tokenizer combines adjacent quoted and unquoted fragments") {
+    const auto tokens =
+        starter::tokenize_command_line(R"(hello "Ada"'-'Lovelace unquoted" suffix" 'prefix'"suffix")");
+    const std::vector<std::string> expected = {
+        "hello",
+        "Ada-Lovelace",
+        "unquoted suffix",
+        "prefixsuffix",
+    };
+
+    CHECK(tokens == expected);
+}
+
+TEST_CASE("join_tokens handles empty single and custom-delimited token lists") {
+    CHECK(starter::join_tokens({}).empty());
+    CHECK(starter::join_tokens({"one"}) == "one");
+    CHECK(starter::join_tokens({"one", "two words", "three"}, " | ") == "one | two words | three");
+}
+
 TEST_CASE("config can round-trip through JSON") {
     starter::AppConfig config;
     config.prompt = "custom";
