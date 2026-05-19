@@ -35,6 +35,9 @@ AppConfig parse_config(std::string_view text);
 AppConfig load_config_or_throw(const std::filesystem::path& path);
 AppConfig load_config_or_default(const std::filesystem::path& path, bool* loaded = nullptr);
 void write_config_template(const std::filesystem::path& path, const AppConfig& config);
-std::string describe_config(const std::filesystem::path& path, const AppConfig& config, bool loaded_from_disk);
+std::string describe_config(
+    const std::filesystem::path& path,
+    const AppConfig& config,
+    bool loaded_from_disk);
 
 }  // namespace starter

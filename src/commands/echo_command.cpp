@@ -41,7 +41,10 @@ void register_echo_command(
     auto options = std::make_shared<EchoOptions>();
     auto* command = root.add_subcommand("echo", "Echo text to demonstrate positional arguments.");
     command->add_flag("--uppercase", options->uppercase, "Render the output in uppercase.");
-    command->add_flag("--numbered", options->numbered, "Print each token on its own numbered line.");
+    command->add_flag(
+        "--numbered",
+        options->numbered,
+        "Print each token on its own numbered line.");
     command->add_option("text", options->text, "Text to echo back.")->required()->expected(-1);
 
     command->callback([&, options]() {

@@ -17,14 +17,17 @@ void register_doctor_command(
     std::ostream& out,
     std::ostream&,
     bool& command_executed) {
-    auto* command = root.add_subcommand("doctor", "Check starter layout and configuration assumptions.");
+    auto* command = root.add_subcommand(
+        "doctor",
+        "Check starter layout and configuration assumptions.");
     command->callback([&]() {
         command_executed = true;
 
         bool layout_ok = true;
         const auto check_path = [&](const char* label, const std::filesystem::path& path) {
             const bool exists = std::filesystem::exists(path);
-            out << '[' << (exists ? "ok" : "missing") << "] " << label << ": " << path.generic_string() << '\n';
+            out << '[' << (exists ? "ok" : "missing") << "] " << label << ": "
+                << path.generic_string() << '\n';
             layout_ok = layout_ok && exists;
         };
 
@@ -45,7 +48,8 @@ void register_doctor_command(
         }
         out << "[info] prompt: " << config.prompt << '\n';
         out << "[info] default name: " << config.default_name << '\n';
-        out << (layout_ok ? "Starter layout looks healthy.\n" : "Starter layout is missing recommended files.\n");
+        out << (layout_ok ? "Starter layout looks healthy.\n"
+                          : "Starter layout is missing recommended files.\n");
     });
 }
 

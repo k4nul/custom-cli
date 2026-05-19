@@ -52,7 +52,10 @@ cli_starter_enable_warnings(starter_core)
 
 add_executable(${CLI_STARTER_BINARY_NAME} src/main.cpp)
 target_link_libraries(${CLI_STARTER_BINARY_NAME} PRIVATE starter_core)
-set_target_properties(${CLI_STARTER_BINARY_NAME} PROPERTIES OUTPUT_NAME "${CLI_STARTER_BINARY_NAME}")
+set_target_properties(
+    ${CLI_STARTER_BINARY_NAME}
+    PROPERTIES OUTPUT_NAME "${CLI_STARTER_BINARY_NAME}"
+)
 cli_starter_enable_warnings(${CLI_STARTER_BINARY_NAME})
 
 if(CLI_STARTER_BUILD_TESTS)
