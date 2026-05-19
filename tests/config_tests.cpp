@@ -488,6 +488,57 @@ TEST_CASE("interactive shell runs no-argv sessions through the normal dispatch p
     CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> ", "starter> "});
 }
 
+TEST_CASE("interactive shell exits cleanly on EOF without an explicit exit command") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+
+    const auto result = run_application_with_scripted_shell({}, {});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Interactive mode. Type 'help' to inspect commands or 'exit' to quit.\n"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"starter> "});
+}
+
+TEST_CASE("interactive shell ignores blank and whitespace-only input before dispatching commands") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+
+    const auto result = run_application_with_scripted_shell({}, {"", " \t  ", "hello --name Ada"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Hello, Ada.\n"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> ", "starter> ", "starter> "});
+}
+
+TEST_CASE("interactive shell exit and quit commands stop the session without dispatch errors") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+
+    for (const auto& command : std::vector<std::string>{"exit", "quit"}) {
+        const auto result = run_application_with_scripted_shell({}, {command});
+
+        CHECK(result.exit_code == 0);
+        CHECK_FALSE(contains_text(result.out, "Run with --help"));
+        CHECK_FALSE(contains_text(result.err, "command finished with exit code"));
+        CHECK(result.err.empty());
+        CHECK(result.prompts == std::vector<std::string>{"starter> "});
+    }
+}
+
+TEST_CASE("interactive shell EOF after a command error still exits the shell successfully") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+
+    const auto result = run_application_with_scripted_shell({}, {"missing-command"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.err, "missing-command"));
+    CHECK(contains_text(result.err, "command finished with exit code "));
+    CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> "});
+}
+
 TEST_CASE("interactive shell reuses disk config and recovers from malformed input") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "custom.json";
