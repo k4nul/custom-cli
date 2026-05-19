@@ -1132,6 +1132,78 @@ TEST_CASE("tab completion uses cursor position for replacement ranges") {
     CHECK_FALSE(state.primed);
 }
 
+TEST_CASE("tab completion clamps cursor beyond line length") {
+    const std::vector<std::string> commands = {"help", "hello", "doctor"};
+
+    const auto completion = starter::resolve_completion("hel", 99, commands);
+
+    CHECK(completion.prefix == "hel");
+    CHECK(completion.replace_begin == 0);
+    CHECK(completion.replace_end == std::string("hel").size());
+    CHECK(completion.candidates == std::vector<std::string>{"help", "hello"});
+}
+
+TEST_CASE("tab completion uses token boundaries after leading and repeated whitespace") {
+    CompletionAppFixture fixture;
+
+    const auto root_completion =
+        starter::resolve_completion("  h", std::string("  h").size(), fixture.app, fixture.shell_commands);
+    CHECK(root_completion.prefix == "h");
+    CHECK(root_completion.replace_begin == 2);
+    CHECK(root_completion.replace_end == std::string("  h").size());
+    CHECK(contains(root_completion.candidates, "hello"));
+    CHECK(contains(root_completion.candidates, "help"));
+    CHECK_FALSE(contains(root_completion.candidates, "config"));
+
+    const auto config_completion = starter::resolve_completion(
+        "config   s",
+        std::string("config   s").size(),
+        fixture.app,
+        fixture.shell_commands);
+    CHECK(config_completion.prefix == "s");
+    CHECK(config_completion.replace_begin == std::string("config   ").size());
+    CHECK(config_completion.replace_end == std::string("config   s").size());
+    CHECK(config_completion.candidates == std::vector<std::string>{"show"});
+}
+
+TEST_CASE("tab completion keeps no-match requests as no-change") {
+    starter::TabCompletionState state;
+    const std::vector<std::string> commands = {"help", "hello"};
+
+    const auto completion = starter::resolve_completion("z", 1, commands);
+    const auto first_action = starter::choose_tab_completion(completion, "z", 1, state);
+    CHECK(first_action.kind == starter::CompletionActionKind::no_change);
+    CHECK(first_action.candidates.empty());
+    CHECK(state.primed);
+
+    const auto second_action = starter::choose_tab_completion(completion, "z", 1, state);
+    CHECK(second_action.kind == starter::CompletionActionKind::no_change);
+    CHECK(second_action.candidates.empty());
+    CHECK(state.primed);
+    CHECK(state.line == "z");
+    CHECK(state.cursor == 1);
+}
+
+TEST_CASE("tab completion treats edited input as a new primed request") {
+    starter::TabCompletionState state;
+    const std::vector<std::string> commands = {"help", "hello"};
+
+    const auto first_completion = starter::resolve_completion("hel", 3, commands);
+    const auto first_action = starter::choose_tab_completion(first_completion, "hel", 3, state);
+    CHECK(first_action.kind == starter::CompletionActionKind::no_change);
+    CHECK(state.primed);
+    CHECK(state.line == "hel");
+
+    const auto edited_completion = starter::resolve_completion("helx", 4, commands);
+    const auto edited_action = starter::choose_tab_completion(edited_completion, "helx", 4, state);
+    CHECK(edited_action.kind == starter::CompletionActionKind::no_change);
+    CHECK(edited_action.candidates.empty());
+    CHECK(state.primed);
+    CHECK(state.line == "helx");
+    CHECK(state.cursor == 4);
+    CHECK(state.prefix == "helx");
+}
+
 TEST_CASE("tab completion offers subcommands after a trailing space") {
     CompletionAppFixture fixture;
     const std::string line = "config ";
