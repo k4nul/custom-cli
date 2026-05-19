@@ -34,9 +34,10 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
 If that command prints paths that still exist in the checkout, the unfiltered
-CTest run is expected to fail in `repository_hygiene` until those tracked
-generated artifacts are removed in a separate cleanup change. You can still
-rebuild into `build/` to inspect current source behavior, but report full
+CTest run is expected to fail in `repository_hygiene` when tests run inside a Git
+worktree with `git` available. The check is scoped to those legacy tracked
+artifact patterns until they are removed in a separate cleanup change. You can
+still rebuild into `build/` to inspect current source behavior, but report full
 validation as blocked by artifact hygiene instead of treating a filtered run or
 old artifact output as authoritative.
 

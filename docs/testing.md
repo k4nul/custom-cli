@@ -3,7 +3,8 @@
 The starter uses CTest for test discovery and doctest for assertions. Most
 behavior tests link through the `starter_core` library, a CTest smoke case runs
 the built executable to catch packaging and command-wiring regressions, and a
-repository hygiene case blocks tracked local artifacts.
+repository hygiene case blocks the tracked legacy artifact patterns it is
+configured to inspect.
 
 ## Test Targets
 
@@ -12,8 +13,9 @@ repository hygiene case blocks tracked local artifacts.
 - `starter_tests`: builds from `tests/config_tests.cpp`
 - `cli_starter_smoke`: runs the built CLI through version, about, doctor,
   config, hello, and echo smoke checks
-- `repository_hygiene`: fails when tracked ignored local artifact paths such as
-  `build-local-*` or `.sandbox-user/*` are present in the repository checkout
+- `repository_hygiene`: when running inside a Git worktree with `git` available,
+  fails if tracked legacy artifact paths matching `build-local-*` or
+  `.sandbox-user/*` are still present in the checkout
 
 The test target and CTest entries are created only when
 `CLI_STARTER_BUILD_TESTS` is enabled. That option defaults to CMake's
@@ -23,7 +25,26 @@ CTest from registering tests even if the test target is compiled.
 
 ## Standard Validation
 
-Use this flow for the normal local validation pass:
+Start the normal local validation pass by checking the tracked artifact patterns
+that `repository_hygiene` enforces:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
+Report test results from a build tree created for the current validation pass.
+Do not use existing `build-local-*` executables or cached CTest files as proof
+that the current source still builds, even when those paths appear in the
+checkout. The ignore rules prevent new local artifacts from being added, but
+they do not make historical tracked artifacts authoritative.
+
+If the artifact check returns paths that still exist in the checkout, full
+unfiltered validation is blocked because `repository_hygiene` is expected to fail
+until the tracked generated artifacts are removed. Build and focused test runs
+can still help diagnose source changes, but report them as partial evidence and
+keep the artifact cleanup as a separate repository hygiene task.
+
+If the artifact check prints no paths, use this flow:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
@@ -35,27 +56,12 @@ Leave the CTest command unfiltered for reportable validation so
 `starter_tests`, `cli_starter_smoke`, and `repository_hygiene` run. Use focused
 doctest filters only for local iteration.
 
-The tracked GitHub Actions workflow at `.github/workflows/ci.yml` runs the same
-CMake/CTest validation on Linux and Windows. Report local results from the flow
-above before publishing source changes.
-
-Report test results from a build tree created for the current validation pass.
-Do not use existing `build-local-*` executables or cached CTest files as proof
-that the current source still builds, even when those paths appear in the
-checkout. The ignore rules prevent new local artifacts from being added, but
-they do not make historical tracked artifacts authoritative.
-
-Check for those paths when validation evidence looks suspicious:
-
-```bash
-git ls-files 'build-local-*' '.sandbox-user/*'
-```
-
-If that command returns paths that still exist in the checkout, full unfiltered
-validation is blocked because `repository_hygiene` is expected to fail until the
-tracked generated artifacts are removed. Build and focused test runs can still
-help diagnose source changes, but report them as partial evidence and keep the
-artifact cleanup as a separate repository hygiene task.
+The tracked GitHub Actions workflow at `.github/workflows/ci.yml` mirrors this
+validation on Linux and Windows. The Linux job configures, builds with
+`cmake --build build --parallel`, and runs unfiltered CTest; the Windows job uses
+the same configure step, then builds `Debug` with `--parallel` and runs
+`ctest --test-dir build -C Debug --output-on-failure`. Report local results from
+the flow above before publishing source changes.
 
 For multi-config generators, build and test the same configuration:
 
@@ -91,7 +97,8 @@ For Visual Studio-style multi-config layouts:
   whitespace, escaped characters, adjacent quoted and unquoted fragments,
   malformed input, and shared token joining helpers,
 - JSON config serialization, parsing, strict top-level object validation, and typed read/write failures,
-- custom config paths for config-backed commands,
+- custom config paths for config-backed commands and explicit `hello --name`
+  overrides for disk config defaults,
 - `config init` output-path behavior and write failure reporting,
 - `config show` fallback output when no config file exists,
 - `config show` defaults for omitted disk config fields,
@@ -99,15 +106,18 @@ For Visual Studio-style multi-config layouts:
 - informational `enabled_commands` behavior, including config-backed commands
   still running when omitted from the list and non-config-backed commands still
   running when the list names only another command,
-- `hello` command dispatch through `Application`, including missing-config guidance,
+- `hello` command dispatch through `Application`, including enthusiastic output,
+  config-backed default names, explicit-name overrides, and missing-config guidance,
 - `echo` command dispatch for positional text, uppercase output, numbered output,
   and combined uppercase numbered output,
 - top-level `--version`, `--help`, `--help-all`, and parse-error stream routing,
 - CLI11 validation errors for missing `echo` text, unknown options, and missing `config` subcommands,
 - `about` output and `doctor` behavior for healthy layouts, missing recommended layout paths,
   missing local config warnings, malformed config JSON, and wrong-type config fields,
-- scripted interactive shell lifecycle coverage for no-argv shell entry, disk-backed prompts,
-  shell-only `help`, `exit`, and `quit` handling, malformed input recovery, and command dispatch reuse,
+- scripted interactive shell lifecycle coverage for no-argv shell entry, EOF,
+  blank input, disk-backed prompts, shell-only `help`, `exit`, and `quit`
+  handling, command-specific help routing, malformed input recovery, parse-error
+  recovery, command-failure recovery, and command dispatch reuse,
 - root command completion, including registered CLI commands plus shell-only `help`, `exit`, and `quit`,
 - subcommand completion for `config init` and `config show`,
 - scoped option completion for root options, `hello`, and `config init`, and
@@ -121,9 +131,10 @@ The `cli_starter_smoke` CTest entry covers the built executable path for
 `--version`, `about`, `doctor`, config initialization and display, `hello`, and
 numbered `echo`.
 
-The `repository_hygiene` CTest entry checks the Git checkout for tracked
-ignored local artifact paths such as `build-local-*` and `.sandbox-user/*`, so
-old generated files do not become source or validation evidence again.
+When it runs inside a Git worktree with `git` available, the
+`repository_hygiene` CTest entry checks the checkout for tracked legacy artifact
+paths matching `build-local-*` and `.sandbox-user/*`, so old generated files do
+not become source or validation evidence again.
 
 ## Known Gaps
 
@@ -194,5 +205,5 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 
 The command should print no paths after the cleanup. Then run the standard
 unfiltered CTest flow from a fresh ignored `build/` tree so
-`repository_hygiene` proves that tracked generated artifacts no longer block
-validation.
+`repository_hygiene` can confirm, in Git worktrees with `git` available, that
+tracked generated artifacts no longer block validation.

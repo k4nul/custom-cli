@@ -29,7 +29,7 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-If tracked ignored artifacts under `build-local-*` or `.sandbox-user/` are still
-present in the checkout, `repository_hygiene` is expected to fail. Treat that as
-a separate cleanup blocker before reporting dependency-update validation as
-complete.
+If tracked legacy artifacts under `build-local-*` or `.sandbox-user/` are still
+present in the checkout, `repository_hygiene` is expected to fail when tests run
+inside a Git worktree with `git` available. Treat that as a separate cleanup
+blocker before reporting dependency-update validation as complete.
