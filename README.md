@@ -133,9 +133,10 @@ to that path unless `--output <path>` is supplied:
 ./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
 ```
 
-`config init` generates a template from the current `AppConfig` defaults and project metadata. It is
-not a byte-for-byte copy of the checked-in template, so keep `config/cli-starter.json`, config
-defaults, and generated template behavior aligned when the schema changes.
+`config init` starts from the current `AppConfig` defaults, then applies the configured prompt label
+and generated-template `notes` value. It is not a byte-for-byte copy of the checked-in template, so
+keep `config/cli-starter.json`, config defaults, and generated template behavior aligned when the
+schema changes.
 
 `enabled_commands` is currently serialized and shown by `config show`; it is not a runtime
 allowlist and does not disable command registration. Command availability comes from compile-time
@@ -390,9 +391,10 @@ starter> exit
 ./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
 ```
 
-`config init`은 현재 `AppConfig` 기본값과 프로젝트 metadata에서 템플릿을 생성합니다.
-체크인된 템플릿을 byte-for-byte로 복사하는 방식이 아니므로 schema를 바꿀 때는
-`config/cli-starter.json`, 설정 기본값, 생성되는 템플릿 동작을 함께 맞춥니다.
+`config init`은 현재 `AppConfig` 기본값에서 시작한 뒤 설정된 프롬프트 레이블과 생성용
+`notes` 값을 적용해 템플릿을 만듭니다. 체크인된 템플릿을 byte-for-byte로 복사하는 방식이
+아니므로 schema를 바꿀 때는 `config/cli-starter.json`, 설정 기본값, 생성되는 템플릿 동작을
+함께 맞춥니다.
 
 `enabled_commands`는 현재 직렬화되고 `config show`에서 표시되지만, 런타임 allowlist가 아니며
 명령 등록을 비활성화하지 않습니다. 명령 사용 가능 여부는 compile-time CLI wiring이 결정합니다.

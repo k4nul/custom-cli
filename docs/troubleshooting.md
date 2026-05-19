@@ -172,8 +172,9 @@ config-backed commands. `config init` writes to that path unless an explicit
 Use `--output` when you want to create a template without changing the active
 config path for the command.
 
-The generated file comes from the current `AppConfig` defaults and project
-metadata. It is not a byte-for-byte copy of `config/cli-starter.json`.
+The generated file starts from the current `AppConfig` defaults, then applies
+the configured prompt label and generated-template `notes` value. It is not a
+byte-for-byte copy of `config/cli-starter.json`.
 
 ## A Config-Backed Command Reports A JSON Error
 
