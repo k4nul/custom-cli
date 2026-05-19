@@ -138,7 +138,9 @@ std::string longest_common_prefix(const std::vector<std::string>& candidates) {
     for (std::size_t index = 1; index < candidates.size(); ++index) {
         const auto& candidate = candidates[index];
         std::size_t length = 0;
-        while (length < prefix.size() && length < candidate.size() && prefix[length] == candidate[length]) {
+        while (length < prefix.size()
+            && length < candidate.size()
+            && prefix[length] == candidate[length]) {
             ++length;
         }
         prefix.resize(length);
@@ -159,7 +161,9 @@ std::string line_after_replacement(
     return updated;
 }
 
-const CLI::App& command_context_for(const CLI::App& app, const std::vector<std::string>& context_tokens) {
+const CLI::App& command_context_for(
+    const CLI::App& app,
+    const std::vector<std::string>& context_tokens) {
     const CLI::App* current = &app;
     for (const auto& token : context_tokens) {
         if (starts_with(token, "-")) {
@@ -237,7 +241,11 @@ CompletionAction choose_tab_completion(
         action.replacement = shared_prefix;
 
         state.primed = true;
-        state.line = line_after_replacement(line, completion.replace_begin, completion.replace_end, shared_prefix);
+        state.line = line_after_replacement(
+            line,
+            completion.replace_begin,
+            completion.replace_end,
+            shared_prefix);
         state.cursor = completion.replace_begin + shared_prefix.size();
         state.replace_begin = completion.replace_begin;
         state.replace_end = state.cursor;
@@ -245,8 +253,11 @@ CompletionAction choose_tab_completion(
         return action;
     }
 
-    const bool same_request = state.primed && state.line == line && state.cursor == cursor
-        && state.replace_begin == completion.replace_begin && state.replace_end == completion.replace_end
+    const bool same_request = state.primed
+        && state.line == line
+        && state.cursor == cursor
+        && state.replace_begin == completion.replace_begin
+        && state.replace_end == completion.replace_end
         && state.prefix == completion.prefix;
     if (same_request && !completion.candidates.empty()) {
         action.kind = CompletionActionKind::list;

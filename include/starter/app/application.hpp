@@ -16,12 +16,20 @@ namespace starter {
 
 class Application {
 public:
-    Application(ProjectInfo project_info, std::ostream& out, std::ostream& err, ShellLineReader shell_line_reader = {});
+    Application(
+        ProjectInfo project_info,
+        std::ostream& out,
+        std::ostream& err,
+        ShellLineReader shell_line_reader = {});
 
     int run(int argc, char** argv);
 
 private:
-    void configure_cli_app(CLI::App& app, std::string& config_path, bool& command_executed, bool& shell_requested);
+    void configure_cli_app(
+        CLI::App& app,
+        std::string& config_path,
+        bool& command_executed,
+        bool& shell_requested);
     int dispatch(std::vector<std::string> args, bool interactive_mode);
     int run_shell(const std::filesystem::path& config_path);
     std::vector<std::string> shell_completion_commands() const;

@@ -59,7 +59,8 @@ bool config_file_exists(const std::filesystem::path& path) {
     std::error_code error;
     const bool exists = std::filesystem::exists(path, error);
     if (error) {
-        throw ConfigReadError("failed to inspect config file: " + path.generic_string() + ": " + error.message());
+        throw ConfigReadError(
+            "failed to inspect config file: " + path.generic_string() + ": " + error.message());
     }
     return exists;
 }
@@ -122,7 +123,8 @@ void write_config_template(const std::filesystem::path& path, const AppConfig& c
             std::filesystem::create_directories(path.parent_path());
         }
     } catch (const std::filesystem::filesystem_error& error) {
-        throw ConfigWriteError("failed to prepare config directory for " + path.generic_string() + ": "
+        throw ConfigWriteError(
+            "failed to prepare config directory for " + path.generic_string() + ": "
             + error.what());
     }
 
@@ -137,7 +139,10 @@ void write_config_template(const std::filesystem::path& path, const AppConfig& c
     }
 }
 
-std::string describe_config(const std::filesystem::path& path, const AppConfig& config, bool loaded_from_disk) {
+std::string describe_config(
+    const std::filesystem::path& path,
+    const AppConfig& config,
+    bool loaded_from_disk) {
     std::ostringstream stream;
     stream << "Config path: " << path.generic_string() << '\n';
     stream << "Source: " << (loaded_from_disk ? "disk" : "built-in defaults") << '\n';

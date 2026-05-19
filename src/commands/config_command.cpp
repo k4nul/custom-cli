@@ -41,7 +41,8 @@ void register_config_command(
 
         AppConfig config_template;
         config_template.prompt = project_info.prompt_label;
-        config_template.notes = "Rename values and trim sample commands once you start customizing the starter.";
+        config_template.notes =
+            "Rename values and trim sample commands once you start customizing the starter.";
 
         const auto output_path = std::filesystem::path(
             init_options->output_path.empty() ? config_path : init_options->output_path);
@@ -49,7 +50,9 @@ void register_config_command(
         out << "Wrote config template to " << output_path.generic_string() << '\n';
     });
 
-    auto* show_command = config_command->add_subcommand("show", "Print the effective starter configuration.");
+    auto* show_command = config_command->add_subcommand(
+        "show",
+        "Print the effective starter configuration.");
     show_command->callback([&]() {
         command_executed = true;
         const auto path = std::filesystem::path(config_path);
