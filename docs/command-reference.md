@@ -100,8 +100,9 @@ Options:
 
 - `-o, --output <path>`: write the generated template to a specific path.
 
-The generated file is built from current `AppConfig` defaults and project
-metadata. It is not a byte-for-byte copy of `config/cli-starter.json`.
+The generated file starts from current `AppConfig` defaults, then applies the
+configured prompt label and generated-template `notes` value. It is not a
+byte-for-byte copy of `config/cli-starter.json`.
 
 ### `config show`
 
@@ -169,7 +170,7 @@ Supported fields:
 
 | Field | Type | Default | Behavior |
 | --- | --- | --- | --- |
-| `prompt` | string | `starter` | Interactive shell prompt when a config file is loaded. |
+| `prompt` | string | `starter` | Interactive shell prompt from built-in defaults, or from disk when a config file is loaded. |
 | `default_name` | string | `world` | Name used by `hello` when `--name` is omitted. |
 | `enabled_commands` | string array | `about`, `hello`, `echo`, `config`, `doctor` | Serialized and shown by `config show`; not a runtime allowlist. |
 | `notes` | string | `Customize this file after copying the starter.` | Informational text shown by `config show`. |

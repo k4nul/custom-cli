@@ -96,6 +96,9 @@ For Visual Studio-style multi-config layouts:
 - `config show` fallback output when no config file exists,
 - `config show` defaults for omitted disk config fields,
 - malformed, non-object, and wrong-type disk config errors for `config show` and config-backed `hello`,
+- informational `enabled_commands` behavior, including config-backed commands
+  still running when omitted from the list and non-config-backed commands still
+  running when the list names only another command,
 - `hello` command dispatch through `Application`, including missing-config guidance,
 - `echo` command dispatch for positional text, uppercase output, numbered output,
   and combined uppercase numbered output,

@@ -87,8 +87,9 @@ When changing config behavior:
 4. Document command examples with `--config ./config/local.json` when the example
    writes a local file.
 
-`config init` writes a generated template from `AppConfig` defaults and project
-metadata, not a byte-for-byte copy of `config/cli-starter.json`. Keep both paths
+`config init` writes a generated template that starts from `AppConfig` defaults,
+then applies the configured prompt label and generated-template `notes` value.
+It is not a byte-for-byte copy of `config/cli-starter.json`. Keep both paths
 aligned when changing defaults, prompt naming, or generated notes.
 
 `config/local.json` and `config/*.local.json` are ignored for local experiments.

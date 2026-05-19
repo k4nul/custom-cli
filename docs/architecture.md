@@ -79,10 +79,14 @@ runtime allowlist.
 
 1. Create `src/commands/example_command.cpp`.
 2. Add the new `.cpp` file to the `starter_core` source list in `CMakeLists.txt`.
-3. Define a small registrar function that adds a `CLI11` subcommand.
-4. Keep option state local to the command via owned state objects.
-5. Register the command centrally.
-6. Add docs and at least one test when the command changes user-facing behavior.
+3. Declare the registrar in `include/starter/commands/registrars.hpp`.
+4. Define a small registrar function that adds a `CLI11` subcommand.
+5. Keep option state local to the command via owned state objects.
+6. Register the command centrally in `src/commands/register_commands.cpp`.
+7. Add or extend doctest coverage in `tests/config_tests.cpp`, or add a focused
+   test file to the `starter_tests` target when that keeps the suite clearer.
+8. Update user-facing docs when the command changes command help, config fields,
+   shell behavior, validation expectations, or troubleshooting paths.
 
 ## Why There Is No Runtime Plugin Layer
 
