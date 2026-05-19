@@ -6,15 +6,30 @@ evidence.
 
 ## Baseline Validation
 
-Use the local CMake/CTest flow before reporting source changes. The tracked CI
-workflow at `.github/workflows/ci.yml` runs the same validation on Linux and
-Windows:
+Use the local CMake/CTest flow before reporting source changes. Start by
+checking the tracked legacy artifact patterns that `repository_hygiene` enforces:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
+If that command returns paths that still exist in the checkout, the full
+unfiltered CTest run is expected to fail in `repository_hygiene` until those
+tracked generated artifacts are removed. Record that state as blocked
+validation; do not use old build output or a filtered CTest run as a passing
+substitute.
+
+If the artifact check prints no paths, run the baseline validation flow:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```
+
+The tracked CI workflow at `.github/workflows/ci.yml` mirrors this validation on
+Linux and Windows. CI builds with `--parallel`; the Windows job builds and tests
+the `Debug` configuration.
 
 Keep both test flags explicit in maintenance reports. `CLI_STARTER_BUILD_TESTS`
 controls whether the project-specific CTest entries are registered:
@@ -30,9 +45,11 @@ ctest --test-dir build -C Debug --output-on-failure
 ```
 
 CTest includes a short built-executable smoke pass and a repository hygiene
-check for ignored local artifacts. After changes that affect the executable
-name, command registration, config paths, or user-facing command behavior,
-these commands are useful for manual inspection too:
+check for the tracked `build-local-*` and `.sandbox-user/*` legacy artifact
+patterns when running inside a Git worktree with `git` available. After changes
+that affect the executable name, command registration, config paths, or
+user-facing command behavior, these commands are useful for manual inspection
+too:
 
 ```bash
 ./build/cli-starter --version
@@ -45,12 +62,6 @@ these commands are useful for manual inspection too:
 `doctor` is an advisory layout and config probe. A missing local config or
 missing recommended layout path is reported in stdout, but CMake/CTest remains
 the validation gate for reportable source changes.
-
-If `git ls-files 'build-local-*' '.sandbox-user/*'` returns paths that still
-exist in the checkout, the full unfiltered CTest run is expected to fail in
-`repository_hygiene` until those tracked generated artifacts are removed. Record
-that state as blocked validation; do not use old build output or a filtered
-CTest run as a passing substitute.
 
 Use the configuration-specific executable path on Visual Studio-style builds.
 
@@ -85,7 +96,8 @@ When changing config behavior:
 2. Keep `config/cli-starter.json` in sync with the defaults.
 3. Add tests for default fallback, disk-loaded config, and error cases.
 4. Document command examples with `--config ./config/local.json` when the example
-   writes a local file.
+   demonstrates the active runtime config path, or `--output ./config/local.json`
+   when it demonstrates writing a template to an explicit local file.
 
 `config init` writes a generated template that starts from `AppConfig` defaults,
 then applies the configured prompt label and generated-template `notes` value.
@@ -103,7 +115,8 @@ package-manager bootstrap for normal builds. When updating a dependency:
 2. Update the vendored header files and the matching license file.
 3. Update `third_party/README.md` with the exact version and source.
 4. Re-run the unfiltered baseline validation flow so `starter_tests`,
-   `cli_starter_smoke`, and `repository_hygiene` cover the update.
+   `cli_starter_smoke`, and, in Git worktrees with `git` available,
+   `repository_hygiene` cover the update.
 5. Update user-facing docs only when dependency behavior changes build, test, or
    CLI usage.
 
@@ -130,8 +143,8 @@ documentation and test reports anchored to fresh validation from `build/`, and
 report full validation as blocked until the paths are removed. Removing those
 tracked generated files is a repository cleanup package: delete the artifacts,
 keep `.gitignore` coverage in place, keep the `repository_hygiene` CTest entry
-passing, rerun the baseline validation flow, and mention the cleanup explicitly
-in the change summary.
+passing for its configured legacy artifact patterns, rerun the baseline
+validation flow, and mention the cleanup explicitly in the change summary.
 
 Use this sequence for that cleanup package:
 

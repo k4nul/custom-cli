@@ -66,11 +66,12 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-When tracked ignored artifacts are still present, the unfiltered CTest run is
-expected to fail in `repository_hygiene`. Treat that as a repository hygiene
-blocker for reportable validation, not as proof that the current source build or
-doctest behavior failed. A filtered or focused run can support investigation,
-but it does not replace the full unfiltered validation gate.
+When tracked `build-local-*` or `.sandbox-user/*` artifacts are still present,
+the unfiltered CTest run is expected to fail in `repository_hygiene` when tests
+run inside a Git worktree with `git` available. Treat that as a repository
+hygiene blocker for reportable validation, not as proof that the current source
+build or doctest behavior failed. A filtered or focused run can support
+investigation, but it does not replace the full unfiltered validation gate.
 
 Removing tracked generated files changes repository contents and should be done
 as a separate cleanup task, not as part of routine docs or test-result updates.
