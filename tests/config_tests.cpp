@@ -500,6 +500,58 @@ TEST_CASE("interactive shell exits cleanly on EOF without an explicit exit comma
     CHECK(result.prompts == std::vector<std::string>{"starter> "});
 }
 
+TEST_CASE("interactive shell reports malformed startup config before prompting") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "bad.json";
+    write_text_file(config_path, R"({"default_name":)");
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"hello --name Ada"});
+
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "parse error"));
+    CHECK(result.prompts.empty());
+}
+
+TEST_CASE("interactive shell falls back to project prompt when disk prompt is empty") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+
+    starter::AppConfig config;
+    config.prompt = "";
+    config.default_name = "Grace";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"hello", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Hello, Grace.\n"));
+    CHECK_FALSE(contains_text(result.out, "Using built-in defaults"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> "});
+}
+
+TEST_CASE("interactive shell rejects wrong-type startup config before prompting") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "wrong-type.json";
+    write_text_file(config_path, R"({"prompt":7})");
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"exit"});
+
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "type must be string"));
+    CHECK(result.prompts.empty());
+}
+
 TEST_CASE("interactive shell ignores blank and whitespace-only input before dispatching commands") {
     TemporaryDirectory temporary_directory;
     const CurrentPathGuard current_path(temporary_directory.path());
