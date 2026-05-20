@@ -44,6 +44,12 @@ until the tracked generated artifacts are removed. Build and focused test runs
 can still help diagnose source changes, but report them as partial evidence and
 keep the artifact cleanup as a separate repository hygiene task.
 
+This is also the task-selection gate for automation. When the artifact check
+prints any path, select the artifact hygiene cleanup before runtime hardening,
+new feature tests, documentation polish, or supply-chain policy tightening.
+Those follow-up tasks should wait until `repository_hygiene` can pass from a
+fresh ignored build tree.
+
 If the artifact check prints no paths, use this flow:
 
 ```bash

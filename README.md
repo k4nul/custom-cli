@@ -216,6 +216,11 @@ build output or a filtered test run. Use the cleanup sequence in
 [docs/troubleshooting.md](docs/troubleshooting.md) only when that separate repository cleanup change
 is intentionally selected.
 
+Automation priority rule: while `git ls-files 'build-local-*' '.sandbox-user/*'`
+prints any path, the next write-capable maintenance task must be the artifact
+hygiene cleanup. Do not spend write-task cycles on lower-priority hardening or
+test expansion until that gate is clean.
+
 If the artifact check prints no paths, run the unfiltered CTest flow:
 
 ```bash
