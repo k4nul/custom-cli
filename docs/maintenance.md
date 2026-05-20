@@ -122,10 +122,10 @@ package-manager bootstrap for normal builds. When updating a dependency:
 
 ## Local Artifact Hygiene
 
-Use ignored build directories such as `build/`, `build-local-*`, or
-`cmake-build-*` for new local work. `.sandbox-user/` is also ignored for local
-sandbox and IDE telemetry. Avoid adding generated build output, IDE telemetry,
-or machine-specific state to future changes.
+Use ignored build directories such as `build/`, `build-linux/`,
+`build-local-*`, `out/`, or `cmake-build-*` for new local work. `.sandbox-user/`
+is also ignored for local sandbox and IDE telemetry. Avoid adding generated
+build output, IDE telemetry, or machine-specific state to future changes.
 
 If an older checkout contains tracked `build-local-*` or `.sandbox-user/` paths,
 treat them as historical local artifacts rather than source evidence. Reconfigure
@@ -171,6 +171,8 @@ Keep the documentation set internally consistent:
 
 - `README.md`: quick start, built-in commands, config, customization, and docs
   map.
+- `docs/project-overview.md`: repository purpose, scope, intended users, and
+  legacy boundary.
 - `docs/command-reference.md`: global options, built-in commands, config
   fields, shell behavior, and exit statuses.
 - `docs/onboarding.md`: first local build, smoke test, shell use, and first
@@ -181,6 +183,8 @@ Keep the documentation set internally consistent:
 - `docs/maintenance.md`: maintainer validation, change checklists, artifact
   hygiene, and CI workflow expectations.
 - `docs/migration-from-legacy.md`: historical migration context.
+- `third_party/README.md`: vendored dependency versions, source URLs, license
+  links, and dependency update guidance.
 
 When a command, config field, CMake cache variable, or validation path changes,
 update the nearest docs in the same change. When a known test gap is closed,

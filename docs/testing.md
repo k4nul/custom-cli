@@ -129,7 +129,11 @@ For Visual Studio-style multi-config layouts:
 
 The `cli_starter_smoke` CTest entry covers the built executable path for
 `--version`, `about`, `doctor`, config initialization and display, `hello`, and
-numbered `echo`.
+numbered `echo`. Each smoke case must exit successfully, match its expected
+stdout pattern, and leave stderr empty. These checks intentionally cover the
+default success path; when display metadata, about text, command registration,
+or config behavior changes, update `cmake/cli_smoke_test.cmake` with the related
+docs and tests.
 
 When it runs inside a Git worktree with `git` available, the
 `repository_hygiene` CTest entry checks the checkout for tracked legacy artifact
@@ -140,7 +144,11 @@ not become source or validation evidence again.
 
 Add focused coverage when work touches these areas:
 
-- raw terminal line editing behavior that depends on platform TTY APIs, and
+- raw terminal line editing behavior that depends on platform TTY APIs,
+- the real redirected-input fallback path in `read_shell_line`, beyond the
+  injected scripted shell reader used by unit tests,
+- built-executable negative/error-path smoke cases for unknown commands, missing
+  arguments, bad config, and stderr routing, and
 - platform-specific config permission or locked-file failures that need OS-specific setup.
 
 ## Adding Tests
@@ -188,8 +196,9 @@ Use the configuration-specific executable path on multi-config generators.
 ## Expected Local Files
 
 Keep generated build trees and local configs out of commits. Prefer ignored
-build directories such as `build/`, `build-local-*`, or `cmake-build-*`, and
-keep local config experiments in `config/local.json` or `config/*.local.json`.
+build directories such as `build/`, `build-linux/`, `build-local-*`, `out/`, or
+`cmake-build-*`; keep sandbox telemetry under `.sandbox-user/`; and keep local
+config experiments in `config/local.json` or `config/*.local.json`.
 
 If generated `build-local-*` or `.sandbox-user/` paths appear from an older
 checkout, do not use them as validation evidence. Rebuild into a fresh ignored
