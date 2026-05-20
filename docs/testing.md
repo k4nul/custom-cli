@@ -2,7 +2,7 @@
 
 The starter uses CTest for test discovery and doctest for assertions. Most
 behavior tests link through the `starter_core` library, a CTest smoke case runs
-the built executable to catch packaging and command-wiring regressions, and a
+the built executable through representative success and failure paths, and a
 repository hygiene case blocks the tracked legacy artifact patterns it is
 configured to inspect.
 
@@ -12,7 +12,8 @@ configured to inspect.
 
 - `starter_tests`: builds from `tests/config_tests.cpp`
 - `cli_starter_smoke`: runs the built CLI through version, about, doctor,
-  config, hello, and echo smoke checks
+  config, hello, and echo success checks, plus parse and config failure checks
+  for executable-level stdout/stderr routing
 - `repository_hygiene`: when running inside a Git worktree with `git` available,
   fails if tracked legacy artifact paths matching `build-local-*` or
   `.sandbox-user/*` are still present in the checkout
@@ -129,17 +130,26 @@ For Visual Studio-style multi-config layouts:
 - scoped option completion for root options, `hello`, and `config init`, and
 - completion fallback to root options when earlier shell context is malformed,
 - completion replacement ranges based on cursor position,
+- cursor clamping beyond the current line length,
+- token-boundary detection after leading and repeated whitespace,
+- no-match completion requests that leave the line unchanged,
+- edited-input priming after the line changes,
 - trailing-space subcommand suggestions,
 - shared-prefix completion priming, and
 - primed-state reset after replacement and listing actions.
 
-The `cli_starter_smoke` CTest entry covers the built executable path for
+The `cli_starter_smoke` CTest entry covers the built executable success path for
 `--version`, `about`, `doctor`, config initialization and display, `hello`, and
-numbered `echo`. Each smoke case must exit successfully, match its expected
-stdout pattern, and leave stderr empty. These checks intentionally cover the
-default success path; when display metadata, about text, command registration,
-or config behavior changes, update `cmake/cli_smoke_test.cmake` with the related
-docs and tests.
+numbered `echo`. Each success case must exit successfully, match its expected
+stdout pattern, and leave stderr empty.
+
+The same smoke script also covers representative built-executable failure
+routing for an unknown command, missing `echo` text, an unknown `hello` option,
+a missing `config` subcommand, malformed config JSON, and a wrong-type
+config-backed `hello` field. Each failure case must return a non-zero status,
+leave stdout empty, and match expected stderr patterns. When display metadata,
+about text, command registration, config behavior, or parse/config error text
+changes, update `cmake/cli_smoke_test.cmake` with the related docs and tests.
 
 When it runs inside a Git worktree with `git` available, the
 `repository_hygiene` CTest entry checks the checkout for tracked legacy artifact
@@ -151,10 +161,8 @@ not become source or validation evidence again.
 Add focused coverage when work touches these areas:
 
 - raw terminal line editing behavior that depends on platform TTY APIs,
-- the real redirected-input fallback path in `read_shell_line`, beyond the
-  injected scripted shell reader used by unit tests,
-- built-executable negative/error-path smoke cases for unknown commands, missing
-  arguments, bad config, and stderr routing, and
+- built-executable interactive shell and redirected-input coverage beyond the
+  injected scripted shell reader used by unit tests, and
 - platform-specific config permission or locked-file failures that need OS-specific setup.
 
 ## Adding Tests
