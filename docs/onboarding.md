@@ -133,6 +133,13 @@ transition. `CLI_STARTER_PROMPT_LABEL` is the fallback shell prompt, but a disk
 config's `prompt` field wins when the config file exists, so update both when
 you want the prompt to stay consistent.
 
+The `cli_starter_smoke` CTest entry checks the built executable's success path,
+including `--version`, `about`, `doctor`, config initialization and display,
+`hello`, and numbered `echo`, and it fails if a case returns a non-zero status,
+misses the expected stdout pattern, or writes to stderr. When a copied project
+intentionally changes display metadata, about text, command registration, or
+config behavior, update `cmake/cli_smoke_test.cmake` in the same change.
+
 ## Adding The First Real Command
 
 The starter uses compile-time command registration instead of a runtime plugin
@@ -161,3 +168,5 @@ tool's purpose.
 - `docs/troubleshooting.md`: common local build and runtime issues
 - `docs/maintenance.md`: maintainer checklist for command, config, dependency, and documentation changes
 - `docs/migration-from-legacy.md`: historical migration notes
+- `third_party/README.md`: vendored dependency versions, source URLs, license
+  links, and update guidance

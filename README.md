@@ -194,8 +194,8 @@ nested subcommands.
 - `config/`: checked-in config template
 - `tests/`: starter behavior tests
 - `third_party/`: vendored header-only dependencies and license files
-- `docs/`: onboarding, command reference, architecture, testing, troubleshooting, maintenance, and
-  migration notes
+- `docs/`: project overview, onboarding, command reference, architecture, testing,
+  troubleshooting, maintenance, and migration notes
 
 ## Testing
 
@@ -452,7 +452,8 @@ cmake -S . -B build \
 - `config/`: 체크인된 설정 템플릿
 - `tests/`: 스타터 동작 테스트
 - `third_party/`: vendored header-only 의존성과 라이선스 파일
-- `docs/`: 온보딩, command reference, 아키텍처, 테스트, 문제 해결, 유지보수, 마이그레이션 노트
+- `docs/`: 프로젝트 개요, 온보딩, command reference, 아키텍처, 테스트, 문제 해결,
+  유지보수, 마이그레이션 노트
 
 ## 테스트
 
