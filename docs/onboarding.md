@@ -135,10 +135,13 @@ you want the prompt to stay consistent.
 
 The `cli_starter_smoke` CTest entry checks the built executable's success path,
 including `--version`, `about`, `doctor`, config initialization and display,
-`hello`, and numbered `echo`, and it fails if a case returns a non-zero status,
-misses the expected stdout pattern, or writes to stderr. When a copied project
-intentionally changes display metadata, about text, command registration, or
-config behavior, update `cmake/cli_smoke_test.cmake` in the same change.
+`hello`, and numbered `echo`, and it fails if a success case returns a non-zero
+status, misses the expected stdout pattern, or writes to stderr. It also checks
+representative failure paths for parser errors and bad config input, where the
+command must fail, leave stdout empty, and print the expected stderr guidance.
+When a copied project intentionally changes display metadata, about text,
+command registration, config behavior, or user-facing parse/config errors,
+update `cmake/cli_smoke_test.cmake` in the same change.
 
 ## Adding The First Real Command
 
