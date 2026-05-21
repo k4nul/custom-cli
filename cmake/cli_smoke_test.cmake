@@ -91,6 +91,53 @@ function(run_cli_failure_smoke_case case_name)
     endforeach()
 endfunction()
 
+function(run_cli_stdin_smoke_case case_name stdin_text)
+    cmake_parse_arguments(
+        STDIN_SMOKE
+        ""
+        ""
+        "COMMAND;STDOUT_MATCHES"
+        ${ARGN}
+    )
+
+    if(NOT STDIN_SMOKE_STDOUT_MATCHES)
+        message(FATAL_ERROR "Stdin smoke case '${case_name}' requires STDOUT_MATCHES patterns")
+    endif()
+
+    string(REGEX REPLACE "[^A-Za-z0-9_.-]" "_" case_file_name "${case_name}")
+    set(input_file "${CLI_STARTER_SMOKE_DIR}/${case_file_name}.stdin.txt")
+    file(WRITE "${input_file}" "${stdin_text}")
+
+    execute_process(
+        COMMAND "${CLI_STARTER_EXECUTABLE}" ${STDIN_SMOKE_COMMAND}
+        INPUT_FILE "${input_file}"
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE stdout
+        ERROR_VARIABLE stderr
+    )
+
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR
+            "Stdin smoke case '${case_name}' failed with exit code ${result}\n"
+            "stdout:\n${stdout}\n"
+            "stderr:\n${stderr}")
+    endif()
+
+    foreach(expected_stdout_regex IN LISTS STDIN_SMOKE_STDOUT_MATCHES)
+        if(NOT stdout MATCHES "${expected_stdout_regex}")
+            message(FATAL_ERROR
+                "Stdin smoke case '${case_name}' stdout did not match /${expected_stdout_regex}/\n"
+                "stdout:\n${stdout}")
+        endif()
+    endforeach()
+
+    if(NOT stderr STREQUAL "")
+        message(FATAL_ERROR
+            "Stdin smoke case '${case_name}' wrote to stderr\n"
+            "stderr:\n${stderr}")
+    endif()
+endfunction()
+
 run_cli_smoke_case("version" "CLI Starter 0\\.1\\.0" --version)
 run_cli_smoke_case("about" "neutral CLI starter" about)
 run_cli_smoke_case("doctor" "Starter layout looks healthy\\." doctor)
@@ -100,6 +147,30 @@ run_cli_smoke_case("config show" "Source: disk"
     --config "${SMOKE_CONFIG_PATH}" config show)
 run_cli_smoke_case("hello" "Hello, Ada\\." hello --name Ada)
 run_cli_smoke_case("echo numbered" "1\\. one" echo --numbered one two)
+
+run_cli_stdin_smoke_case("redirected default shell"
+    "help\nhello --name Ada\nexit\n"
+    STDOUT_MATCHES
+        "Interactive mode\\. Type 'help' to inspect commands or 'exit' to quit\\."
+        "Usage:"
+        "Hello, Ada\\."
+        "starter> ")
+
+set(SHELL_CONFIG_PATH "${CLI_STARTER_SMOKE_DIR}/config/shell.json")
+file(WRITE "${SHELL_CONFIG_PATH}"
+    "{\n"
+    "  \"prompt\": \"scripted\",\n"
+    "  \"default_name\": \"Grace\",\n"
+    "  \"enabled_commands\": [\"about\", \"hello\", \"echo\", \"config\", \"doctor\"],\n"
+    "  \"notes\": \"Smoke test config.\"\n"
+    "}\n")
+run_cli_stdin_smoke_case("redirected explicit shell"
+    "hello\nquit\n"
+    COMMAND --config "${SHELL_CONFIG_PATH}" shell
+    STDOUT_MATCHES
+        "Interactive mode\\. Type 'help' to inspect commands or 'exit' to quit\\."
+        "scripted> "
+        "Hello, Grace\\.")
 
 run_cli_failure_smoke_case("unknown command"
     STDERR_MATCHES "missing-command" "Run with --help"
