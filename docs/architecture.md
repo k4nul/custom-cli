@@ -28,7 +28,10 @@ caller provide global options first, such as `--config ./config/local.json shell
 
 Shell startup loads the active config path once to choose the prompt. If the
 file does not exist, the shell uses built-in defaults and tells the user which
-config path would be used. Inside the shell:
+config path would be used. If the file exists but contains malformed JSON or
+wrong field types, startup reports a config error and exits before the first
+prompt. A non-empty disk `prompt` overrides the configured project prompt label;
+an empty disk `prompt` falls back to that label. Inside the shell:
 
 - `help` dispatches to top-level `--help`.
 - `help <command...>` dispatches to that command path with `--help` appended.

@@ -142,6 +142,8 @@ schema changes.
 allowlist and does not disable command registration. Command availability comes from compile-time
 CLI wiring: `shell` is registered by `Application`, and sample commands are registered through
 `src/commands/register_commands.cpp`.
+Unknown top-level config fields are ignored by the current parser and are not written by generated
+templates.
 
 ## Customizing The Starter
 
@@ -166,8 +168,9 @@ After renaming, replace the sample commands with your own application behavior.
 If you change `CLI_STARTER_CONFIG_FILE`, copy or rename the JSON template to
 `config/<configured-name>` or pass `--config <path>` while you are migrating. If
 you change `CLI_STARTER_PROMPT_LABEL`, update the JSON `prompt` field too when
-you want disk-backed shell sessions to use the same prompt; a config file's
-`prompt` value overrides the CMake fallback.
+you want disk-backed shell sessions to use the same prompt. A non-empty config
+file `prompt` value overrides the CMake fallback; an empty `prompt` falls back
+to `CLI_STARTER_PROMPT_LABEL`.
 
 ## Adding A Command
 
@@ -408,6 +411,7 @@ starter> exit
 명령 등록을 비활성화하지 않습니다. 명령 사용 가능 여부는 compile-time CLI wiring이 결정합니다.
 `shell`은 `Application`에서 등록되고, sample command는 `src/commands/register_commands.cpp`를 통해
 등록됩니다.
+알 수 없는 top-level config field는 현재 parser가 무시하며 생성되는 템플릿에도 기록되지 않습니다.
 
 ## 스타터 커스터마이징
 
@@ -432,7 +436,8 @@ cmake -S . -B build \
 `CLI_STARTER_CONFIG_FILE`을 바꾸면 JSON 템플릿도 `config/<설정한-이름>`으로 복사하거나
 이름을 바꾸고, 전환 중에는 `--config <path>`를 사용합니다. `CLI_STARTER_PROMPT_LABEL`을
 바꾼 뒤 디스크 설정을 사용하는 셸에서도 같은 프롬프트를 쓰려면 JSON의 `prompt` 값도 함께
-바꿉니다. 설정 파일의 `prompt` 값은 CMake fallback보다 우선합니다.
+바꿉니다. 설정 파일의 비어 있지 않은 `prompt` 값은 CMake fallback보다 우선하고, 빈
+`prompt` 값은 `CLI_STARTER_PROMPT_LABEL`로 fallback됩니다.
 
 ## 명령 추가하기
 

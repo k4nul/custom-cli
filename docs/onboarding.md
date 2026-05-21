@@ -130,8 +130,9 @@ you intentionally rename or replace it.
 you set it to `my-cli.json`, copy or rename the template to
 `config/my-cli.json`, or pass `--config <path>` while the copied project is in
 transition. `CLI_STARTER_PROMPT_LABEL` is the fallback shell prompt, but a disk
-config's `prompt` field wins when the config file exists, so update both when
-you want the prompt to stay consistent.
+config's non-empty `prompt` field wins when the config file exists, so update
+both when you want the prompt to stay consistent. If the disk config keeps
+`prompt` empty, shell startup falls back to `CLI_STARTER_PROMPT_LABEL`.
 
 The `cli_starter_smoke` CTest entry checks the built executable's success path,
 including `--version`, `about`, `doctor`, config initialization and display,

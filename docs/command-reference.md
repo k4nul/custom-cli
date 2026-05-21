@@ -148,6 +148,9 @@ Inside the shell:
 Malformed shell input, such as an unterminated quote, is reported as an input
 error and the shell continues. A command that returns a non-zero status reports
 that status, then the shell prompts for the next command.
+Shell startup loads the active config before printing the first prompt. A
+missing config file uses built-in defaults, but malformed JSON or wrong config
+field types abort startup with config error status `4`.
 
 ## Interactive Completion
 
@@ -170,13 +173,14 @@ Supported fields:
 
 | Field | Type | Default | Behavior |
 | --- | --- | --- | --- |
-| `prompt` | string | `starter` | Interactive shell prompt from built-in defaults, or from disk when a config file is loaded. |
+| `prompt` | string | `starter` | Interactive shell prompt from built-in defaults, or from disk when a non-empty config value is loaded. An empty disk value falls back to the configured project prompt label. |
 | `default_name` | string | `world` | Name used by `hello` when `--name` is omitted. |
 | `enabled_commands` | string array | `about`, `hello`, `echo`, `config`, `doctor` | Serialized and shown by `config show`; not a runtime allowlist. |
 | `notes` | string | `Customize this file after copying the starter.` | Informational text shown by `config show`. |
 
 Missing fields fall back to built-in defaults. Malformed JSON, a non-object JSON
-document, or wrong field types are reported as config errors.
+document, or wrong field types are reported as config errors. Unknown top-level
+fields are ignored and are omitted from generated or serialized config output.
 
 ## Exit Statuses
 

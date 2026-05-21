@@ -188,8 +188,29 @@ the file is malformed, fix the JSON or regenerate a local template:
 ```
 
 The supported fields are `prompt`, `default_name`, `enabled_commands`, and
-`notes`. Missing fields fall back to built-in defaults, but malformed JSON or
-wrong field types are reported as command errors.
+`notes`. Missing fields fall back to built-in defaults, and unknown top-level
+fields are ignored. Malformed JSON or wrong field types are reported as command
+errors.
+
+## The Shell Exits Before Showing A Prompt
+
+The interactive shell loads the active config before it prints the first prompt.
+A missing config file is allowed and uses built-in defaults, but an existing
+config file with malformed JSON or wrong field types exits with config error
+status `4`:
+
+```bash
+./build/cli-starter --config ./config/local.json shell
+```
+
+Fix the JSON, correct the field types, or regenerate the local template:
+
+```bash
+./build/cli-starter --config ./config/local.json config init
+```
+
+If the config's `prompt` field is an empty string, the shell uses the configured
+project prompt label instead.
 
 ## `config init` Cannot Write The Config File
 
