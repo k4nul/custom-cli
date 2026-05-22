@@ -235,7 +235,8 @@ ctest --test-dir build --output-on-failure
 
 This unfiltered CTest run covers the registered entries: `starter_tests`, `cli_starter_smoke`, and
 `repository_hygiene`. The smoke entry exercises built-executable success commands and representative
-parser/config failure paths so stdout and stderr routing stay visible in normal validation.
+parser/config failure paths, plus redirected default and explicit shell sessions, so stdout and
+stderr routing and basic shell dispatch stay visible in normal validation.
 The tracked GitHub Actions workflow at [.github/workflows/ci.yml](.github/workflows/ci.yml) runs the
 same CMake/CTest validation on Linux and Windows.
 Use the local flow above before reporting source changes.
@@ -493,7 +494,8 @@ ctest --test-dir build --output-on-failure
 
 필터를 걸지 않은 이 CTest 실행은 등록된 `starter_tests`, `cli_starter_smoke`, `repository_hygiene`를 포함합니다.
 `cli_starter_smoke`는 빌드된 실행 파일의 성공 명령과 대표적인 parser/config 실패 경로를 함께 실행해
-stdout과 stderr routing을 일반 검증에서 확인합니다.
+stdout과 stderr routing을 일반 검증에서 확인합니다. 또한 표준 입력 리다이렉션으로 기본 셸과
+명시적 `shell` 하위 명령을 실행해 기본 shell dispatch를 확인합니다.
 추적되는 GitHub Actions workflow인 [.github/workflows/ci.yml](.github/workflows/ci.yml)은 Linux와
 Windows에서 같은 CMake/CTest 검증을 실행합니다.
 소스 변경 결과를 보고하기 전에는 위의 로컬 흐름을 사용하세요.

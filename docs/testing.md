@@ -12,8 +12,8 @@ configured to inspect.
 
 - `starter_tests`: builds from `tests/config_tests.cpp`
 - `cli_starter_smoke`: runs the built CLI through version, about, doctor,
-  config, hello, and echo success checks, plus parse and config failure checks
-  for executable-level stdout/stderr routing
+  config, hello, echo, and redirected shell success checks, plus parse and
+  config failure checks for executable-level stdout/stderr routing
 - `repository_hygiene`: when running inside a Git worktree with `git` available,
   fails if tracked legacy artifact paths matching `build-local-*` or
   `.sandbox-user/*` are still present in the checkout
@@ -143,13 +143,20 @@ The `cli_starter_smoke` CTest entry covers the built executable success path for
 numbered `echo`. Each success case must exit successfully, match its expected
 stdout pattern, and leave stderr empty.
 
+It also covers redirected shell input through the real executable. The default
+shell smoke case feeds `help`, `hello --name Ada`, and `exit` through stdin and
+checks the interactive banner, prompt, help output, and command output. The
+explicit `shell` smoke case uses a generated config file to verify a disk-backed
+prompt and default `hello` name before `quit`.
+
 The same smoke script also covers representative built-executable failure
 routing for an unknown command, missing `echo` text, an unknown `hello` option,
 a missing `config` subcommand, malformed config JSON, and a wrong-type
 config-backed `hello` field. Each failure case must return a non-zero status,
 leave stdout empty, and match expected stderr patterns. When display metadata,
-about text, command registration, config behavior, or parse/config error text
-changes, update `cmake/cli_smoke_test.cmake` with the related docs and tests.
+about text, command registration, config behavior, shell startup behavior,
+redirected shell behavior, or parse/config error text changes, update
+`cmake/cli_smoke_test.cmake` with the related docs and tests.
 
 When it runs inside a Git worktree with `git` available, the
 `repository_hygiene` CTest entry checks the checkout for tracked legacy artifact
@@ -161,8 +168,9 @@ not become source or validation evidence again.
 Add focused coverage when work touches these areas:
 
 - raw terminal line editing behavior that depends on platform TTY APIs,
-- built-executable interactive shell and redirected-input coverage beyond the
-  injected scripted shell reader used by unit tests, and
+- true interactive terminal completion and raw-mode behavior beyond the
+  redirected shell smoke cases and injected scripted shell reader used by unit
+  tests, and
 - platform-specific config permission or locked-file failures that need OS-specific setup.
 
 ## Adding Tests
@@ -211,8 +219,9 @@ Use the configuration-specific executable path on multi-config generators.
 
 Keep generated build trees and local configs out of commits. Prefer ignored
 build directories such as `build/`, `build-linux/`, `build-local-*`, `out/`, or
-`cmake-build-*`; keep sandbox telemetry under `.sandbox-user/`; and keep local
-config experiments in `config/local.json` or `config/*.local.json`.
+`cmake-build-*`; keep CTest's top-level `Testing/` output ignored; keep sandbox
+telemetry under `.sandbox-user/`; and keep local config experiments in
+`config/local.json` or `config/*.local.json`.
 
 If generated `build-local-*` or `.sandbox-user/` paths appear from an older
 checkout, do not use them as validation evidence. Rebuild into a fresh ignored

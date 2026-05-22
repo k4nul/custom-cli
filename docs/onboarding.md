@@ -137,12 +137,15 @@ both when you want the prompt to stay consistent. If the disk config keeps
 The `cli_starter_smoke` CTest entry checks the built executable's success path,
 including `--version`, `about`, `doctor`, config initialization and display,
 `hello`, and numbered `echo`, and it fails if a success case returns a non-zero
-status, misses the expected stdout pattern, or writes to stderr. It also checks
-representative failure paths for parser errors and bad config input, where the
-command must fail, leave stdout empty, and print the expected stderr guidance.
-When a copied project intentionally changes display metadata, about text,
-command registration, config behavior, or user-facing parse/config errors,
-update `cmake/cli_smoke_test.cmake` in the same change.
+status, misses the expected stdout pattern, or writes to stderr. It also feeds
+redirected stdin into the default shell and the explicit `shell` subcommand so
+the built executable covers the banner, prompts, shell help, command dispatch,
+and config-backed prompt/default-name flow. Representative failure paths cover
+parser errors and bad config input, where the command must fail, leave stdout
+empty, and print the expected stderr guidance. When a copied project
+intentionally changes display metadata, about text, command registration,
+config behavior, shell startup or redirected shell behavior, or user-facing
+parse/config errors, update `cmake/cli_smoke_test.cmake` in the same change.
 
 ## Adding The First Real Command
 
