@@ -315,6 +315,38 @@ TEST_CASE("config parsing rejects non-object documents") {
     }
 }
 
+TEST_CASE("config parsing keeps defaults for omitted fields") {
+    const auto parsed = starter::parse_config(R"({"default_name":"Grace"})");
+    const starter::AppConfig defaults;
+
+    CHECK(parsed.prompt == defaults.prompt);
+    CHECK(parsed.default_name == "Grace");
+    CHECK(parsed.enabled_commands == defaults.enabled_commands);
+    CHECK(parsed.notes == defaults.notes);
+}
+
+TEST_CASE("config parsing ignores unknown top-level fields") {
+    const starter::AppConfig defaults;
+    const auto parsed = starter::parse_config(
+        R"({
+            "prompt":"custom",
+            "experimental":{"prompt":7},
+            "extra_commands":["hidden"],
+            "enabled_commands":["hello"]
+        })");
+
+    CHECK(parsed.prompt == "custom");
+    CHECK(parsed.default_name == defaults.default_name);
+    CHECK(parsed.enabled_commands == std::vector<std::string>{"hello"});
+    CHECK(parsed.notes == defaults.notes);
+
+    const auto serialized = starter::serialize_config(parsed);
+    CHECK_FALSE(contains_text(serialized, "experimental"));
+    CHECK_FALSE(contains_text(serialized, "extra_commands"));
+    CHECK(contains_text(serialized, R"("prompt": "custom")"));
+    CHECK(contains_text(serialized, R"("enabled_commands": [)"));
+}
+
 TEST_CASE("config read failures use typed errors") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "missing.json";
@@ -893,6 +925,29 @@ TEST_CASE("config show reports disk enabled command list verbatim") {
 
     CHECK(result.exit_code == 0);
     CHECK(result.out == expected.str());
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("config show omits unknown disk config fields") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+    write_text_file(
+        config_path,
+        R"({
+            "prompt":"project",
+            "default_name":"Grace",
+            "unknown":"ignored",
+            "future":{"nested":true}
+        })");
+
+    const auto result = run_application({"--config", config_path.string(), "config", "show"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Source: disk\n"));
+    CHECK(contains_text(result.out, "Prompt: project\n"));
+    CHECK(contains_text(result.out, "Default name: Grace\n"));
+    CHECK_FALSE(contains_text(result.out, "unknown"));
+    CHECK_FALSE(contains_text(result.out, "future"));
     CHECK(result.err.empty());
 }
 
