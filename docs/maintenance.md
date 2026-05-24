@@ -36,6 +36,9 @@ controls whether the project-specific CTest entries are registered:
 `starter_tests`, `cli_starter_smoke`, and `repository_hygiene`. `BUILD_TESTING`
 keeps CTest registration enabled through the repository's `include(CTest)`
 setup.
+Git is required for `repository_hygiene` to prove the tracked artifact gate. If
+`git` is unavailable, that entry is skipped and should not be reported as a
+passing artifact hygiene check.
 
 For multi-config generators, build and test the same configuration:
 
@@ -136,6 +139,8 @@ build output, IDE telemetry, or machine-specific state to future changes.
 If an older checkout contains tracked `build-local-*` or `.sandbox-user/` paths,
 treat them as historical local artifacts rather than source evidence. Reconfigure
 into a fresh ignored build directory before validating behavior.
+Use [docs/artifact-hygiene.md](artifact-hygiene.md) as the canonical cleanup
+runbook when the artifact hygiene package is intentionally selected.
 
 Use this check when preparing maintenance reports or reviewing unexpected build
 evidence:
@@ -185,6 +190,8 @@ Keep the documentation set internally consistent:
   customization loop.
 - `docs/architecture.md`: component layout, command flow, and extension points.
 - `docs/testing.md`: validation commands, current coverage, and test gaps.
+- `docs/artifact-hygiene.md`: tracked local artifact gate, cleanup sequence, and
+  reporting states.
 - `docs/troubleshooting.md`: known build, config, and runtime failures.
 - `docs/maintenance.md`: maintainer validation, change checklists, artifact
   hygiene, and CI workflow expectations.

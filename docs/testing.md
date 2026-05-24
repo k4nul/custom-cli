@@ -23,6 +23,8 @@ The test target and CTest entries are created only when
 `BUILD_TESTING` value because the project includes `CTest`. Keep
 `BUILD_TESTING` enabled too; a cache or preset that turns it off can prevent
 CTest from registering tests even if the test target is compiled.
+Git is also required for `repository_hygiene` to prove the tracked artifact gate;
+without `git`, that CTest entry skips instead of passing the gate.
 
 ## Standard Validation
 
@@ -44,6 +46,9 @@ unfiltered validation is blocked because `repository_hygiene` is expected to fai
 until the tracked generated artifacts are removed. Build and focused test runs
 can still help diagnose source changes, but report them as partial evidence and
 keep the artifact cleanup as a separate repository hygiene task.
+
+Use [docs/artifact-hygiene.md](artifact-hygiene.md) for the dedicated cleanup
+runbook.
 
 This is also the task-selection gate for automation. When the artifact check
 prints any path, select the artifact hygiene cleanup before runtime hardening,

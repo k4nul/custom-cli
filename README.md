@@ -20,6 +20,8 @@ It includes:
 
 - CMake 3.18 or newer
 - A C++17 compiler
+- Git for reportable full validation, because the repository hygiene check and
+  artifact inspection use `git ls-files`
 
 On Linux, `cmake`, `g++` or `clang++`, and `ctest` are enough for the normal build and test flow.
 On Windows, use Visual Studio, Build Tools for Visual Studio, or another CMake-supported C++ toolchain.
@@ -216,8 +218,8 @@ If the artifact check returns paths that still exist in the checkout, `repositor
 expected to fail until those tracked generated artifacts are removed in a cleanup change. In that
 state, report full validation as blocked by artifact hygiene instead of replacing it with historical
 build output or a filtered test run. Use the cleanup sequence in
-[docs/troubleshooting.md](docs/troubleshooting.md) only when that separate repository cleanup change
-is intentionally selected.
+[docs/artifact-hygiene.md](docs/artifact-hygiene.md) only when that separate repository cleanup
+change is intentionally selected.
 
 Automation priority rule: while `git ls-files 'build-local-*' '.sandbox-user/*'`
 prints any path, the next write-capable maintenance task must be the artifact
@@ -264,6 +266,7 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 - [docs/onboarding.md](docs/onboarding.md): first local build, smoke test, and customization loop
 - [docs/architecture.md](docs/architecture.md): structure and extension points
 - [docs/testing.md](docs/testing.md): CTest/doctest validation flow and coverage notes
+- [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate and cleanup runbook
 - [docs/troubleshooting.md](docs/troubleshooting.md): common local setup and runtime issues
 - [docs/maintenance.md](docs/maintenance.md): maintainer checklist for command, config, dependency, and
   documentation changes
@@ -290,6 +293,8 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 
 - CMake 3.18 이상
 - C++17 컴파일러
+- 전체 검증을 보고하려면 Git이 필요합니다. repository hygiene check와 artifact 점검이
+  `git ls-files`를 사용합니다.
 
 Linux에서는 보통 `cmake`, `g++` 또는 `clang++`, `ctest`만 있으면 빌드와 테스트가
 가능합니다. Windows에서는 Visual Studio, Visual Studio Build Tools, 또는 CMake가 지원하는
@@ -481,7 +486,7 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 이 명령이 checkout에 실제로 남아 있는 경로를 출력하면 해당 tracked generated artifact를 별도
 cleanup change에서 제거할 때까지 `repository_hygiene`가 실패하는 것이 정상입니다. 이 상태에서는
 과거 build output이나 필터링된 test run으로 대체하지 말고, 전체 검증이 artifact hygiene 때문에
-blocked되었다고 보고합니다. [docs/troubleshooting.md](docs/troubleshooting.md)의 cleanup 순서는
+blocked되었다고 보고합니다. [docs/artifact-hygiene.md](docs/artifact-hygiene.md)의 cleanup 순서는
 별도 repository cleanup change를 의도적으로 선택했을 때만 사용합니다.
 
 artifact check가 아무 경로도 출력하지 않으면 필터를 걸지 않은 CTest 흐름을 실행합니다.
@@ -527,6 +532,7 @@ ctest --test-dir build -C Debug --output-on-failure
 - [docs/onboarding.md](docs/onboarding.md): 첫 로컬 빌드, smoke test, 커스터마이징 흐름
 - [docs/architecture.md](docs/architecture.md): 구조와 확장 지점
 - [docs/testing.md](docs/testing.md): CTest/doctest 검증 흐름과 테스트 범위
+- [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate와 cleanup runbook
 - [docs/troubleshooting.md](docs/troubleshooting.md): 로컬 설정과 실행 중 자주 겪는 문제
 - [docs/maintenance.md](docs/maintenance.md): 명령, 설정, 의존성, 문서 변경을 위한 maintainer 체크리스트
 - [docs/migration-from-legacy.md](docs/migration-from-legacy.md): 마이그레이션 노트

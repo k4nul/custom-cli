@@ -32,4 +32,5 @@ ctest --test-dir build --output-on-failure
 If tracked legacy artifacts under `build-local-*` or `.sandbox-user/` are still
 present in the checkout, `repository_hygiene` is expected to fail when tests run
 inside a Git worktree with `git` available. Treat that as a separate cleanup
-blocker before reporting dependency-update validation as complete.
+blocker before reporting dependency-update validation as complete, and use
+[docs/artifact-hygiene.md](../docs/artifact-hygiene.md) for the cleanup runbook.

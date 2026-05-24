@@ -75,6 +75,8 @@ investigation, but it does not replace the full unfiltered validation gate.
 
 Removing tracked generated files changes repository contents and should be done
 as a separate cleanup task, not as part of routine docs or test-result updates.
+The dedicated runbook for that cleanup is
+[docs/artifact-hygiene.md](artifact-hygiene.md).
 
 When that cleanup task is intentionally selected, use a fresh branch or change
 set and make the removal explicit. Start by confirming that the worktree has no
