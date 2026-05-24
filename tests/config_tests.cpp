@@ -92,6 +92,16 @@ struct ApplicationRunResult {
     std::vector<std::string> prompts;
 };
 
+struct CompletionProbe {
+    std::string line;
+    std::size_t cursor = 0;
+};
+
+struct CompletionProbeRunResult {
+    ApplicationRunResult run;
+    std::vector<starter::CompletionResult> completions;
+};
+
 ApplicationRunResult run_application(std::vector<std::string> arguments) {
     std::ostringstream out;
     std::ostringstream err;
@@ -145,6 +155,46 @@ ApplicationRunResult run_application_with_scripted_shell(
 
     const int exit_code = application.run(static_cast<int>(argv.size()), argv.data());
     return {exit_code, out.str(), err.str(), prompts};
+}
+
+CompletionProbeRunResult run_application_with_completion_probes(
+    std::vector<std::string> arguments,
+    std::vector<CompletionProbe> probes) {
+    std::ostringstream out;
+    std::ostringstream err;
+    std::vector<std::string> prompts;
+    std::vector<starter::CompletionResult> completions;
+    const auto project_info = starter::load_project_info();
+
+    starter::ShellLineReader shell_reader =
+        [probes = std::move(probes), &prompts, &completions, first_prompt = true](
+            const std::string& prompt,
+            std::ostream& shell_out,
+            const starter::CompletionProvider& completion_provider) mutable -> std::optional<std::string> {
+            prompts.push_back(prompt);
+            shell_out << prompt;
+            if (first_prompt) {
+                first_prompt = false;
+                for (const auto& probe : probes) {
+                    completions.push_back(completion_provider(probe.line, probe.cursor));
+                }
+            }
+            return "exit";
+        };
+
+    starter::Application application(project_info, out, err, std::move(shell_reader));
+
+    std::vector<std::string> arg_storage = {project_info.binary_name};
+    arg_storage.insert(arg_storage.end(), arguments.begin(), arguments.end());
+
+    std::vector<char*> argv;
+    argv.reserve(arg_storage.size());
+    for (auto& arg : arg_storage) {
+        argv.push_back(arg.data());
+    }
+
+    const int exit_code = application.run(static_cast<int>(argv.size()), argv.data());
+    return {{exit_code, out.str(), err.str(), prompts}, completions};
 }
 
 void configure_starter_app(
@@ -697,6 +747,98 @@ TEST_CASE("interactive shell reports command failures and keeps the session aliv
 
     std::error_code ignored;
     CHECK_FALSE(fs::exists(output_path, ignored));
+}
+
+TEST_CASE("interactive shell exposes command completion through line reader") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+
+    const auto result = run_application_with_completion_probes(
+        {},
+        {
+            {"", 0},
+            {"he", std::string("he").size()},
+            {"shell ", std::string("shell ").size()},
+        });
+
+    CHECK(result.run.exit_code == 0);
+    CHECK(result.run.err.empty());
+    CHECK(result.run.prompts == std::vector<std::string>{"starter> "});
+    REQUIRE(result.completions.size() == 3);
+
+    const auto& root = result.completions[0];
+    CHECK(root.prefix.empty());
+    CHECK(root.replace_begin == 0);
+    CHECK(root.replace_end == 0);
+    CHECK(contains(root.candidates, "about"));
+    CHECK(contains(root.candidates, "hello"));
+    CHECK(contains(root.candidates, "echo"));
+    CHECK(contains(root.candidates, "config"));
+    CHECK(contains(root.candidates, "doctor"));
+    CHECK(contains(root.candidates, "shell"));
+    CHECK(contains(root.candidates, "help"));
+    CHECK(contains(root.candidates, "exit"));
+    CHECK(contains(root.candidates, "quit"));
+
+    const auto& help_or_hello = result.completions[1];
+    CHECK(help_or_hello.prefix == "he");
+    CHECK(help_or_hello.replace_begin == 0);
+    CHECK(help_or_hello.replace_end == std::string("he").size());
+    CHECK(help_or_hello.candidates == std::vector<std::string>{"hello", "help"});
+
+    const auto& shell_context = result.completions[2];
+    CHECK(shell_context.prefix.empty());
+    CHECK(shell_context.replace_begin == std::string("shell ").size());
+    CHECK(shell_context.replace_end == std::string("shell ").size());
+    CHECK(shell_context.candidates.empty());
+}
+
+TEST_CASE("interactive shell scopes completion probes through application command context") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const std::string config_line = "config ";
+    const std::string hello_options_line = "hello --";
+    const std::string config_init_options_line = "config init --";
+    const std::string midline = "config i --later";
+    const auto midline_cursor = std::string("config i").size();
+
+    const auto result = run_application_with_completion_probes(
+        {},
+        {
+            {config_line, config_line.size()},
+            {hello_options_line, hello_options_line.size()},
+            {config_init_options_line, config_init_options_line.size()},
+            {midline, midline_cursor},
+        });
+
+    CHECK(result.run.exit_code == 0);
+    CHECK(result.run.err.empty());
+    REQUIRE(result.completions.size() == 4);
+
+    const auto& config_subcommands = result.completions[0];
+    CHECK(config_subcommands.prefix.empty());
+    CHECK(config_subcommands.candidates == std::vector<std::string>{"init", "show"});
+    CHECK_FALSE(contains(config_subcommands.candidates, "hello"));
+    CHECK_FALSE(contains(config_subcommands.candidates, "help"));
+
+    const auto& hello_options = result.completions[1];
+    CHECK(contains(hello_options.candidates, "--name"));
+    CHECK(contains(hello_options.candidates, "--enthusiastic"));
+    CHECK_FALSE(contains(hello_options.candidates, "--config"));
+    CHECK_FALSE(contains(hello_options.candidates, "--output"));
+
+    const auto& config_init_options = result.completions[2];
+    CHECK(contains(config_init_options.candidates, "--output"));
+    CHECK(contains(config_init_options.candidates, "--help"));
+    CHECK(contains(config_init_options.candidates, "--help-all"));
+    CHECK_FALSE(contains(config_init_options.candidates, "--config"));
+    CHECK_FALSE(contains(config_init_options.candidates, "--name"));
+
+    const auto& cursor_scoped_completion = result.completions[3];
+    CHECK(cursor_scoped_completion.prefix == "i");
+    CHECK(cursor_scoped_completion.replace_begin == std::string("config ").size());
+    CHECK(cursor_scoped_completion.replace_end == midline_cursor);
+    CHECK(cursor_scoped_completion.candidates == std::vector<std::string>{"init"});
 }
 
 TEST_CASE("about command reports starter metadata") {
