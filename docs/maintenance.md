@@ -17,7 +17,15 @@ If that command returns paths that still exist in the checkout, the full
 unfiltered CTest run is expected to fail in `repository_hygiene` until those
 tracked generated artifacts are removed. Record that state as blocked
 validation; do not use old build output or a filtered CTest run as a passing
-substitute.
+substitute. A focused run of `starter_tests` and `cli_starter_smoke` can support
+source-behavior investigation while the gate is dirty, but it must be labeled as
+partial validation and paired with the artifact preflight output:
+
+```bash
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+```
 
 If the artifact check prints no paths, run the baseline validation flow:
 
@@ -38,13 +46,28 @@ keeps CTest registration enabled through the repository's `include(CTest)`
 setup.
 Git is required for `repository_hygiene` to prove the tracked artifact gate. If
 `git` is unavailable, that entry is skipped and should not be reported as a
-passing artifact hygiene check.
+passing artifact hygiene check. Use a verbose hygiene-only CTest run, or include
+the `git` preflight commands, when normal CTest output does not make the skip
+state clear:
+
+```bash
+command -v git
+git rev-parse --is-inside-work-tree
+ctest --test-dir build --output-on-failure -R '^repository_hygiene$' -V
+```
 
 For multi-config generators, build and test the same configuration:
 
 ```powershell
 cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure
+```
+
+For partial validation while the artifact gate is dirty, keep the same
+configuration and filter only the non-hygiene entries:
+
+```powershell
+ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|cli_starter_smoke)$"
 ```
 
 CTest includes a short built-executable smoke pass and a repository hygiene
@@ -208,4 +231,6 @@ move it from `docs/testing.md`'s gap list into the current coverage summary.
 The tracked GitHub Actions workflow lives at `.github/workflows/ci.yml` and
 mirrors the baseline validation flow. It runs one Linux single-config CMake job
 and one Windows Visual Studio-style multi-config job so both executable layouts
-stay documented and tested.
+stay documented and tested. Because CI runs unfiltered CTest, tracked
+`build-local-*` or `.sandbox-user/*` paths make CI fail in `repository_hygiene`
+until the artifact cleanup package removes them.

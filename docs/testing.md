@@ -25,6 +25,15 @@ The test target and CTest entries are created only when
 CTest from registering tests even if the test target is compiled.
 Git is also required for `repository_hygiene` to prove the tracked artifact gate;
 without `git`, that CTest entry skips instead of passing the gate.
+Because normal CTest output can summarize that early return as a successful test
+process, prove skip reporting with the Git preflight or a verbose hygiene-only
+run when the environment is in doubt:
+
+```bash
+command -v git
+git rev-parse --is-inside-work-tree
+ctest --test-dir build --output-on-failure -R '^repository_hygiene$' -V
+```
 
 ## Standard Validation
 
@@ -46,6 +55,26 @@ unfiltered validation is blocked because `repository_hygiene` is expected to fai
 until the tracked generated artifacts are removed. Build and focused test runs
 can still help diagnose source changes, but report them as partial evidence and
 keep the artifact cleanup as a separate repository hygiene task.
+
+When you need partial source-behavior evidence while the artifact gate is dirty,
+use a fresh ignored build tree and run only the non-hygiene CTest entries:
+
+```bash
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+```
+
+Label that result as partial validation. Include the artifact preflight output
+in the report, and do not describe the repository as fully validated until
+`git ls-files 'build-local-*' '.sandbox-user/*'` prints no paths and the
+unfiltered CTest flow passes. For multi-config generators, build and test the
+same configuration:
+
+```powershell
+cmake --build build --config Debug
+ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|cli_starter_smoke)$"
+```
 
 Use [docs/artifact-hygiene.md](artifact-hygiene.md) for the dedicated cleanup
 runbook.
@@ -176,7 +205,10 @@ Add focused coverage when work touches these areas:
 - true interactive terminal completion and raw-mode behavior beyond the
   redirected shell smoke cases and injected scripted shell reader used by unit
   tests, and
-- platform-specific config permission or locked-file failures that need OS-specific setup.
+- platform-specific config permission or locked-file failures that need OS-specific setup, and
+- validation-tooling breadth beyond the current CMake/CTest baseline: the
+  tracked CI covers Linux and Windows only, and does not currently include
+  macOS, sanitizer, coverage, static-analysis, or formatting/lint jobs.
 
 ## Adding Tests
 
@@ -205,8 +237,8 @@ as `.\build\Debug\starter_tests.exe`.
 ## CLI Smoke Checks
 
 CTest covers reusable internals, command dispatch, and a short built-executable
-smoke pass. A manual CLI pass is still useful after renaming the starter or
-changing command registration:
+smoke pass. A manual CLI success pass is still useful after renaming the starter
+or changing command registration:
 
 ```bash
 ./build/cli-starter --version
@@ -218,7 +250,12 @@ changing command registration:
 ./build/cli-starter echo --numbered one two
 ```
 
-Use the configuration-specific executable path on multi-config generators.
+Use the configuration-specific executable path on multi-config generators. This
+manual list is a success-path spot check, not a replacement for
+`cli_starter_smoke`. The CTest smoke script also covers redirected shell input
+and representative parser/config failure routing, so run the CTest entry when
+display metadata, command registration, shell startup, config behavior, or error
+text changes.
 
 ## Expected Local Files
 

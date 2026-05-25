@@ -27,6 +27,12 @@ The default executable name is controlled by the `CLI_STARTER_BINARY_NAME` CMake
 cache variable. If that value is changed, replace `cli-starter` in examples with
 the configured output name.
 
+Runtime paths are resolved from the process current working directory, not from
+the executable location. Run examples from the repository root unless you pass an
+absolute or explicitly relative `--config` path. The default config path is
+`config/<configured-file-name>` relative to that working directory, and `doctor`
+checks layout paths such as `src`, `include`, and `docs` from the same place.
+
 ## Global Options
 
 Global options are registered on the root command and should be placed before the

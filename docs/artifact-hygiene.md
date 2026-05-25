@@ -17,6 +17,9 @@ worktree with `git` available, it inspects tracked paths that match:
 The check fails when matching tracked paths still exist in the checkout. If
 `git` is not available, or the test is run outside a Git worktree, the hygiene
 script reports a skip instead of proving that the checkout is clean.
+CTest may still summarize that skip path as a successful test process because
+the script returns early. Treat it as a skipped gate, not a passed hygiene proof,
+unless the Git preflight succeeds and the tracked artifact query is clean.
 
 ## Inspect Current State
 
@@ -87,3 +90,12 @@ they keep the cleanup instructions accurate.
   or validation runs outside a Git worktree.
 - Report full validation as passing only after the artifact gate prints no paths
   and the unfiltered CMake/CTest flow passes from a fresh ignored build tree.
+
+When the skip state is ambiguous in normal CTest output, run the hygiene entry
+verbosely or include the Git preflight in the report:
+
+```bash
+command -v git
+git rev-parse --is-inside-work-tree
+ctest --test-dir build --output-on-failure -R '^repository_hygiene$' -V
+```

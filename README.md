@@ -115,6 +115,9 @@ Inside the interactive shell, `help`, `exit`, and `quit` are also available.
 ## Configuration
 
 The default config template is [config/cli-starter.json](config/cli-starter.json).
+Runtime config paths are resolved from the process current working directory.
+Run examples from the repository root, or pass an absolute or explicitly
+relative `--config <path>` when launching from another directory.
 
 ```json
 {
@@ -195,12 +198,12 @@ nested subcommands.
 - `src/commands/`: built-in command implementations
 - `src/core/`: shared helpers such as config loading, tokenization, and completion
 - `include/starter/`: public headers for the starter
-- `cmake/`: templates for generated project metadata
+- `cmake/`: templates for generated project metadata and CTest scripts
 - `config/`: checked-in config template
 - `tests/`: starter behavior tests
 - `third_party/`: vendored header-only dependencies and license files
 - `docs/`: project overview, onboarding, command reference, architecture, testing,
-  troubleshooting, maintenance, and migration notes
+  artifact hygiene, troubleshooting, maintenance, and migration notes
 
 ## Testing
 
@@ -241,6 +244,8 @@ parser/config failure paths, plus redirected default and explicit shell sessions
 stderr routing and basic shell dispatch stay visible in normal validation.
 The tracked GitHub Actions workflow at [.github/workflows/ci.yml](.github/workflows/ci.yml) runs the
 same CMake/CTest validation on Linux and Windows.
+Because CI runs unfiltered CTest, tracked `build-local-*` or `.sandbox-user/*` paths make CI fail in
+`repository_hygiene` until the artifact cleanup package removes them.
 Use the local flow above before reporting source changes.
 
 With multi-config generators, build and test the same configuration:
@@ -388,6 +393,9 @@ starter> exit
 ## 설정 파일
 
 기본 설정 템플릿은 [config/cli-starter.json](config/cli-starter.json)에 있습니다.
+런타임 설정 경로는 프로세스의 현재 작업 디렉터리를 기준으로 해석됩니다. 예제는 저장소
+루트에서 실행하거나, 다른 디렉터리에서 실행할 때는 절대 경로 또는 명시적인 상대 경로로
+`--config <path>`를 전달합니다.
 
 ```json
 {
@@ -466,12 +474,12 @@ cmake -S . -B build \
 - `src/commands/`: 기본 명령 구현
 - `src/core/`: 설정 로딩, 토큰화, 자동완성 같은 공통 helper
 - `include/starter/`: 스타터용 public header
-- `cmake/`: 생성되는 프로젝트 metadata용 템플릿
+- `cmake/`: 생성되는 프로젝트 metadata용 템플릿과 CTest 스크립트
 - `config/`: 체크인된 설정 템플릿
 - `tests/`: 스타터 동작 테스트
 - `third_party/`: vendored header-only 의존성과 라이선스 파일
-- `docs/`: 프로젝트 개요, 온보딩, command reference, 아키텍처, 테스트, 문제 해결,
-  유지보수, 마이그레이션 노트
+- `docs/`: 프로젝트 개요, 온보딩, command reference, 아키텍처, 테스트, artifact hygiene,
+  문제 해결, 유지보수, 마이그레이션 노트
 
 ## 테스트
 
@@ -503,6 +511,8 @@ stdout과 stderr routing을 일반 검증에서 확인합니다. 또한 표준 �
 명시적 `shell` 하위 명령을 실행해 기본 shell dispatch를 확인합니다.
 추적되는 GitHub Actions workflow인 [.github/workflows/ci.yml](.github/workflows/ci.yml)은 Linux와
 Windows에서 같은 CMake/CTest 검증을 실행합니다.
+CI는 필터를 걸지 않은 CTest를 실행하므로, tracked `build-local-*` 또는 `.sandbox-user/*`
+경로가 남아 있으면 artifact cleanup package가 제거될 때까지 `repository_hygiene`에서 실패합니다.
 소스 변경 결과를 보고하기 전에는 위의 로컬 흐름을 사용하세요.
 
 자동화 우선순위 규칙: `git ls-files 'build-local-*' '.sandbox-user/*'`가 경로를 하나라도

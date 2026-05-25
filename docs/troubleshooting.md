@@ -44,6 +44,21 @@ such as `.\build\Debug\cli-starter.exe`.
 If you changed `CLI_STARTER_BINARY_NAME`, the output file uses that configured
 name instead of `cli-starter`.
 
+## Config Or Layout Checks Change Outside The Repo Root
+
+The starter resolves runtime paths from the process current working directory.
+The default config path is `config/<configured-file-name>` relative to where you
+start the process, and `doctor` checks `src`, `include`, `docs`, `config`, and
+`third_party` relative to that same directory.
+
+Run examples from the repository root, or pass an explicit config path:
+
+```bash
+cd /path/to/copied/starter
+./build/cli-starter doctor
+./build/cli-starter --config "$PWD/config/local.json" config show
+```
+
 ## Tracked Local Artifacts Appear In `git ls-files`
 
 The repository ignore rules cover new `build/`, `build-linux/`,
