@@ -46,6 +46,18 @@ old artifact output as authoritative.
 Use [docs/artifact-hygiene.md](artifact-hygiene.md) when that separate cleanup
 package is intentionally selected.
 
+When you need partial source-behavior evidence before that cleanup lands, keep
+the artifact preflight output with the report and filter out only the hygiene
+entry:
+
+```bash
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+```
+
+After the artifact preflight prints no paths, use the unfiltered flow:
+
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build

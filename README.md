@@ -224,6 +224,17 @@ build output or a filtered test run. Use the cleanup sequence in
 [docs/artifact-hygiene.md](docs/artifact-hygiene.md) only when that separate repository cleanup
 change is intentionally selected.
 
+When you still need current source-behavior evidence while the artifact gate is dirty, build a fresh
+ignored `build/` tree and filter out only the hygiene entry:
+
+```bash
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+```
+
+Label that result as partial validation and include the artifact preflight output in the report.
+
 Automation priority rule: while `git ls-files 'build-local-*' '.sandbox-user/*'`
 prints any path, the next write-capable maintenance task must be the artifact
 hygiene cleanup. Do not spend write-task cycles on lower-priority hardening or
@@ -496,6 +507,17 @@ cleanup change에서 제거할 때까지 `repository_hygiene`가 실패하는 �
 과거 build output이나 필터링된 test run으로 대체하지 말고, 전체 검증이 artifact hygiene 때문에
 blocked되었다고 보고합니다. [docs/artifact-hygiene.md](docs/artifact-hygiene.md)의 cleanup 순서는
 별도 repository cleanup change를 의도적으로 선택했을 때만 사용합니다.
+
+artifact gate가 dirty인 동안에도 현재 source behavior 증거가 필요하면 새로 만든 무시 대상
+`build/` 트리에서 hygiene entry만 제외해 실행합니다.
+
+```bash
+cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+```
+
+이 결과는 partial validation으로 표시하고, 보고서에는 artifact preflight 출력을 함께 남깁니다.
 
 artifact check가 아무 경로도 출력하지 않으면 필터를 걸지 않은 CTest 흐름을 실행합니다.
 

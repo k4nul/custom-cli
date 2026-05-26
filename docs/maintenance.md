@@ -67,6 +67,7 @@ For partial validation while the artifact gate is dirty, keep the same
 configuration and filter only the non-hygiene entries:
 
 ```powershell
+cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|cli_starter_smoke)$"
 ```
 
