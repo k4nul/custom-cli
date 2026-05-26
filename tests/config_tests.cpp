@@ -1347,6 +1347,40 @@ TEST_CASE("tab completion keeps option candidates scoped to the active command")
     CHECK_FALSE(contains(config_init_options.candidates, "--name"));
 }
 
+TEST_CASE("tab completion keeps command option context after option values") {
+    CompletionAppFixture fixture;
+
+    const std::string hello_line = "hello --name Ada --e";
+    const auto hello_options =
+        starter::resolve_completion(hello_line, hello_line.size(), fixture.app, fixture.shell_commands);
+    CHECK(hello_options.prefix == "--e");
+    CHECK(hello_options.replace_begin == std::string("hello --name Ada ").size());
+    CHECK(hello_options.replace_end == hello_line.size());
+    CHECK(contains(hello_options.candidates, "--enthusiastic"));
+    CHECK_FALSE(contains(hello_options.candidates, "--config"));
+    CHECK_FALSE(contains(hello_options.candidates, "--output"));
+
+    const std::string config_help_line = "config init --output generated.json --h";
+    const auto config_help_options =
+        starter::resolve_completion(config_help_line, config_help_line.size(), fixture.app, fixture.shell_commands);
+    CHECK(config_help_options.prefix == "--h");
+    CHECK(config_help_options.replace_begin == std::string("config init --output generated.json ").size());
+    CHECK(config_help_options.replace_end == config_help_line.size());
+    CHECK(contains(config_help_options.candidates, "--help"));
+    CHECK(contains(config_help_options.candidates, "--help-all"));
+    CHECK_FALSE(contains(config_help_options.candidates, "--config"));
+    CHECK_FALSE(contains(config_help_options.candidates, "--name"));
+
+    const std::string quoted_output_line = R"(config init --output "path with spaces.json" --o)";
+    const auto quoted_output_options =
+        starter::resolve_completion(quoted_output_line, quoted_output_line.size(), fixture.app, fixture.shell_commands);
+    CHECK(quoted_output_options.prefix == "--o");
+    CHECK(quoted_output_options.replace_begin == quoted_output_line.rfind("--o"));
+    CHECK(quoted_output_options.replace_end == quoted_output_line.size());
+    REQUIRE(quoted_output_options.candidates.size() == 1);
+    CHECK(quoted_output_options.candidates.front() == "--output");
+}
+
 TEST_CASE("tab completion falls back to root options when prior context is malformed") {
     CompletionAppFixture fixture;
     const std::string line = "hello \"unterminated --";
