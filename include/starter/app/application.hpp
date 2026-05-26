@@ -31,6 +31,7 @@ private:
         bool& command_executed,
         bool& shell_requested);
     int dispatch(std::vector<std::string> args, bool interactive_mode);
+    bool dispatch_shell_tokens(std::vector<std::string> tokens);
     int run_shell(const std::filesystem::path& config_path);
     std::vector<std::string> shell_completion_commands() const;
 

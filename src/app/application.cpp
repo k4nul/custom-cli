@@ -21,6 +21,48 @@
 
 namespace starter {
 
+namespace {
+
+class ActiveShellConfigPathGuard {
+public:
+    ActiveShellConfigPathGuard(
+        std::string& active_path,
+        const std::filesystem::path& config_path)
+        : active_path_(active_path) {
+        active_path_ = config_path.string();
+    }
+
+    ActiveShellConfigPathGuard(const ActiveShellConfigPathGuard&) = delete;
+    ActiveShellConfigPathGuard& operator=(const ActiveShellConfigPathGuard&) = delete;
+
+    ~ActiveShellConfigPathGuard() {
+        active_path_.clear();
+    }
+
+private:
+    std::string& active_path_;
+};
+
+std::string shell_prompt_for(const AppConfig& config, const ProjectInfo& project_info) {
+    return config.prompt.empty() ? project_info.prompt_label : config.prompt;
+}
+
+bool is_shell_exit_command(const std::string& command) {
+    return command == "exit" || command == "quit";
+}
+
+std::vector<std::string> make_shell_help_args(const std::vector<std::string>& tokens) {
+    if (tokens.size() == 1) {
+        return {"--help"};
+    }
+
+    std::vector<std::string> help_args(tokens.begin() + 1, tokens.end());
+    help_args.push_back("--help");
+    return help_args;
+}
+
+}  // namespace
+
 Application::Application(
     ProjectInfo project_info,
     std::ostream& out,
@@ -107,18 +149,38 @@ void Application::configure_cli_app(
     register_builtin_commands(app, project_info_, config_path, out_, err_, command_executed);
 }
 
+bool Application::dispatch_shell_tokens(std::vector<std::string> tokens) {
+    if (tokens.empty()) {
+        return true;
+    }
+
+    if (is_shell_exit_command(tokens.front())) {
+        return false;
+    }
+
+    if (tokens.front() == "help") {
+        (void)dispatch(make_shell_help_args(tokens), true);
+        return true;
+    }
+
+    const int result = dispatch(std::move(tokens), true);
+    if (result != to_int(ExitCode::success)) {
+        err_ << "command finished with exit code " << result << '\n';
+    }
+    return true;
+}
+
 int Application::run_shell(const std::filesystem::path& config_path) {
-    active_shell_config_path_ = config_path.string();
+    const ActiveShellConfigPathGuard active_config_path(active_shell_config_path_, config_path);
     bool loaded_from_disk = false;
     AppConfig config;
     try {
         config = load_config_or_default(config_path, &loaded_from_disk);
     } catch (const std::exception& error) {
         err_ << "error: " << error.what() << '\n';
-        active_shell_config_path_.clear();
         return to_int(ExitCode::config_error);
     }
-    const auto prompt = config.prompt.empty() ? project_info_.prompt_label : config.prompt;
+    const auto prompt = shell_prompt_for(config, project_info_);
 
     out_ << project_info_.display_name << " " << project_info_.version << '\n';
     out_ << "Interactive mode. Type 'help' to inspect commands or 'exit' to quit.\n";
@@ -162,32 +224,11 @@ int Application::run_shell(const std::filesystem::path& config_path) {
             continue;
         }
 
-        if (tokens.empty()) {
-            continue;
-        }
-
-        if (tokens.front() == "exit" || tokens.front() == "quit") {
+        if (!dispatch_shell_tokens(std::move(tokens))) {
             break;
-        }
-
-        if (tokens.front() == "help") {
-            if (tokens.size() == 1) {
-                (void)dispatch({"--help"}, true);
-            } else {
-                std::vector<std::string> help_args(tokens.begin() + 1, tokens.end());
-                help_args.push_back("--help");
-                (void)dispatch(help_args, true);
-            }
-            continue;
-        }
-
-        const int result = dispatch(std::move(tokens), true);
-        if (result != to_int(ExitCode::success)) {
-            err_ << "command finished with exit code " << result << '\n';
         }
     }
 
-    active_shell_config_path_.clear();
     return to_int(ExitCode::success);
 }
 
