@@ -109,9 +109,12 @@ removing a sample command:
 2. Add new command source files to the `starter_core` source list in `CMakeLists.txt`.
 3. Update the registrar declaration in `include/starter/commands/registrars.hpp`.
 4. Update central registration in `src/commands/register_commands.cpp`.
-5. Add or update doctest coverage under `tests/`.
-6. Update `README.md`, `docs/architecture.md`, `docs/testing.md`, and
-   `docs/troubleshooting.md` when user-facing behavior changes.
+5. Add or update doctest coverage under `tests/`, and update
+   `cmake/cli_smoke_test.cmake` when the built executable's command path,
+   output, error text, or shell dispatch changes.
+6. Update `README.md`, `docs/command-reference.md`, `docs/architecture.md`,
+   `docs/testing.md`, and `docs/troubleshooting.md` when user-facing behavior
+   changes.
 
 The `enabled_commands` field in config is serialized and shown by `config show`;
 it is not a runtime allowlist. Do not document it as a way to disable commands

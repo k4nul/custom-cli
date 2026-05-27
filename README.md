@@ -157,7 +157,8 @@ The main naming knobs are CMake cache variables:
 - `CLI_STARTER_BINARY_NAME`: executable file name
 - `CLI_STARTER_DISPLAY_NAME`: human-readable application name
 - `CLI_STARTER_CONFIG_FILE`: default JSON config file name
-- `CLI_STARTER_PROMPT_LABEL`: interactive shell prompt label
+- `CLI_STARTER_PROMPT_LABEL`: prompt label written by `config init` and used when a loaded
+  config has an empty `prompt`
 
 Example:
 
@@ -172,10 +173,11 @@ cmake -S . -B build \
 After renaming, replace the sample commands with your own application behavior.
 If you change `CLI_STARTER_CONFIG_FILE`, copy or rename the JSON template to
 `config/<configured-name>` or pass `--config <path>` while you are migrating. If
-you change `CLI_STARTER_PROMPT_LABEL`, update the JSON `prompt` field too when
-you want disk-backed shell sessions to use the same prompt. A non-empty config
-file `prompt` value overrides the CMake fallback; an empty `prompt` falls back
-to `CLI_STARTER_PROMPT_LABEL`.
+you change `CLI_STARTER_PROMPT_LABEL`, regenerate or update the JSON `prompt`
+field too when you want disk-backed shell sessions to use the same prompt.
+Without a config file, the shell uses the built-in `AppConfig` default prompt,
+currently `starter`, until that file exists. A non-empty loaded config `prompt`
+wins; an empty loaded `prompt` falls back to `CLI_STARTER_PROMPT_LABEL`.
 
 ## Adding A Command
 
@@ -184,8 +186,11 @@ to `CLI_STARTER_PROMPT_LABEL`.
 3. Declare its registrar in [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp).
 4. Register it from [src/commands/register_commands.cpp](src/commands/register_commands.cpp).
 5. Add tests in [tests/config_tests.cpp](tests/config_tests.cpp), or add a new test file and include
-   it in the `starter_tests` target in [CMakeLists.txt](CMakeLists.txt).
+   it in the `starter_tests` target in [CMakeLists.txt](CMakeLists.txt). Update
+   [cmake/cli_smoke_test.cmake](cmake/cli_smoke_test.cmake) when the built-executable
+   command path, output, error text, or shell dispatch changes.
 6. Document user-facing behavior in this README and the nearest relevant docs, such as
+   [docs/command-reference.md](docs/command-reference.md),
    [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md), or
    [docs/troubleshooting.md](docs/troubleshooting.md).
 
@@ -445,7 +450,8 @@ starter> exit
 - `CLI_STARTER_BINARY_NAME`: 실행 파일 이름
 - `CLI_STARTER_DISPLAY_NAME`: 사용자에게 보이는 애플리케이션 이름
 - `CLI_STARTER_CONFIG_FILE`: 기본 JSON 설정 파일 이름
-- `CLI_STARTER_PROMPT_LABEL`: 인터랙티브 셸 프롬프트 이름
+- `CLI_STARTER_PROMPT_LABEL`: `config init`이 기록하고, 로드된 설정의 `prompt`가 비어 있을 때
+  사용하는 프롬프트 이름
 
 예시:
 
@@ -460,9 +466,10 @@ cmake -S . -B build \
 이름을 바꾼 뒤에는 예제 명령을 실제 애플리케이션 동작으로 교체하면 됩니다.
 `CLI_STARTER_CONFIG_FILE`을 바꾸면 JSON 템플릿도 `config/<설정한-이름>`으로 복사하거나
 이름을 바꾸고, 전환 중에는 `--config <path>`를 사용합니다. `CLI_STARTER_PROMPT_LABEL`을
-바꾼 뒤 디스크 설정을 사용하는 셸에서도 같은 프롬프트를 쓰려면 JSON의 `prompt` 값도 함께
-바꿉니다. 설정 파일의 비어 있지 않은 `prompt` 값은 CMake fallback보다 우선하고, 빈
-`prompt` 값은 `CLI_STARTER_PROMPT_LABEL`로 fallback됩니다.
+바꾼 뒤 디스크 설정을 사용하는 셸에서도 같은 프롬프트를 쓰려면 JSON의 `prompt` 값을 다시
+생성하거나 함께 바꿉니다. 설정 파일이 없으면 셸은 파일이 생길 때까지 내장 `AppConfig`
+기본 프롬프트인 `starter`를 사용합니다. 로드된 설정 파일의 비어 있지 않은 `prompt` 값이
+우선하고, 로드된 `prompt` 값이 비어 있으면 `CLI_STARTER_PROMPT_LABEL`로 fallback됩니다.
 
 ## 명령 추가하기
 
@@ -471,8 +478,11 @@ cmake -S . -B build \
 3. [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp)에 registrar를 선언합니다.
 4. [src/commands/register_commands.cpp](src/commands/register_commands.cpp)에서 명령을 등록합니다.
 5. [tests/config_tests.cpp](tests/config_tests.cpp)에 테스트를 추가하거나, 새 테스트 파일을 만들고
-   [CMakeLists.txt](CMakeLists.txt)의 `starter_tests` target에 포함합니다.
+   [CMakeLists.txt](CMakeLists.txt)의 `starter_tests` target에 포함합니다. 빌드된 실행 파일의
+   명령 경로, 출력, 오류 문구, 셸 dispatch가 바뀌면
+   [cmake/cli_smoke_test.cmake](cmake/cli_smoke_test.cmake)도 함께 업데이트합니다.
 6. 사용자에게 보이는 동작을 이 README와 관련 문서에 맞춰 문서화합니다. 예를 들어
+   [docs/command-reference.md](docs/command-reference.md),
    [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md),
    [docs/troubleshooting.md](docs/troubleshooting.md)를 함께 확인합니다.
 

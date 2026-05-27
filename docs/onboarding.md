@@ -146,10 +146,11 @@ you intentionally rename or replace it.
 `CLI_STARTER_CONFIG_FILE` changes the default runtime path under `config/`. If
 you set it to `my-cli.json`, copy or rename the template to
 `config/my-cli.json`, or pass `--config <path>` while the copied project is in
-transition. `CLI_STARTER_PROMPT_LABEL` is the fallback shell prompt, but a disk
-config's non-empty `prompt` field wins when the config file exists, so update
-both when you want the prompt to stay consistent. If the disk config keeps
-`prompt` empty, shell startup falls back to `CLI_STARTER_PROMPT_LABEL`.
+transition. `CLI_STARTER_PROMPT_LABEL` is written by `config init` and is used
+when a loaded config has an empty `prompt`. If no config file exists, shell
+startup uses the built-in `AppConfig` prompt, currently `starter`, until that
+file exists. Update or regenerate the disk config's `prompt` when you want
+disk-backed shell sessions to use the renamed prompt consistently.
 
 The `cli_starter_smoke` CTest entry checks the built executable's success path,
 including `--version`, `about`, `doctor`, config initialization and display,
@@ -173,9 +174,12 @@ loader. To add a command:
 2. Add the command `.cpp` file to the `starter_core` source list in `CMakeLists.txt`.
 3. Declare the registrar in `include/starter/commands/registrars.hpp`.
 4. Register it from `src/commands/register_commands.cpp`.
-5. Add or extend tests under `tests/`.
-6. Update user-facing docs for the command, including README, architecture,
-   testing, and troubleshooting notes when the behavior changes those areas.
+5. Add or extend tests under `tests/`, and update
+   `cmake/cli_smoke_test.cmake` when the built executable's command path,
+   output, error text, or shell dispatch changes.
+6. Update user-facing docs for the command, including README, command
+   reference, architecture, testing, and troubleshooting notes when the behavior
+   changes those areas.
 
 Keep sample commands only as long as they help the copied project. Once real
 commands exist, remove or rewrite the samples that no longer match the new
