@@ -1323,6 +1323,82 @@ TEST_CASE("tab completion reflects starter commands subcommands and options") {
     CHECK(hello_long_enthusiastic.candidates.front() == "--enthusiastic");
 }
 
+TEST_CASE("tab completion includes visible subcommand aliases once") {
+    CLI::App app{"completion aliases"};
+    app.add_subcommand("deploy", "Deploy artifacts.")->alias("dp");
+    app.add_subcommand("doctor", "Inspect the environment.")->alias("diag");
+
+    const auto root = starter::resolve_completion("", 0, app, {"dp", "help"});
+
+    const std::vector<std::string> expected = {"deploy", "dp", "doctor", "diag", "help"};
+    CHECK(root.candidates == expected);
+    CHECK(std::count(root.candidates.begin(), root.candidates.end(), "dp") == 1);
+
+    const auto d_prefix = starter::resolve_completion("d", 1, app, {"dp", "help"});
+    CHECK(d_prefix.candidates == std::vector<std::string>{"deploy", "dp", "doctor", "diag"});
+}
+
+TEST_CASE("tab completion resolves subcommand aliases as command contexts") {
+    CLI::App app{"completion alias contexts"};
+    std::string root_profile;
+    app.add_option("--root-profile", root_profile, "Root profile path.");
+
+    auto* config_command = app.add_subcommand("config", "Manage configuration.");
+    config_command->alias("cfg");
+    std::string profile;
+    config_command->add_option("--profile", profile, "Config profile name.");
+    config_command->add_subcommand("init", "Initialize configuration.");
+
+    const std::string subcommand_line = "cfg i";
+    const auto subcommand_completion =
+        starter::resolve_completion(subcommand_line, subcommand_line.size(), app, {});
+    CHECK(subcommand_completion.prefix == "i");
+    CHECK(subcommand_completion.replace_begin == std::string("cfg ").size());
+    CHECK(subcommand_completion.replace_end == subcommand_line.size());
+    CHECK(subcommand_completion.candidates == std::vector<std::string>{"init"});
+
+    const std::string option_line = "cfg --p";
+    const auto option_completion = starter::resolve_completion(option_line, option_line.size(), app, {});
+    CHECK(option_completion.prefix == "--p");
+    CHECK(contains(option_completion.candidates, "--profile"));
+    CHECK_FALSE(contains(option_completion.candidates, "--root-profile"));
+}
+
+TEST_CASE("tab completion omits hidden silent and disabled subcommands") {
+    CLI::App app{"completion visibility"};
+    app.add_subcommand("visible", "Visible command.");
+    app.add_subcommand("hidden", "Hidden command.")->group("");
+    app.add_subcommand("silent", "Silent command.")->silent();
+    app.add_subcommand("disabled", "Disabled command.")->disabled();
+
+    const auto root = starter::resolve_completion("", 0, app, {});
+
+    CHECK(root.candidates == std::vector<std::string>{"visible"});
+    CHECK(starter::resolve_completion("h", 1, app, {}).candidates.empty());
+    CHECK(starter::resolve_completion("s", 1, app, {}).candidates.empty());
+    CHECK(starter::resolve_completion("d", 1, app, {}).candidates.empty());
+}
+
+TEST_CASE("tab completion omits hidden and positional options") {
+    CLI::App app{"completion option visibility"};
+    std::string visible;
+    std::string hidden;
+    std::string positional;
+    bool verbose = false;
+
+    app.add_option("--visible", visible, "Visible option.");
+    app.add_option("--hidden", hidden, "Hidden option.")->group("");
+    app.add_option("positional", positional, "Positional value.");
+    app.add_flag("--verbose", verbose, "Verbose output.");
+
+    const auto options = starter::resolve_completion("--", 2, app, {});
+
+    CHECK(contains(options.candidates, "--visible"));
+    CHECK(contains(options.candidates, "--verbose"));
+    CHECK_FALSE(contains(options.candidates, "--hidden"));
+    CHECK_FALSE(contains(options.candidates, "positional"));
+}
+
 TEST_CASE("tab completion keeps option candidates scoped to the active command") {
     CompletionAppFixture fixture;
 
