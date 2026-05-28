@@ -694,6 +694,73 @@ TEST_CASE("interactive shell reuses disk config and recovers from malformed inpu
     CHECK(result.prompts == std::vector<std::string>{"custom> ", "custom> ", "custom> ", "custom> "});
 }
 
+TEST_CASE("interactive shell config show uses startup config path") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "profiles" / "shell.json";
+    starter::AppConfig config;
+    config.prompt = "custom";
+    config.default_name = "Grace";
+    config.enabled_commands = {"hello", "config"};
+    config.notes = "shell config";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"config show", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK_FALSE(contains_text(result.out, "Using built-in defaults"));
+    CHECK(contains_text(result.out, "Config path: " + config_path.generic_string() + '\n'));
+    CHECK(contains_text(result.out, "Source: disk\n"));
+    CHECK(contains_text(result.out, "Prompt: custom\n"));
+    CHECK(contains_text(result.out, "Default name: Grace\n"));
+    CHECK(contains_text(result.out, "Enabled commands: hello, config\n"));
+    CHECK(contains_text(result.out, "Notes: shell config\n"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"custom> ", "custom> "});
+}
+
+TEST_CASE("interactive shell config init defaults to startup config path") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "profiles" / "generated.json";
+    const auto default_config_path = temporary_directory.path() / "config" / "cli-starter.json";
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"config init", "config show", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Using built-in defaults until " + config_path.generic_string() + " exists.\n"));
+    CHECK(contains_text(result.out, "Wrote config template to " + config_path.generic_string() + '\n'));
+    CHECK(contains_text(result.out, "Config path: " + config_path.generic_string() + '\n'));
+    CHECK(contains_text(result.out, "Source: disk\n"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> ", "starter> "});
+    CHECK(fs::exists(config_path));
+    CHECK_FALSE(fs::exists(default_config_path));
+}
+
+TEST_CASE("interactive shell config init explicit output keeps startup config path active") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "profiles" / "active.json";
+    const auto output_path = temporary_directory.path() / "generated" / "explicit.json";
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"config init --output " + output_path.string(), "config show", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Wrote config template to " + output_path.generic_string() + '\n'));
+    CHECK(contains_text(result.out, "Config path: " + config_path.generic_string() + '\n'));
+    CHECK(contains_text(result.out, "Source: built-in defaults\n"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> ", "starter> "});
+    CHECK(fs::exists(output_path));
+    CHECK_FALSE(fs::exists(config_path));
+}
+
 TEST_CASE("interactive shell routes command-specific help through normal dispatch") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "missing.json";
