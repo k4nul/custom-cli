@@ -102,22 +102,35 @@ struct CompletionProbeRunResult {
     std::vector<starter::CompletionResult> completions;
 };
 
+struct ApplicationArguments {
+    std::vector<std::string> storage;
+    std::vector<char*> argv;
+};
+
+ApplicationArguments make_application_arguments(
+    const starter::ProjectInfo& project_info,
+    std::vector<std::string> arguments) {
+    ApplicationArguments result;
+    result.storage = {project_info.binary_name};
+    result.storage.insert(result.storage.end(), arguments.begin(), arguments.end());
+
+    result.argv.reserve(result.storage.size());
+    for (auto& arg : result.storage) {
+        result.argv.push_back(arg.data());
+    }
+    return result;
+}
+
 ApplicationRunResult run_application(std::vector<std::string> arguments) {
     std::ostringstream out;
     std::ostringstream err;
     const auto project_info = starter::load_project_info();
     starter::Application application(project_info, out, err);
 
-    std::vector<std::string> arg_storage = {project_info.binary_name};
-    arg_storage.insert(arg_storage.end(), arguments.begin(), arguments.end());
-
-    std::vector<char*> argv;
-    argv.reserve(arg_storage.size());
-    for (auto& arg : arg_storage) {
-        argv.push_back(arg.data());
-    }
-
-    const int exit_code = application.run(static_cast<int>(argv.size()), argv.data());
+    auto app_args = make_application_arguments(project_info, std::move(arguments));
+    const int exit_code = application.run(
+        static_cast<int>(app_args.argv.size()),
+        app_args.argv.data());
     return {exit_code, out.str(), err.str(), {}};
 }
 
@@ -144,16 +157,10 @@ ApplicationRunResult run_application_with_scripted_shell(
 
     starter::Application application(project_info, out, err, std::move(shell_reader));
 
-    std::vector<std::string> arg_storage = {project_info.binary_name};
-    arg_storage.insert(arg_storage.end(), arguments.begin(), arguments.end());
-
-    std::vector<char*> argv;
-    argv.reserve(arg_storage.size());
-    for (auto& arg : arg_storage) {
-        argv.push_back(arg.data());
-    }
-
-    const int exit_code = application.run(static_cast<int>(argv.size()), argv.data());
+    auto app_args = make_application_arguments(project_info, std::move(arguments));
+    const int exit_code = application.run(
+        static_cast<int>(app_args.argv.size()),
+        app_args.argv.data());
     return {exit_code, out.str(), err.str(), prompts};
 }
 
@@ -184,16 +191,10 @@ CompletionProbeRunResult run_application_with_completion_probes(
 
     starter::Application application(project_info, out, err, std::move(shell_reader));
 
-    std::vector<std::string> arg_storage = {project_info.binary_name};
-    arg_storage.insert(arg_storage.end(), arguments.begin(), arguments.end());
-
-    std::vector<char*> argv;
-    argv.reserve(arg_storage.size());
-    for (auto& arg : arg_storage) {
-        argv.push_back(arg.data());
-    }
-
-    const int exit_code = application.run(static_cast<int>(argv.size()), argv.data());
+    auto app_args = make_application_arguments(project_info, std::move(arguments));
+    const int exit_code = application.run(
+        static_cast<int>(app_args.argv.size()),
+        app_args.argv.data());
     return {{exit_code, out.str(), err.str(), prompts}, completions};
 }
 
