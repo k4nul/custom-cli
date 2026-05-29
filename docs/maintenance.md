@@ -37,7 +37,8 @@ ctest --test-dir build --output-on-failure
 
 The tracked CI workflow at `.github/workflows/ci.yml` mirrors this validation on
 Linux and Windows. CI builds with `--parallel`; the Windows job builds and tests
-the `Debug` configuration.
+the `Debug` configuration. See [docs/ci.md](ci.md) for workflow triggers, exact
+job commands, and failure triage.
 
 Keep both test flags explicit in maintenance reports. `CLI_STARTER_BUILD_TESTS`
 controls whether the project-specific CTest entries are registered:
@@ -115,7 +116,8 @@ removing a sample command:
    output, error text, or shell dispatch changes.
 6. Update `README.md`, `docs/command-reference.md`, `docs/architecture.md`,
    `docs/testing.md`, and `docs/troubleshooting.md` when user-facing behavior
-   changes.
+   changes. Update `docs/ci.md` too when the command change modifies
+   `cmake/cli_smoke_test.cmake` or CI reproduction guidance.
 
 The `enabled_commands` field in config is serialized and shown by `config show`;
 it is not a runtime allowlist. Do not document it as a way to disable commands
@@ -220,6 +222,7 @@ Keep the documentation set internally consistent:
 - `docs/testing.md`: validation commands, current coverage, and test gaps.
 - `docs/artifact-hygiene.md`: tracked local artifact gate, cleanup sequence, and
   reporting states.
+- `docs/ci.md`: GitHub Actions triggers, job commands, and failure triage.
 - `docs/troubleshooting.md`: known build, config, and runtime failures.
 - `docs/maintenance.md`: maintainer validation, change checklists, artifact
   hygiene, and CI workflow expectations.
@@ -239,3 +242,6 @@ and one Windows Visual Studio-style multi-config job so both executable layouts
 stay documented and tested. Because CI runs unfiltered CTest, tracked
 `build-local-*` or `.sandbox-user/*` paths make CI fail in `repository_hygiene`
 until the artifact cleanup package removes them.
+
+Use [docs/ci.md](ci.md) as the CI runbook for triggers, permissions, exact job
+commands, local reproduction, and workflow update rules.

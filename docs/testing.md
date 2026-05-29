@@ -45,10 +45,12 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
 Report test results from a build tree created for the current validation pass.
-Do not use existing `build-local-*` executables or cached CTest files as proof
-that the current source still builds, even when those paths appear in the
-checkout. The ignore rules prevent new local artifacts from being added, but
-they do not make historical tracked artifacts authoritative.
+If `build/` already exists from an earlier run, remove it or choose another
+ignored build directory before collecting reportable validation evidence. Do not
+use existing `build-local-*` executables, old `build/` CTest state, or cached
+CTest files as proof that the current source still builds, even when those paths
+appear in the checkout. The ignore rules prevent new local artifacts from being
+added, but they do not make historical tracked artifacts authoritative.
 
 If the artifact check returns paths that still exist in the checkout, full
 unfiltered validation is blocked because `repository_hygiene` is expected to fail
@@ -66,10 +68,16 @@ ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke
 ```
 
 Label that result as partial validation. Include the artifact preflight output
-in the report, and do not describe the repository as fully validated until
-`git ls-files 'build-local-*' '.sandbox-user/*'` prints no paths and the
-unfiltered CTest flow passes. For multi-config generators, build and test the
-same configuration:
+in the report; when the listing is long, include the path count and top-level
+artifact families too:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*' | cut -d/ -f1 | sort | uniq -c
+```
+
+Do not describe the repository as fully validated until `git ls-files
+'build-local-*' '.sandbox-user/*'` prints no paths and the unfiltered CTest flow
+passes. For multi-config generators, build and test the same configuration:
 
 ```powershell
 cmake --build build --config Debug
@@ -98,11 +106,9 @@ Leave the CTest command unfiltered for reportable validation so
 doctest filters only for local iteration.
 
 The tracked GitHub Actions workflow at `.github/workflows/ci.yml` mirrors this
-validation on Linux and Windows. The Linux job configures, builds with
-`cmake --build build --parallel`, and runs unfiltered CTest; the Windows job uses
-the same configure step, then builds `Debug` with `--parallel` and runs
-`ctest --test-dir build -C Debug --output-on-failure`. Report local results from
-the flow above before publishing source changes.
+validation on Linux and Windows. See [docs/ci.md](ci.md) for workflow triggers,
+job commands, and CI failure triage. Report local results from the flow above
+before publishing source changes.
 
 For multi-config generators, build and test the same configuration:
 
@@ -238,7 +244,9 @@ as `.\build\Debug\starter_tests.exe`.
 
 CTest covers reusable internals, command dispatch, and a short built-executable
 smoke pass. A manual CLI success pass is still useful after renaming the starter
-or changing command registration:
+or changing command registration. These examples assume the default
+`CLI_STARTER_BINARY_NAME` value; renamed starters should substitute the
+configured executable path:
 
 ```bash
 ./build/cli-starter --version

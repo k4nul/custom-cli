@@ -195,6 +195,7 @@ tool's purpose.
 - `docs/architecture.md`: component layout and command flow
 - `docs/testing.md`: test targets, validation commands, and coverage notes
 - `docs/artifact-hygiene.md`: tracked local artifact gate and cleanup runbook
+- `docs/ci.md`: GitHub Actions triggers, job commands, and failure triage
 - `docs/troubleshooting.md`: common local build and runtime issues
 - `docs/maintenance.md`: maintainer checklist for command, config, dependency, and documentation changes
 - `docs/migration-from-legacy.md`: historical migration notes

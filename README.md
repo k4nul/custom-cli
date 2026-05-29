@@ -209,7 +209,7 @@ nested subcommands.
 - `tests/`: starter behavior tests
 - `third_party/`: vendored header-only dependencies and license files
 - `docs/`: project overview, onboarding, command reference, architecture, testing,
-  artifact hygiene, troubleshooting, maintenance, and migration notes
+  artifact hygiene, CI, troubleshooting, maintenance, and migration notes
 
 ## Testing
 
@@ -263,6 +263,7 @@ The tracked GitHub Actions workflow at [.github/workflows/ci.yml](.github/workfl
 same CMake/CTest validation on Linux and Windows.
 Because CI runs unfiltered CTest, tracked `build-local-*` or `.sandbox-user/*` paths make CI fail in
 `repository_hygiene` until the artifact cleanup package removes them.
+See [docs/ci.md](docs/ci.md) for workflow triggers, job commands, and failure triage.
 Use the local flow above before reporting source changes.
 
 With multi-config generators, build and test the same configuration:
@@ -289,6 +290,7 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 - [docs/architecture.md](docs/architecture.md): structure and extension points
 - [docs/testing.md](docs/testing.md): CTest/doctest validation flow and coverage notes
 - [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate and cleanup runbook
+- [docs/ci.md](docs/ci.md): GitHub Actions triggers, job commands, and failure triage
 - [docs/troubleshooting.md](docs/troubleshooting.md): common local setup and runtime issues
 - [docs/maintenance.md](docs/maintenance.md): maintainer checklist for command, config, dependency, and
   documentation changes
@@ -501,7 +503,7 @@ cmake -S . -B build \
 - `tests/`: 스타터 동작 테스트
 - `third_party/`: vendored header-only 의존성과 라이선스 파일
 - `docs/`: 프로젝트 개요, 온보딩, command reference, 아키텍처, 테스트, artifact hygiene,
-  문제 해결, 유지보수, 마이그레이션 노트
+  CI, 문제 해결, 유지보수, 마이그레이션 노트
 
 ## 테스트
 
@@ -546,6 +548,7 @@ stdout과 stderr routing을 일반 검증에서 확인합니다. 또한 표준 �
 Windows에서 같은 CMake/CTest 검증을 실행합니다.
 CI는 필터를 걸지 않은 CTest를 실행하므로, tracked `build-local-*` 또는 `.sandbox-user/*`
 경로가 남아 있으면 artifact cleanup package가 제거될 때까지 `repository_hygiene`에서 실패합니다.
+workflow trigger, job command, failure triage는 [docs/ci.md](docs/ci.md)를 참고하세요.
 소스 변경 결과를 보고하기 전에는 위의 로컬 흐름을 사용하세요.
 
 자동화 우선순위 규칙: `git ls-files 'build-local-*' '.sandbox-user/*'`가 경로를 하나라도
@@ -576,6 +579,7 @@ ctest --test-dir build -C Debug --output-on-failure
 - [docs/architecture.md](docs/architecture.md): 구조와 확장 지점
 - [docs/testing.md](docs/testing.md): CTest/doctest 검증 흐름과 테스트 범위
 - [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate와 cleanup runbook
+- [docs/ci.md](docs/ci.md): GitHub Actions trigger, job command, failure triage
 - [docs/troubleshooting.md](docs/troubleshooting.md): 로컬 설정과 실행 중 자주 겪는 문제
 - [docs/maintenance.md](docs/maintenance.md): 명령, 설정, 의존성, 문서 변경을 위한 maintainer 체크리스트
 - [docs/migration-from-legacy.md](docs/migration-from-legacy.md): 마이그레이션 노트
