@@ -216,7 +216,14 @@ void configure_starter_app(
         shell_requested = true;
     });
 
-    starter::register_builtin_commands(app, project_info, config_path, out, err, command_executed);
+    starter::CommandRegistrationContext command_context{
+        project_info,
+        config_path,
+        out,
+        err,
+        command_executed,
+    };
+    starter::register_builtin_commands(app, command_context);
 }
 
 struct CompletionAppFixture {

@@ -8,11 +8,11 @@ namespace starter {
 
 void register_about_command(
     CLI::App& root,
-    const ProjectInfo& project_info,
-    std::string&,
-    std::ostream& out,
-    std::ostream&,
-    bool& command_executed) {
+    const CommandRegistrationContext& context) {
+    const auto& project_info = context.project_info;
+    auto& out = context.out;
+    auto& command_executed = context.command_executed;
+
     auto* command = root.add_subcommand("about", "Describe what this starter provides.");
     command->callback([&]() {
         command_executed = true;

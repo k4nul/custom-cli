@@ -22,11 +22,11 @@ struct HelloOptions {
 
 void register_hello_command(
     CLI::App& root,
-    const ProjectInfo&,
-    std::string& config_path,
-    std::ostream& out,
-    std::ostream&,
-    bool& command_executed) {
+    const CommandRegistrationContext& context) {
+    auto& config_path = context.config_path;
+    auto& out = context.out;
+    auto& command_executed = context.command_executed;
+
     auto options = std::make_shared<HelloOptions>();
     auto* command = root.add_subcommand(
         "hello",

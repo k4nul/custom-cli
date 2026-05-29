@@ -107,7 +107,8 @@ removing a sample command:
 
 1. Add or update the implementation under `src/commands/`.
 2. Add new command source files to the `starter_core` source list in `CMakeLists.txt`.
-3. Update the registrar declaration in `include/starter/commands/registrars.hpp`.
+3. Update the registrar declaration in `include/starter/commands/registrars.hpp`
+   using `CommandRegistrationContext`.
 4. Update central registration in `src/commands/register_commands.cpp`.
 5. Add or update doctest coverage under `tests/`, and update
    `cmake/cli_smoke_test.cmake` when the built executable's command path,

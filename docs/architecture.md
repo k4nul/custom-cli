@@ -83,7 +83,8 @@ runtime allowlist.
 1. Create `src/commands/example_command.cpp`.
 2. Add the new `.cpp` file to the `starter_core` source list in `CMakeLists.txt`.
 3. Declare the registrar in `include/starter/commands/registrars.hpp`.
-4. Define a small registrar function that adds a `CLI11` subcommand.
+4. Define a small registrar function that accepts `CommandRegistrationContext`
+   and adds a `CLI11` subcommand.
 5. Keep option state local to the command via owned state objects.
 6. Register the command centrally in `src/commands/register_commands.cpp`.
 7. Add or extend doctest coverage in `tests/config_tests.cpp`, or add a focused

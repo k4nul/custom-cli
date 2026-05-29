@@ -146,7 +146,14 @@ void Application::configure_cli_app(
         shell_requested = true;
     });
 
-    register_builtin_commands(app, project_info_, config_path, out_, err_, command_executed);
+    CommandRegistrationContext command_context{
+        project_info_,
+        config_path,
+        out_,
+        err_,
+        command_executed,
+    };
+    register_builtin_commands(app, command_context);
 }
 
 bool Application::dispatch_shell_tokens(std::vector<std::string> tokens) {

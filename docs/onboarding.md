@@ -172,7 +172,8 @@ loader. To add a command:
 
 1. Add a command implementation under `src/commands/`.
 2. Add the command `.cpp` file to the `starter_core` source list in `CMakeLists.txt`.
-3. Declare the registrar in `include/starter/commands/registrars.hpp`.
+3. Declare the registrar in `include/starter/commands/registrars.hpp`
+   using `CommandRegistrationContext`.
 4. Register it from `src/commands/register_commands.cpp`.
 5. Add or extend tests under `tests/`, and update
    `cmake/cli_smoke_test.cmake` when the built executable's command path,

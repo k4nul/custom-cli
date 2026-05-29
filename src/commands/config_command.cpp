@@ -21,11 +21,12 @@ struct ConfigInitOptions {
 
 void register_config_command(
     CLI::App& root,
-    const ProjectInfo& project_info,
-    std::string& config_path,
-    std::ostream& out,
-    std::ostream&,
-    bool& command_executed) {
+    const CommandRegistrationContext& context) {
+    const auto& project_info = context.project_info;
+    auto& config_path = context.config_path;
+    auto& out = context.out;
+    auto& command_executed = context.command_executed;
+
     auto* config_command = root.add_subcommand("config", "Write or inspect starter configuration.");
     config_command->require_subcommand(1);
 

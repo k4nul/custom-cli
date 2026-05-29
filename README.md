@@ -183,7 +183,8 @@ wins; an empty loaded `prompt` falls back to `CLI_STARTER_PROMPT_LABEL`.
 
 1. Add a command implementation under `src/commands/`.
 2. Add the command `.cpp` file to the `starter_core` source list in [CMakeLists.txt](CMakeLists.txt).
-3. Declare its registrar in [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp).
+3. Declare its registrar in [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp)
+   using `CommandRegistrationContext` for shared command dependencies.
 4. Register it from [src/commands/register_commands.cpp](src/commands/register_commands.cpp).
 5. Add tests in [tests/config_tests.cpp](tests/config_tests.cpp), or add a new test file and include
    it in the `starter_tests` target in [CMakeLists.txt](CMakeLists.txt). Update
