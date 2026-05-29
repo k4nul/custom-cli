@@ -441,6 +441,104 @@ TEST_CASE("config write failures use typed errors") {
     CHECK_FALSE(fs::exists(config_path, ignored));
 }
 
+TEST_CASE("load_config_or_default returns defaults for missing files without creating them") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "profiles" / "missing.json";
+    const starter::AppConfig defaults;
+    bool loaded_from_disk = true;
+
+    const auto config = starter::load_config_or_default(config_path, &loaded_from_disk);
+
+    CHECK_FALSE(loaded_from_disk);
+    CHECK(config.prompt == defaults.prompt);
+    CHECK(config.default_name == defaults.default_name);
+    CHECK(config.enabled_commands == defaults.enabled_commands);
+    CHECK(config.notes == defaults.notes);
+    CHECK_FALSE(fs::exists(config_path));
+}
+
+TEST_CASE("load_config_or_default marks disk-backed configs as loaded") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+    write_text_file(
+        config_path,
+        R"({
+            "prompt":"ops",
+            "default_name":"Ada",
+            "enabled_commands":["doctor","about"],
+            "notes":"loaded from disk"
+        })");
+    bool loaded_from_disk = false;
+
+    const auto config = starter::load_config_or_default(config_path, &loaded_from_disk);
+    const std::vector<std::string> expected_commands = {"doctor", "about"};
+
+    CHECK(loaded_from_disk);
+    CHECK(config.prompt == "ops");
+    CHECK(config.default_name == "Ada");
+    CHECK(config.enabled_commands == expected_commands);
+    CHECK(config.notes == "loaded from disk");
+}
+
+TEST_CASE("write_config_template creates parent directories for nested config paths") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "profiles" / "team" / "starter.json";
+
+    starter::AppConfig config;
+    config.prompt = "team";
+    config.default_name = "Grace";
+    config.enabled_commands = {"hello", "doctor"};
+    config.notes = "nested config";
+
+    starter::write_config_template(config_path, config);
+
+    const std::vector<std::string> expected_commands = {"hello", "doctor"};
+    CHECK(fs::is_directory(config_path.parent_path()));
+    const auto loaded = starter::load_config_or_throw(config_path);
+    CHECK(loaded.prompt == "team");
+    CHECK(loaded.default_name == "Grace");
+    CHECK(loaded.enabled_commands == expected_commands);
+    CHECK(loaded.notes == "nested config");
+}
+
+TEST_CASE("write_config_template truncates stale config contents") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "starter.json";
+    write_text_file(
+        config_path,
+        "{\n"
+        "  \"prompt\": \"stale\",\n"
+        "  \"default_name\": \"stale\",\n"
+        "  \"enabled_commands\": [\"stale\"],\n"
+        "  \"notes\": \"stale\",\n"
+        "  \"legacy\": true\n"
+        "}\n");
+
+    starter::AppConfig replacement;
+    replacement.prompt = "fresh";
+    replacement.default_name = "Ada";
+    replacement.enabled_commands = {"hello"};
+    replacement.notes = "current";
+
+    starter::write_config_template(config_path, replacement);
+
+    const auto text = [&]() {
+        std::ifstream input(config_path);
+        std::ostringstream buffer;
+        buffer << input.rdbuf();
+        return buffer.str();
+    }();
+    const auto loaded = starter::load_config_or_throw(config_path);
+    const std::vector<std::string> expected_commands = {"hello"};
+
+    CHECK(loaded.prompt == "fresh");
+    CHECK(loaded.default_name == "Ada");
+    CHECK(loaded.enabled_commands == expected_commands);
+    CHECK(loaded.notes == "current");
+    CHECK_FALSE(contains_text(text, "legacy"));
+    CHECK_FALSE(contains_text(text, "stale"));
+}
+
 TEST_CASE("application accepts hello subcommand options from argv order") {
     const auto result = run_application({"hello", "--name", "starter user"});
 
