@@ -1,8 +1,9 @@
 # Command Reference
 
 This reference describes the starter's current command surface. It is grounded in
-the root CLI setup in `src/app/application.cpp`, the sample-command registrations
-in `src/commands/register_commands.cpp`, and the config schema in
+the root CLI setup in `src/app/cli_app.cpp`, application dispatch in
+`src/app/application.cpp`, the sample-command registrations in
+`src/commands/register_commands.cpp`, and the config schema in
 `include/starter/core/config.hpp`.
 
 ## Invocation Model

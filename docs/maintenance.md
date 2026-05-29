@@ -102,8 +102,8 @@ Use the configuration-specific executable path on Visual Studio-style builds.
 ## Command Changes
 
 Command availability is compile-time CLI wiring, not a runtime plugin system.
-`Application` registers the root `shell` command directly, while sample commands
-under `src/commands/` use central registration. When adding, renaming, or
+`configure_cli_app` registers the root `shell` command and delegates sample
+commands under `src/commands/` to central registration. When adding, renaming, or
 removing a sample command:
 
 1. Add or update the implementation under `src/commands/`.

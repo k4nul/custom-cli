@@ -12,7 +12,7 @@
 
 #include <CLI/CLI.hpp>
 
-#include "starter/commands/registrars.hpp"
+#include "starter/app/cli_app.hpp"
 #include "starter/core/completion.hpp"
 #include "starter/core/config.hpp"
 #include "starter/core/exit_code.hpp"
@@ -98,7 +98,14 @@ int Application::dispatch(std::vector<std::string> args, bool interactive_mode) 
     bool shell_requested = false;
 
     CLI::App app(project_info_.display_name + " - generic C++ CLI starter");
-    configure_cli_app(app, config_path, command_executed, shell_requested);
+    configure_cli_app(
+        app,
+        project_info_,
+        config_path,
+        out_,
+        err_,
+        command_executed,
+        shell_requested);
 
     try {
         std::reverse(args.begin(), args.end());
@@ -129,31 +136,6 @@ int Application::dispatch(std::vector<std::string> args, bool interactive_mode) 
     }
 
     return to_int(ExitCode::success);
-}
-
-void Application::configure_cli_app(
-    CLI::App& app,
-    std::string& config_path,
-    bool& command_executed,
-    bool& shell_requested) {
-    app.set_help_all_flag("--help-all", "Show help for all subcommands.");
-    app.set_version_flag("--version", project_info_.display_name + " " + project_info_.version);
-    app.add_option("-c,--config", config_path, "Path to the JSON configuration file.");
-
-    auto* shell_command = app.add_subcommand("shell", "Start the interactive shell.");
-    shell_command->callback([&]() {
-        command_executed = true;
-        shell_requested = true;
-    });
-
-    CommandRegistrationContext command_context{
-        project_info_,
-        config_path,
-        out_,
-        err_,
-        command_executed,
-    };
-    register_builtin_commands(app, command_context);
 }
 
 bool Application::dispatch_shell_tokens(std::vector<std::string> tokens) {
@@ -201,7 +183,10 @@ int Application::run_shell(const std::filesystem::path& config_path) {
     CLI::App completion_app(project_info_.display_name + " - generic C++ CLI starter");
     configure_cli_app(
         completion_app,
+        project_info_,
         completion_config_path,
+        out_,
+        err_,
         completion_command_executed,
         completion_shell_requested);
     const auto shell_commands = shell_completion_commands();

@@ -2,7 +2,7 @@
 
 ## Directory Layout
 
-- `src/app/`: application lifecycle and dispatch flow
+- `src/app/`: application lifecycle, dispatch flow, and root CLI parser assembly
 - `src/commands/`: command implementations and registrar wiring
 - `src/core/`: shared helpers such as config loading, tokenization, and completion
 - `include/starter/`: public headers for the starter
@@ -14,6 +14,8 @@
 ## Core Components
 
 - `Application`: owns one-shot execution, interactive shell mode, and global options
+- Root CLI app configurator: wires global options, the `shell` command, and built-in command
+  registrars for both dispatch and completion
 - Shell line reader: handles interactive input and completion; `Application` can receive a scripted
   reader for deterministic lifecycle tests
 - Command registrars: add subcommands to the root parser in one place
@@ -45,11 +47,12 @@ error and the shell keeps running. If a dispatched command returns a non-zero
 exit code, the shell reports that exit code and then prompts for the next
 command.
 
-Completion is derived from a fresh CLI11 parser configured with the same
-commands and global options as normal dispatch. Root completion includes the
-registered CLI commands plus shell-only `help`, `exit`, and `quit`. Subcommand
-completion follows the current command context, while option completion is
-scoped to the active command when the current token starts with `-`.
+Completion is derived from a fresh CLI11 parser configured by the same
+`configure_cli_app` helper used for normal dispatch. Root completion includes
+the registered CLI commands plus shell-only `help`, `exit`, and `quit`.
+Subcommand completion follows the current command context, while option
+completion is scoped to the active command when the current token starts with
+`-`.
 
 The line reader performs completion only for an interactive terminal. If stdin
 is not interactive, or raw terminal mode cannot be enabled on POSIX systems, it
@@ -64,17 +67,17 @@ falls back to ordinary line reads without interactive completion.
 - If the command adds new config needs, update `AppConfig`, `config/`, JSON parsing and serialization,
   and `describe_config`
 
-Command availability is controlled by compile-time CLI wiring. `Application`
-registers the root `shell` command directly, and `register_builtin_commands`
-registers the sample commands from `src/commands/`. The `enabled_commands`
-config field is currently serialized and displayed, but it is not used as a
-runtime allowlist.
+Command availability is controlled by compile-time CLI wiring.
+`configure_cli_app` registers the root `shell` command and delegates sample
+commands from `src/commands/` to `register_builtin_commands`. The
+`enabled_commands` config field is currently serialized and displayed, but it
+is not used as a runtime allowlist.
 
 ## Command Flow
 
 1. `src/main.cpp` loads project metadata and creates `Application`.
-2. `Application` builds a fresh CLI parser for each dispatch.
-3. Command registrars attach subcommands and callbacks.
+2. `Application` builds a fresh CLI parser for each dispatch through `configure_cli_app`.
+3. The app configurator and command registrars attach subcommands and callbacks.
 4. Callbacks read config and produce output through shared streams.
 5. Shell mode tokenizes user input and reuses the same dispatch path.
 

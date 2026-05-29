@@ -8,10 +8,6 @@
 #include "starter/core/project_info.hpp"
 #include "starter/core/shell_line_reader.hpp"
 
-namespace CLI {
-class App;
-}
-
 namespace starter {
 
 class Application {
@@ -25,11 +21,6 @@ public:
     int run(int argc, char** argv);
 
 private:
-    void configure_cli_app(
-        CLI::App& app,
-        std::string& config_path,
-        bool& command_executed,
-        bool& shell_requested);
     int dispatch(std::vector<std::string> args, bool interactive_mode);
     bool dispatch_shell_tokens(std::vector<std::string> tokens);
     int run_shell(const std::filesystem::path& config_path);

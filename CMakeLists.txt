@@ -25,6 +25,7 @@ configure_file(
 )
 
 add_library(starter_core
+    src/app/cli_app.cpp
     src/app/application.cpp
     src/commands/about_command.cpp
     src/commands/config_command.cpp

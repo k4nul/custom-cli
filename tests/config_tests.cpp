@@ -18,7 +18,7 @@
 #include <CLI/CLI.hpp>
 
 #include "starter/app/application.hpp"
-#include "starter/commands/registrars.hpp"
+#include "starter/app/cli_app.hpp"
 #include "starter/core/completion.hpp"
 #include "starter/core/config.hpp"
 #include "starter/core/exit_code.hpp"
@@ -198,34 +198,6 @@ CompletionProbeRunResult run_application_with_completion_probes(
     return {{exit_code, out.str(), err.str(), prompts}, completions};
 }
 
-void configure_starter_app(
-    CLI::App& app,
-    const starter::ProjectInfo& project_info,
-    std::string& config_path,
-    std::ostream& out,
-    std::ostream& err,
-    bool& command_executed,
-    bool& shell_requested) {
-    app.set_help_all_flag("--help-all", "Show help for all subcommands.");
-    app.set_version_flag("--version", project_info.display_name + " " + project_info.version);
-    app.add_option("-c,--config", config_path, "Path to the JSON configuration file.");
-
-    auto* shell_command = app.add_subcommand("shell", "Start the interactive shell.");
-    shell_command->callback([&]() {
-        command_executed = true;
-        shell_requested = true;
-    });
-
-    starter::CommandRegistrationContext command_context{
-        project_info,
-        config_path,
-        out,
-        err,
-        command_executed,
-    };
-    starter::register_builtin_commands(app, command_context);
-}
-
 struct CompletionAppFixture {
     starter::ProjectInfo project_info = starter::load_project_info();
     std::string config_path = "cli-starter.json";
@@ -237,7 +209,14 @@ struct CompletionAppFixture {
     std::vector<std::string> shell_commands = {"help", "exit", "quit"};
 
     CompletionAppFixture() {
-        configure_starter_app(app, project_info, config_path, out, err, command_executed, shell_requested);
+        starter::configure_cli_app(
+            app,
+            project_info,
+            config_path,
+            out,
+            err,
+            command_executed,
+            shell_requested);
     }
 };
 
