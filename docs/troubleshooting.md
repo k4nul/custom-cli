@@ -216,7 +216,8 @@ the file is malformed, fix the JSON or regenerate a local template:
 The supported fields are `prompt`, `default_name`, `enabled_commands`, and
 `notes`. Missing fields fall back to built-in defaults, and unknown top-level
 fields are ignored. Malformed JSON or wrong field types are reported as command
-errors.
+errors. Existing config paths must point to regular files no larger than 1 MiB;
+directories, device files, and oversized files are rejected before parsing.
 
 ## The Shell Exits Before Showing A Prompt
 

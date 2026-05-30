@@ -115,7 +115,8 @@ byte-for-byte copy of `config/cli-starter.json`.
 
 Prints the effective config path, source, prompt, default name, enabled command
 list, and notes. Missing config files use built-in defaults. Existing config
-files must be JSON objects with supported field types.
+files must be regular files, no larger than 1 MiB, and JSON objects with
+supported field types.
 
 ```bash
 ./build/cli-starter --config ./config/local.json config show
@@ -185,9 +186,11 @@ Supported fields:
 | `enabled_commands` | string array | `about`, `hello`, `echo`, `config`, `doctor` | Serialized and shown by `config show`; not a runtime allowlist. |
 | `notes` | string | `Customize this file after copying the starter.` | Informational text shown by `config show`. |
 
-Missing fields fall back to built-in defaults. Malformed JSON, a non-object JSON
-document, or wrong field types are reported as config errors. Unknown top-level
-fields are ignored and are omitted from generated or serialized config output.
+Missing fields fall back to built-in defaults. Existing config paths must point
+to regular files no larger than 1 MiB. Malformed JSON, a non-object JSON
+document, wrong field types, non-regular config paths, or oversized config files
+are reported as config errors. Unknown top-level fields are ignored and are
+omitted from generated or serialized config output.
 
 ## Exit Statuses
 

@@ -400,6 +400,42 @@ TEST_CASE("config read failures use typed errors") {
     CHECK(caught);
 }
 
+TEST_CASE("config read rejects non-regular paths") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "config-directory.json";
+    fs::create_directories(config_path);
+    bool caught = false;
+
+    try {
+        (void)starter::load_config_or_throw(config_path);
+    } catch (const starter::ConfigReadError& error) {
+        caught = true;
+        CHECK(contains_text(error.what(), "config path is not a regular file"));
+        CHECK(contains_text(error.what(), config_path.generic_string()));
+    }
+
+    CHECK(caught);
+}
+
+TEST_CASE("config read rejects oversized files before parsing") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "oversized.json";
+    constexpr std::size_t max_config_file_size = 1024U * 1024U;
+    write_text_file(config_path, std::string(max_config_file_size + 1U, 'x'));
+    bool caught = false;
+
+    try {
+        (void)starter::load_config_or_throw(config_path);
+    } catch (const starter::ConfigReadError& error) {
+        caught = true;
+        CHECK(contains_text(error.what(), "config file is too large"));
+        CHECK(contains_text(error.what(), config_path.generic_string()));
+        CHECK(contains_text(error.what(), std::to_string(max_config_file_size)));
+    }
+
+    CHECK(caught);
+}
+
 TEST_CASE("config write failures use typed errors") {
     TemporaryDirectory temporary_directory;
     const auto blocking_parent = temporary_directory.path() / "config-parent";

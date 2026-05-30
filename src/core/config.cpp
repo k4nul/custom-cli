@@ -1,6 +1,8 @@
 #include "starter/core/config.hpp"
 
+#include <array>
 #include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -44,6 +46,8 @@ namespace {
 
 using json = nlohmann::json;
 
+constexpr std::size_t max_config_file_size_bytes = 1024U * 1024U;
+
 std::string join_commands(const std::vector<std::string>& commands) {
     std::ostringstream stream;
     for (std::size_t index = 0; index < commands.size(); ++index) {
@@ -63,6 +67,72 @@ bool config_file_exists(const std::filesystem::path& path) {
             "failed to inspect config file: " + path.generic_string() + ": " + error.message());
     }
     return exists;
+}
+
+std::string config_file_too_large_message(
+    const std::filesystem::path& path,
+    std::uintmax_t observed_size) {
+    return "config file is too large: " + path.generic_string() + " ("
+        + std::to_string(observed_size) + " bytes, max "
+        + std::to_string(max_config_file_size_bytes) + " bytes)";
+}
+
+std::uintmax_t inspect_config_file_for_read(const std::filesystem::path& path) {
+    std::error_code error;
+    const bool regular_file = std::filesystem::is_regular_file(path, error);
+    if (error) {
+        throw ConfigReadError(
+            "failed to inspect config file: " + path.generic_string() + ": "
+            + error.message());
+    }
+    if (!regular_file) {
+        throw ConfigReadError("config path is not a regular file: " + path.generic_string());
+    }
+
+    const auto file_size = std::filesystem::file_size(path, error);
+    if (error) {
+        throw ConfigReadError(
+            "failed to inspect config file: " + path.generic_string() + ": "
+            + error.message());
+    }
+    if (file_size > max_config_file_size_bytes) {
+        throw ConfigReadError(config_file_too_large_message(path, file_size));
+    }
+    return file_size;
+}
+
+std::string read_config_text(
+    const std::filesystem::path& path,
+    std::uintmax_t inspected_size) {
+    std::ifstream input(path, std::ios::binary);
+    if (!input) {
+        throw ConfigReadError("failed to open config file: " + path.generic_string());
+    }
+
+    std::string text;
+    text.reserve(static_cast<std::size_t>(inspected_size));
+
+    std::array<char, 4096> buffer{};
+    while (input) {
+        input.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+        const auto bytes_read = input.gcount();
+        if (bytes_read <= 0) {
+            continue;
+        }
+
+        const auto incoming_size = static_cast<std::size_t>(bytes_read);
+        if (text.size() > max_config_file_size_bytes - incoming_size) {
+            throw ConfigReadError(config_file_too_large_message(
+                path,
+                static_cast<std::uintmax_t>(text.size() + incoming_size)));
+        }
+        text.append(buffer.data(), incoming_size);
+    }
+
+    if (input.bad()) {
+        throw ConfigReadError("failed to read config file: " + path.generic_string());
+    }
+    return text;
 }
 
 }  // namespace
@@ -90,17 +160,12 @@ AppConfig parse_config(std::string_view text) {
 }
 
 AppConfig load_config_or_throw(const std::filesystem::path& path) {
-    std::ifstream input(path);
-    if (!input) {
+    if (!config_file_exists(path)) {
         throw ConfigReadError("failed to open config file: " + path.generic_string());
     }
 
-    std::ostringstream buffer;
-    buffer << input.rdbuf();
-    if (input.bad()) {
-        throw ConfigReadError("failed to read config file: " + path.generic_string());
-    }
-    return parse_config(buffer.str());
+    const auto inspected_size = inspect_config_file_for_read(path);
+    return parse_config(read_config_text(path, inspected_size));
 }
 
 AppConfig load_config_or_default(const std::filesystem::path& path, bool* loaded) {
