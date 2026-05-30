@@ -21,8 +21,8 @@ public:
     int run(int argc, char** argv);
 
 private:
-    int dispatch(std::vector<std::string> args, bool interactive_mode);
-    bool dispatch_shell_tokens(std::vector<std::string> tokens);
+    int dispatch(std::vector<std::string> args, bool interactive_mode, std::string config_path);
+    bool dispatch_shell_tokens(std::vector<std::string> tokens, const std::string& config_path);
     int run_shell(const std::filesystem::path& config_path);
     std::vector<std::string> shell_completion_commands() const;
 
@@ -30,7 +30,6 @@ private:
     std::ostream& out_;
     std::ostream& err_;
     ShellLineReader shell_line_reader_;
-    std::string active_shell_config_path_;
 };
 
 }  // namespace starter
