@@ -183,7 +183,7 @@ wins; an empty loaded `prompt` falls back to `CLI_STARTER_PROMPT_LABEL`.
 
 1. Add a command implementation under `src/commands/`.
 2. Add the command `.cpp` file to the `starter_core` source list in [CMakeLists.txt](CMakeLists.txt).
-3. Declare its registrar in [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp)
+3. Declare its registrar in `src/commands/builtin_command_registrars.hpp`
    using `CommandRegistrationContext` for shared command dependencies.
 4. Register it from [src/commands/register_commands.cpp](src/commands/register_commands.cpp).
 5. Add tests in [tests/config_tests.cpp](tests/config_tests.cpp), or add a new test file and include
@@ -478,7 +478,7 @@ cmake -S . -B build \
 
 1. `src/commands/` 아래에 명령 구현 파일을 추가합니다.
 2. 명령 `.cpp` 파일을 [CMakeLists.txt](CMakeLists.txt)의 `starter_core` source list에 추가합니다.
-3. [include/starter/commands/registrars.hpp](include/starter/commands/registrars.hpp)에 registrar를 선언합니다.
+3. `src/commands/builtin_command_registrars.hpp`에 registrar를 선언합니다.
 4. [src/commands/register_commands.cpp](src/commands/register_commands.cpp)에서 명령을 등록합니다.
 5. [tests/config_tests.cpp](tests/config_tests.cpp)에 테스트를 추가하거나, 새 테스트 파일을 만들고
    [CMakeLists.txt](CMakeLists.txt)의 `starter_tests` target에 포함합니다. 빌드된 실행 파일의

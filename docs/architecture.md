@@ -62,7 +62,7 @@ falls back to ordinary line reads without interactive completion.
 
 - Add a new command file under `src/commands/`
 - Add the command source to the manually maintained `starter_core` source list in `CMakeLists.txt`
-- Declare its registrar in `include/starter/commands/registrars.hpp`
+- Declare its built-in registrar in `src/commands/builtin_command_registrars.hpp`
 - Register it from `src/commands/register_commands.cpp`
 - If the command adds new config needs, update `AppConfig`, `config/`, JSON parsing and serialization,
   and `describe_config`
@@ -72,6 +72,11 @@ Command availability is controlled by compile-time CLI wiring.
 commands from `src/commands/` to `register_builtin_commands`. The
 `enabled_commands` config field is currently serialized and displayed, but it
 is not used as a runtime allowlist.
+
+The public command registrar header exposes the shared registration context and
+the single `register_builtin_commands` entry point used by `src/app/`. Individual
+built-in command registrars stay in the private `src/commands/` header so the app
+layer does not depend on every command implementation.
 
 ## Command Flow
 
@@ -85,7 +90,7 @@ is not used as a runtime allowlist.
 
 1. Create `src/commands/example_command.cpp`.
 2. Add the new `.cpp` file to the `starter_core` source list in `CMakeLists.txt`.
-3. Declare the registrar in `include/starter/commands/registrars.hpp`.
+3. Declare the registrar in `src/commands/builtin_command_registrars.hpp`.
 4. Define a small registrar function that accepts `CommandRegistrationContext`
    and adds a `CLI11` subcommand.
 5. Keep option state local to the command via owned state objects.

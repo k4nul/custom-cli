@@ -1,4 +1,4 @@
-#include "starter/commands/registrars.hpp"
+#include "builtin_command_registrars.hpp"
 
 namespace starter {
 
