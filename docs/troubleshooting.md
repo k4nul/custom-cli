@@ -19,6 +19,16 @@ toolchain, or preset disabled `BUILD_TESTING`, reconfigure with both flags set
 to `ON` instead of only rebuilding the old tree. A healthy tree registers
 `starter_tests`, `cli_starter_smoke`, and `repository_hygiene`.
 
+Use CTest discovery mode when you need to confirm registration without running
+the tests:
+
+```bash
+ctest --test-dir build -N
+```
+
+If the expected names are missing, reconfigure the build tree with both test
+flags set before rebuilding.
+
 ## Multi-Config Tests Fail To Start
 
 Visual Studio and other multi-config generators put binaries under a
@@ -34,6 +44,19 @@ The same rule applies when running the executable directly:
 ```powershell
 .\build\Debug\cli-starter.exe about
 ```
+
+## CLI Smoke Fails
+
+Run the smoke entry by itself with verbose CTest output:
+
+```bash
+ctest --test-dir build --output-on-failure -R '^cli_starter_smoke$' -V
+```
+
+The smoke script runs built-executable success cases, redirected shell sessions,
+and representative parser/config failures. Inspect
+`cmake/cli_smoke_test.cmake` when failures point to changed command output,
+stderr routing, shell startup, config behavior, or executable layout.
 
 ## `./build/cli-starter` Does Not Exist
 

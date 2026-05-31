@@ -167,8 +167,12 @@ For Visual Studio-style multi-config layouts:
   recovery, command-failure recovery, and command dispatch reuse,
 - root command completion, including registered CLI commands plus shell-only `help`, `exit`, and `quit`,
 - subcommand completion for `config init` and `config show`,
-- scoped option completion for root options, `hello`, and `config init`, and
+- visible subcommand alias completion, including alias reuse as the active command context,
+- completion filtering for hidden, silent, and disabled subcommands,
+- scoped option completion for root options, `hello`, and `config init`,
+- completion filtering for hidden and positional options,
 - completion fallback to root options when earlier shell context is malformed,
+- active command option context after option values, including quoted values,
 - completion replacement ranges based on cursor position,
 - cursor clamping beyond the current line length,
 - token-boundary detection after leading and repeated whitespace,
@@ -208,10 +212,10 @@ not become source or validation evidence again.
 Add focused coverage when work touches these areas:
 
 - raw terminal line editing behavior that depends on platform TTY APIs,
-- true interactive terminal completion and raw-mode behavior beyond the
-  redirected shell smoke cases and injected scripted shell reader used by unit
-  tests, and
-- platform-specific config permission or locked-file failures that need OS-specific setup, and
+- true interactive terminal completion and platform key-reading behavior beyond
+  the redirected shell smoke cases and injected scripted shell reader used by
+  unit tests,
+- platform-specific config permission or locked-file failures that need OS-specific setup,
 - validation-tooling breadth beyond the current CMake/CTest baseline: the
   tracked CI covers Linux and Windows only, and does not currently include
   macOS, sanitizer, coverage, static-analysis, or formatting/lint jobs.
@@ -221,7 +225,7 @@ Add focused coverage when work touches these areas:
 For a small command or helper change, add a focused doctest case to
 `tests/config_tests.cpp`. If a new test file is clearer, add it to the
 `starter_tests` target in `CMakeLists.txt`. If a built-executable smoke case
-needs to change, update `cmake/cli_smoke_test.cmake` in the same package.
+needs to change, update `cmake/cli_smoke_test.cmake` in the same change.
 
 Prefer tests that call the same application dispatch path as real CLI usage
 when the behavior is user-facing. For pure helpers, test the helper directly.

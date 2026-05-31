@@ -59,10 +59,13 @@ and a short description of the starter.
 
 ### `hello`
 
-Prints a greeting. Use `--name <value>` to provide the name directly, or omit it
-to read `default_name` from the active config. If the active config file is
-missing and no `--name` is supplied, the command uses the built-in default and
-prints a tip to generate a config file.
+Prints a greeting. The command validates the active config file when it exists.
+Use `--name <value>` to override `default_name` from the active config, or omit
+it to read the configured default name. If the active config file is missing and
+no `--name` is supplied, the command uses the built-in default and prints a tip
+to generate a config file. An explicit `--name` suppresses that missing-config
+tip, but malformed or wrong-type existing config files still fail before the
+greeting is printed.
 
 ```bash
 ./build/cli-starter hello --name Ada
@@ -163,8 +166,10 @@ field types abort startup with config error status `4`.
 ## Interactive Completion
 
 Completion is available only when the shell is attached to an interactive
-terminal and terminal raw mode is available. Redirected input still works, but it
-uses ordinary line reads without `Tab` completion.
+terminal and interactive key reading is available. On non-Windows builds this
+requires POSIX raw terminal mode; on Windows it uses console key reads.
+Redirected input still works, but it uses ordinary line reads without `Tab`
+completion.
 
 Completion candidates come from a fresh CLI11 parser configured with the same
 commands and global options as normal dispatch. Root completion includes

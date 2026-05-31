@@ -74,9 +74,9 @@ starter> exit
 ## Interactive Completion
 
 The interactive shell supports command, subcommand, and option completion when
-it is attached to an interactive terminal. If stdin is redirected, or terminal
-raw mode is unavailable, the shell still accepts commands but reads plain lines
-without `Tab` completion.
+it is attached to an interactive terminal. If stdin is redirected, or
+interactive key reading is unavailable, the shell still accepts commands but
+reads plain lines without `Tab` completion.
 
 - Press `Tab` when there is one match to complete it.
 - Press `Tab` when several matches share a longer prefix to complete that shared prefix.
@@ -145,8 +145,8 @@ schema changes.
 
 `enabled_commands` is currently serialized and shown by `config show`; it is not a runtime
 allowlist and does not disable command registration. Command availability comes from compile-time
-CLI wiring: `shell` is registered by `Application`, and sample commands are registered through
-`src/commands/register_commands.cpp`.
+CLI wiring: the root CLI configurator registers `shell`, and sample commands are registered
+through `src/commands/register_commands.cpp`.
 Unknown top-level config fields are ignored by the current parser and are not written by generated
 templates.
 
@@ -372,7 +372,7 @@ starter> exit
 ## 인터랙티브 자동완성
 
 인터랙티브 셸이 interactive terminal에 연결되어 있을 때 명령, 하위명령, 옵션 자동완성을
-지원합니다. stdin이 redirect되었거나 terminal raw mode를 사용할 수 없으면 셸은 계속 명령을
+지원합니다. stdin이 redirect되었거나 interactive key input을 사용할 수 없으면 셸은 계속 명령을
 받지만 `Tab` 자동완성 없이 일반 줄 입력으로 동작합니다.
 
 - 후보가 하나뿐이면 `Tab`으로 완성합니다.
@@ -442,8 +442,8 @@ starter> exit
 
 `enabled_commands`는 현재 직렬화되고 `config show`에서 표시되지만, 런타임 allowlist가 아니며
 명령 등록을 비활성화하지 않습니다. 명령 사용 가능 여부는 compile-time CLI wiring이 결정합니다.
-`shell`은 `Application`에서 등록되고, sample command는 `src/commands/register_commands.cpp`를 통해
-등록됩니다.
+root CLI configurator가 `shell`을 등록하고, sample command는
+`src/commands/register_commands.cpp`를 통해 등록됩니다.
 알 수 없는 top-level config field는 현재 parser가 무시하며 생성되는 템플릿에도 기록되지 않습니다.
 
 ## 스타터 커스터마이징
