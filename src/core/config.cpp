@@ -168,18 +168,21 @@ AppConfig load_config_or_throw(const std::filesystem::path& path) {
     return parse_config(read_config_text(path, inspected_size));
 }
 
-AppConfig load_config_or_default(const std::filesystem::path& path, bool* loaded) {
+ConfigLoadResult load_config_with_source(const std::filesystem::path& path) {
     if (!config_file_exists(path)) {
-        if (loaded != nullptr) {
-            *loaded = false;
-        }
-        return AppConfig{};
+        return {};
     }
 
+    return {load_config_or_throw(path), true};
+}
+
+AppConfig load_config_or_default(const std::filesystem::path& path, bool* loaded) {
+    const auto result = load_config_with_source(path);
+
     if (loaded != nullptr) {
-        *loaded = true;
+        *loaded = result.loaded_from_disk;
     }
-    return load_config_or_throw(path);
+    return result.config;
 }
 
 void write_config_template(const std::filesystem::path& path, const AppConfig& config) {
@@ -202,6 +205,12 @@ void write_config_template(const std::filesystem::path& path, const AppConfig& c
     if (!output) {
         throw ConfigWriteError("failed to write config file: " + path.generic_string());
     }
+}
+
+std::string describe_config(
+    const std::filesystem::path& path,
+    const ConfigLoadResult& loaded_config) {
+    return describe_config(path, loaded_config.config, loaded_config.loaded_from_disk);
 }
 
 std::string describe_config(

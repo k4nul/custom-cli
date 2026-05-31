@@ -464,10 +464,16 @@ TEST_CASE("load_config_or_default returns defaults for missing files without cre
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "profiles" / "missing.json";
     const starter::AppConfig defaults;
+    const auto result = starter::load_config_with_source(config_path);
     bool loaded_from_disk = true;
 
     const auto config = starter::load_config_or_default(config_path, &loaded_from_disk);
 
+    CHECK_FALSE(result.loaded_from_disk);
+    CHECK(result.config.prompt == defaults.prompt);
+    CHECK(result.config.default_name == defaults.default_name);
+    CHECK(result.config.enabled_commands == defaults.enabled_commands);
+    CHECK(result.config.notes == defaults.notes);
     CHECK_FALSE(loaded_from_disk);
     CHECK(config.prompt == defaults.prompt);
     CHECK(config.default_name == defaults.default_name);
@@ -487,11 +493,17 @@ TEST_CASE("load_config_or_default marks disk-backed configs as loaded") {
             "enabled_commands":["doctor","about"],
             "notes":"loaded from disk"
         })");
+    const auto result = starter::load_config_with_source(config_path);
     bool loaded_from_disk = false;
 
     const auto config = starter::load_config_or_default(config_path, &loaded_from_disk);
     const std::vector<std::string> expected_commands = {"doctor", "about"};
 
+    CHECK(result.loaded_from_disk);
+    CHECK(result.config.prompt == "ops");
+    CHECK(result.config.default_name == "Ada");
+    CHECK(result.config.enabled_commands == expected_commands);
+    CHECK(result.config.notes == "loaded from disk");
     CHECK(loaded_from_disk);
     CHECK(config.prompt == "ops");
     CHECK(config.default_name == "Ada");

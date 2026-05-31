@@ -159,19 +159,18 @@ bool Application::dispatch_shell_tokens(
 }
 
 int Application::run_shell(const std::filesystem::path& config_path) {
-    bool loaded_from_disk = false;
-    AppConfig config;
+    ConfigLoadResult loaded_config;
     try {
-        config = load_config_or_default(config_path, &loaded_from_disk);
+        loaded_config = load_config_with_source(config_path);
     } catch (const std::exception& error) {
         err_ << "error: " << error.what() << '\n';
         return to_int(ExitCode::config_error);
     }
-    const auto prompt = shell_prompt_for(config, project_info_);
+    const auto prompt = shell_prompt_for(loaded_config.config, project_info_);
 
     out_ << project_info_.display_name << " " << project_info_.version << '\n';
     out_ << "Interactive mode. Type 'help' to inspect commands or 'exit' to quit.\n";
-    if (!loaded_from_disk) {
+    if (!loaded_config.loaded_from_disk) {
         out_ << "Using built-in defaults until " << config_path.generic_string() << " exists.\n";
     }
 

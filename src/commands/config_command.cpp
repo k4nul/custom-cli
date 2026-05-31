@@ -57,9 +57,7 @@ void register_config_command(
     show_command->callback([&]() {
         command_executed = true;
         const auto path = std::filesystem::path(config_path);
-        bool loaded_from_disk = false;
-        const auto config = load_config_or_default(path, &loaded_from_disk);
-        out << describe_config(path, config, loaded_from_disk);
+        out << describe_config(path, load_config_with_source(path));
     });
 }
 
