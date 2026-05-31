@@ -232,6 +232,10 @@ void write_text_file(const fs::path& path, const std::string& text) {
     output << text;
 }
 
+std::string quote_shell_path(const fs::path& path) {
+    return "\"" + path.generic_string() + "\"";
+}
+
 }  // namespace
 
 TEST_CASE("tokenizer preserves quoted groups") {
@@ -880,6 +884,100 @@ TEST_CASE("interactive shell config init explicit output keeps startup config pa
     CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> ", "starter> "});
     CHECK(fs::exists(output_path));
     CHECK_FALSE(fs::exists(config_path));
+}
+
+TEST_CASE("interactive shell applies inline config overrides to one command") {
+    TemporaryDirectory temporary_directory;
+    const auto session_config_path = temporary_directory.path() / "session.json";
+    const auto alternate_config_path = temporary_directory.path() / "alternate.json";
+
+    starter::AppConfig session_config;
+    session_config.prompt = "session";
+    session_config.default_name = "Grace";
+    starter::write_config_template(session_config_path, session_config);
+
+    starter::AppConfig alternate_config;
+    alternate_config.prompt = "alternate";
+    alternate_config.default_name = "Ada";
+    starter::write_config_template(alternate_config_path, alternate_config);
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", session_config_path.string(), "shell"},
+        {"--config " + quote_shell_path(alternate_config_path) + " hello", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Hello, Ada.\n"));
+    CHECK_FALSE(contains_text(result.out, "Using built-in defaults"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"session> ", "session> "});
+}
+
+TEST_CASE("interactive shell keeps startup config after inline config overrides") {
+    TemporaryDirectory temporary_directory;
+    const auto session_config_path = temporary_directory.path() / "session.json";
+    const auto alternate_config_path = temporary_directory.path() / "alternate.json";
+
+    starter::AppConfig session_config;
+    session_config.prompt = "session";
+    session_config.default_name = "Grace";
+    starter::write_config_template(session_config_path, session_config);
+
+    starter::AppConfig alternate_config;
+    alternate_config.prompt = "alternate";
+    alternate_config.default_name = "Ada";
+    starter::write_config_template(alternate_config_path, alternate_config);
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", session_config_path.string(), "shell"},
+        {
+            "--config " + quote_shell_path(alternate_config_path) + " config show",
+            "config show",
+            "hello",
+            "exit",
+        });
+
+    const auto alternate_report = "Config path: " + alternate_config_path.generic_string() + '\n';
+    const auto session_report = "Config path: " + session_config_path.generic_string() + '\n';
+    const auto alternate_position = result.out.find(alternate_report);
+    const auto session_position = result.out.find(session_report);
+
+    CHECK(result.exit_code == 0);
+    REQUIRE(alternate_position != std::string::npos);
+    REQUIRE(session_position != std::string::npos);
+    CHECK(alternate_position < session_position);
+    CHECK(contains_text(result.out, "Prompt: alternate\n"));
+    CHECK(contains_text(result.out, "Default name: Ada\n"));
+    CHECK(contains_text(result.out, "Prompt: session\n"));
+    CHECK(contains_text(result.out, "Default name: Grace\n"));
+    CHECK(contains_text(result.out, "Hello, Grace.\n"));
+    CHECK_FALSE(contains_text(result.out, "Using built-in defaults"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"session> ", "session> ", "session> ", "session> "});
+}
+
+TEST_CASE("interactive shell recovers from inline config parse errors") {
+    TemporaryDirectory temporary_directory;
+    const auto session_config_path = temporary_directory.path() / "session.json";
+    const auto bad_config_path = temporary_directory.path() / "bad.json";
+
+    starter::AppConfig session_config;
+    session_config.prompt = "session";
+    session_config.default_name = "Grace";
+    starter::write_config_template(session_config_path, session_config);
+    write_text_file(bad_config_path, R"({"default_name":)");
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", session_config_path.string(), "shell"},
+        {"--config " + quote_shell_path(bad_config_path) + " hello", "hello", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Hello, Grace.\n"));
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "parse error"));
+    CHECK(contains_text(
+        result.err,
+        "command finished with exit code " + std::to_string(starter::to_int(starter::ExitCode::config_error))));
+    CHECK(result.prompts == std::vector<std::string>{"session> ", "session> ", "session> "});
 }
 
 TEST_CASE("interactive shell routes command-specific help through normal dispatch") {
