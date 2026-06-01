@@ -161,6 +161,34 @@ std::string line_after_replacement(
     return updated;
 }
 
+bool is_repeat_tab_request(
+    const TabCompletionState& state,
+    std::string_view line,
+    std::size_t cursor,
+    const CompletionResult& completion) {
+    return state.primed
+        && state.line == line
+        && state.cursor == cursor
+        && state.replace_begin == completion.replace_begin
+        && state.replace_end == completion.replace_end
+        && state.prefix == completion.prefix;
+}
+
+void prime_tab_completion(
+    TabCompletionState& state,
+    std::string line,
+    std::size_t cursor,
+    std::size_t replace_begin,
+    std::size_t replace_end,
+    std::string prefix) {
+    state.primed = true;
+    state.line = std::move(line);
+    state.cursor = cursor;
+    state.replace_begin = replace_begin;
+    state.replace_end = replace_end;
+    state.prefix = std::move(prefix);
+}
+
 const CLI::App& command_context_for(
     const CLI::App& app,
     const std::vector<std::string>& context_tokens) {
@@ -237,40 +265,37 @@ CompletionAction choose_tab_completion(
 
     const auto shared_prefix = longest_common_prefix(completion.candidates);
     if (shared_prefix.size() > completion.prefix.size()) {
+        const auto replacement_cursor = completion.replace_begin + shared_prefix.size();
         action.kind = CompletionActionKind::replace;
         action.replacement = shared_prefix;
 
-        state.primed = true;
-        state.line = line_after_replacement(
-            line,
+        prime_tab_completion(
+            state,
+            line_after_replacement(
+                line,
+                completion.replace_begin,
+                completion.replace_end,
+                shared_prefix),
+            replacement_cursor,
             completion.replace_begin,
-            completion.replace_end,
+            replacement_cursor,
             shared_prefix);
-        state.cursor = completion.replace_begin + shared_prefix.size();
-        state.replace_begin = completion.replace_begin;
-        state.replace_end = state.cursor;
-        state.prefix = shared_prefix;
         return action;
     }
 
-    const bool same_request = state.primed
-        && state.line == line
-        && state.cursor == cursor
-        && state.replace_begin == completion.replace_begin
-        && state.replace_end == completion.replace_end
-        && state.prefix == completion.prefix;
-    if (same_request && !completion.candidates.empty()) {
+    if (is_repeat_tab_request(state, line, cursor, completion) && !completion.candidates.empty()) {
         action.kind = CompletionActionKind::list;
         reset_tab_completion(state);
         return action;
     }
 
-    state.primed = true;
-    state.line = std::string(line);
-    state.cursor = cursor;
-    state.replace_begin = completion.replace_begin;
-    state.replace_end = completion.replace_end;
-    state.prefix = completion.prefix;
+    prime_tab_completion(
+        state,
+        std::string(line),
+        cursor,
+        completion.replace_begin,
+        completion.replace_end,
+        completion.prefix);
     return action;
 }
 
