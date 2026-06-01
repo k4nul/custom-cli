@@ -232,6 +232,11 @@ void write_text_file(const fs::path& path, const std::string& text) {
     output << text;
 }
 
+void write_oversized_config_file(const fs::path& path) {
+    constexpr std::size_t max_config_file_size = 1024U * 1024U;
+    write_text_file(path, std::string(max_config_file_size + 1U, 'x'));
+}
+
 std::string quote_shell_path(const fs::path& path) {
     return "\"" + path.generic_string() + "\"";
 }
@@ -768,6 +773,23 @@ TEST_CASE("interactive shell rejects wrong-type startup config before prompting"
     CHECK(result.out.empty());
     CHECK(contains_text(result.err, "error: "));
     CHECK(contains_text(result.err, "type must be string"));
+    CHECK(result.prompts.empty());
+}
+
+TEST_CASE("interactive shell reports non-regular startup config before prompting") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "config-directory.json";
+    fs::create_directories(config_path);
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"exit"});
+
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "config path is not a regular file"));
+    CHECK(contains_text(result.err, config_path.generic_string()));
     CHECK(result.prompts.empty());
 }
 
@@ -1430,6 +1452,20 @@ TEST_CASE("config show reports wrong-type disk config through stderr") {
     CHECK(contains_text(result.err, "type must be array"));
 }
 
+TEST_CASE("config show reports non-regular disk config through stderr") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "config-directory.json";
+    fs::create_directories(config_path);
+
+    const auto result = run_application({"--config", config_path.string(), "config", "show"});
+
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "config path is not a regular file"));
+    CHECK(contains_text(result.err, config_path.generic_string()));
+}
+
 TEST_CASE("config-backed hello reports malformed disk config through stderr") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "bad.json";
@@ -1454,6 +1490,21 @@ TEST_CASE("config-backed hello reports wrong-type disk config through stderr") {
     CHECK(result.out.empty());
     CHECK(contains_text(result.err, "error: "));
     CHECK(contains_text(result.err, "type must be string"));
+}
+
+TEST_CASE("config-backed hello reports oversized disk config before explicit name") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "oversized.json";
+    write_oversized_config_file(config_path);
+
+    const auto result = run_application({"--config", config_path.string(), "hello", "--name", "Ada"});
+
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
+    CHECK(result.out.empty());
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "config file is too large"));
+    CHECK(contains_text(result.err, config_path.generic_string()));
+    CHECK(contains_text(result.err, "1048576"));
 }
 
 TEST_CASE("doctor reports healthy starter layout with missing config warning") {
@@ -1535,6 +1586,25 @@ TEST_CASE("doctor reports wrong-type disk config through stderr") {
     CHECK(contains_text(result.err, "error: "));
     CHECK(contains_text(result.err, "type must be string"));
     CHECK_FALSE(contains_text(result.out, "[info] prompt:"));
+}
+
+TEST_CASE("doctor reports oversized disk config through stderr") {
+    TemporaryDirectory temporary_directory;
+    create_recommended_starter_layout(temporary_directory.path());
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "config" / "oversized.json";
+    write_oversized_config_file(config_path);
+
+    const auto result = run_application({"--config", config_path.string(), "doctor"});
+
+    CHECK(result.exit_code == starter::to_int(starter::ExitCode::config_error));
+    CHECK(contains_text(result.out, "[ok] source directory: src\n"));
+    CHECK(contains_text(result.out, "[ok] third-party directory: third_party\n"));
+    CHECK(contains_text(result.err, "error: "));
+    CHECK(contains_text(result.err, "config file is too large"));
+    CHECK(contains_text(result.err, config_path.generic_string()));
+    CHECK_FALSE(contains_text(result.out, "[info] prompt:"));
+    CHECK_FALSE(contains_text(result.out, "Starter layout looks healthy."));
 }
 
 TEST_CASE("tab completion filters root command prefixes") {
