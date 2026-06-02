@@ -42,6 +42,11 @@ an empty disk `prompt` falls back to that label. Inside the shell:
 - All other input is tokenized and dispatched through the same command path as
   one-shot argv execution.
 
+Each dispatched shell command receives the shell startup config path by default.
+If a shell line starts with a global option such as `--config`, normal CLI
+parsing applies that override to the dispatched command only. The shell prompt
+and later commands that omit `--config` remain tied to the startup config path.
+
 Malformed shell input, such as an unterminated quote, is reported as an input
 error and the shell keeps running. If a dispatched command returns a non-zero
 exit code, the shell reports that exit code and then prompts for the next

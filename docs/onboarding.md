@@ -124,6 +124,22 @@ completion for root commands, subcommands, and options when stdin is an
 interactive terminal. Redirected shell input still works, but it uses plain line
 reading without interactive completion.
 
+If you start the shell with a config path, that path remains the session
+default:
+
+```bash
+./build/cli-starter --config ./config/local.json shell
+```
+
+Inside the shell, put `--config` before a command when you want one dispatch to
+read a different config. The prompt and later commands still use the startup
+config path unless those later commands pass their own `--config` value:
+
+```text
+starter> --config ./config/alternate.json config show
+starter> config show
+```
+
 ## Customization Loop
 
 The first customization pass usually changes names before replacing behavior.

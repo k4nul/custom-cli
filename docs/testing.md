@@ -144,6 +144,9 @@ For Visual Studio-style multi-config layouts:
   whitespace, escaped characters, adjacent quoted and unquoted fragments,
   malformed input, and shared token joining helpers,
 - JSON config serialization, parsing, strict top-level object validation, and typed read/write failures,
+- config file edges, including non-regular config paths, oversized configs,
+  parent directory creation for generated templates, and truncation of stale
+  config contents,
 - custom config paths for config-backed commands and explicit `hello --name`
   overrides for disk config defaults,
 - `config init` output-path behavior and write failure reporting,
@@ -164,7 +167,9 @@ For Visual Studio-style multi-config layouts:
 - scripted interactive shell lifecycle coverage for no-argv shell entry, EOF,
   blank input, disk-backed prompts, shell-only `help`, `exit`, and `quit`
   handling, command-specific help routing, malformed input recovery, parse-error
-  recovery, command-failure recovery, and command dispatch reuse,
+  recovery, command-failure recovery, command dispatch reuse, startup config
+  path reuse, inline config overrides scoped to a single shell command, and
+  `config init` behavior from shell sessions,
 - root command completion, including registered CLI commands plus shell-only `help`, `exit`, and `quit`,
 - subcommand completion for `config init` and `config show`,
 - visible subcommand alias completion, including alias reuse as the active command context,

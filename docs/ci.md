@@ -90,7 +90,13 @@ by the cleanup runbook in `docs/artifact-hygiene.md`.
   `--config Debug` for Windows multi-config failures.
 - If `starter_tests` fails, run `ctest --test-dir build --output-on-failure -R
   '^starter_tests$'` and then use focused doctest filters from
-  `docs/testing.md`.
+  `docs/testing.md`. For the Windows workflow layout, include the matching
+  configuration:
+
+  ```powershell
+  ctest --test-dir build -C Debug --output-on-failure -R '^starter_tests$'
+  ```
+
 - If `cli_starter_smoke` fails, inspect the command path, stdout/stderr
   expectations, redirected shell behavior, and config examples in
   `cmake/cli_smoke_test.cmake`.

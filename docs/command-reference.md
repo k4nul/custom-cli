@@ -156,6 +156,17 @@ Inside the shell:
 - Other input is tokenized and dispatched through the same command path as
   one-shot execution.
 
+Global options still work when they appear before a dispatched command inside
+the shell. For example, this line reads an alternate config for one command:
+
+```text
+starter> --config ./config/alternate.json config show
+```
+
+The shell session keeps the config path and prompt chosen at startup. Inline
+`--config` overrides do not retarget the prompt or later shell commands that
+omit `--config`.
+
 Malformed shell input, such as an unterminated quote, is reported as an input
 error and the shell continues. A command that returns a non-zero status reports
 that status, then the shell prompts for the next command.

@@ -118,6 +118,9 @@ The default config template is [config/cli-starter.json](config/cli-starter.json
 Runtime config paths are resolved from the process current working directory.
 Run examples from the repository root, or pass an absolute or explicitly
 relative `--config <path>` when launching from another directory.
+When the shell is started with `--config`, that path remains the session default. A command typed
+inside the shell can still pass `--config` before the command path for that one dispatch, but the
+prompt and later shell commands continue to use the startup config path.
 
 ```json
 {
@@ -415,6 +418,9 @@ starter> exit
 런타임 설정 경로는 프로세스의 현재 작업 디렉터리를 기준으로 해석됩니다. 예제는 저장소
 루트에서 실행하거나, 다른 디렉터리에서 실행할 때는 절대 경로 또는 명시적인 상대 경로로
 `--config <path>`를 전달합니다.
+셸을 `--config`와 함께 시작하면 그 경로가 세션 기본값으로 유지됩니다. 셸 안에서 입력하는
+명령도 명령 경로 앞에 `--config`를 붙이면 해당 dispatch 한 번에만 다른 설정을 사용할 수 있고,
+프롬프트와 이후 셸 명령은 시작할 때 선택한 설정 경로를 계속 사용합니다.
 
 ```json
 {

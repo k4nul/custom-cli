@@ -192,7 +192,7 @@ point commands at it:
 
 ## `doctor` Warns That Config Is Missing
 
-`doctor` checks repository layout directories and the active config path. A
+`doctor` checks repository layout paths and the active config path. A
 missing config is a warning, not a broken build, when you have not generated a
 local config yet.
 
@@ -207,6 +207,26 @@ Use `config init` to create one:
 recommended layout paths still exit successfully so maintainers can inspect the
 report. Malformed JSON or wrong field types in an existing config file are
 config errors. Use the full CMake/CTest flow when you need validation evidence.
+
+## A Shell Command Uses The Wrong Config
+
+The interactive shell keeps the config path it selected at startup. If you
+started the shell with `--config ./config/local.json`, commands typed later use
+that path by default:
+
+```bash
+./build/cli-starter --config ./config/local.json shell
+```
+
+Use an inline global option when one shell command should inspect or use another
+config file:
+
+```text
+starter> --config ./config/alternate.json config show
+```
+
+That inline override applies only to the dispatched command. It does not change
+the prompt or the default config path for later shell commands.
 
 ## `config init` Writes Somewhere Unexpected
 
