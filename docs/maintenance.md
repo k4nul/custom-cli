@@ -27,6 +27,16 @@ cmake --build build
 ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
 ```
 
+When the artifact preflight prints paths, treat artifact cleanup as the next
+write-capable automation task. Keep unrelated hardening, feature-test,
+documentation-polish, dependency-policy, and CI-expansion work behind that gate.
+If the listing is too long for a report, include the count and top-level
+families instead:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*' | cut -d/ -f1 | sort | uniq -c
+```
+
 If the artifact check prints no paths, run the baseline validation flow:
 
 ```bash

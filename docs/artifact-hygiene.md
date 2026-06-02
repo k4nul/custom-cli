@@ -42,6 +42,23 @@ families are still tracked:
 git ls-files 'build-local-*' '.sandbox-user/*' | cut -d/ -f1 | sort | uniq -c
 ```
 
+Use that breakdown in reports when the full listing is long. Record the path
+count and top-level artifact families instead of pasting hundreds of generated
+paths, then link the result back to the cleanup package below.
+
+## Automation Task Selection
+
+The artifact gate is also the write-task priority gate for this repository.
+While `git ls-files 'build-local-*' '.sandbox-user/*'` prints any path that
+still exists in the checkout, the next write-capable maintenance package should
+be this artifact cleanup. Defer unrelated runtime hardening, feature tests,
+documentation polish, dependency policy, or CI expansion until
+`repository_hygiene` can pass from a fresh ignored build tree.
+
+Artifact-hygiene documentation that keeps this runbook accurate is directly
+related to the cleanup package. Do not mix the actual artifact removal with
+command, config, dependency, or unrelated test behavior changes.
+
 ## Cleanup Package
 
 Keep the cleanup mechanical and isolated:
