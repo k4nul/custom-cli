@@ -241,6 +241,21 @@ std::string quote_shell_path(const fs::path& path) {
     return "\"" + path.generic_string() + "\"";
 }
 
+std::string generated_config_template_notes() {
+    return "Rename values and trim sample commands once you start customizing the starter.";
+}
+
+void check_generated_config_template(const starter::AppConfig& config) {
+    const auto project_info = starter::load_project_info();
+    const starter::AppConfig defaults;
+
+    CHECK(config.prompt == project_info.prompt_label);
+    CHECK(config.default_name == defaults.default_name);
+    CHECK(config.enabled_commands == defaults.enabled_commands);
+    CHECK(config.notes == generated_config_template_notes());
+    CHECK(config.notes != defaults.notes);
+}
+
 }  // namespace
 
 TEST_CASE("tokenizer preserves quoted groups") {
@@ -1291,7 +1306,7 @@ TEST_CASE("config init honors global config path by default") {
     CHECK_FALSE(fs::exists(temporary_directory.path() / "config" / "cli-starter.json"));
 
     const auto config = starter::load_config_or_throw(config_path);
-    CHECK(config.prompt == starter::load_project_info().prompt_label);
+    check_generated_config_template(config);
 }
 
 TEST_CASE("config init explicit output overrides global config path") {
@@ -1308,6 +1323,35 @@ TEST_CASE("config init explicit output overrides global config path") {
     CHECK(result.err.empty());
     CHECK(fs::exists(output_path));
     CHECK_FALSE(fs::exists(config_path));
+
+    const auto config = starter::load_config_or_throw(output_path);
+    check_generated_config_template(config);
+}
+
+TEST_CASE("config init generated template is immediately consumable by config show") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "profiles" / "generated.json";
+    const auto project_info = starter::load_project_info();
+    const starter::AppConfig defaults;
+
+    const auto init_result = run_application({"--config", config_path.string(), "config", "init"});
+    REQUIRE(init_result.exit_code == 0);
+    CHECK(init_result.out == "Wrote config template to " + config_path.generic_string() + '\n');
+    CHECK(init_result.err.empty());
+
+    const auto show_result = run_application({"--config", config_path.string(), "config", "show"});
+
+    CHECK(show_result.exit_code == 0);
+    CHECK(contains_text(show_result.out, "Config path: " + config_path.generic_string() + '\n'));
+    CHECK(contains_text(show_result.out, "Source: disk\n"));
+    CHECK(contains_text(show_result.out, "Prompt: " + project_info.prompt_label + '\n'));
+    CHECK(contains_text(show_result.out, "Default name: " + defaults.default_name + '\n'));
+    CHECK(contains_text(
+        show_result.out,
+        "Enabled commands: " + starter::join_tokens(defaults.enabled_commands, ", ") + '\n'));
+    CHECK(contains_text(show_result.out, "Notes: " + generated_config_template_notes() + '\n'));
+    CHECK(show_result.err.empty());
 }
 
 TEST_CASE("config init reports write failures through stderr") {
