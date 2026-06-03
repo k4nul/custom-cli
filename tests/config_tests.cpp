@@ -408,6 +408,64 @@ TEST_CASE("config parsing ignores unknown top-level fields") {
     CHECK(contains_text(serialized, R"("enabled_commands": [)"));
 }
 
+TEST_CASE("describe_config reports built-in defaults source with an empty command list") {
+    starter::AppConfig config;
+    config.prompt = "minimal";
+    config.default_name = "nobody";
+    config.enabled_commands = {};
+    config.notes = "";
+    const auto config_path = fs::path("profiles") / "minimal.json";
+
+    std::ostringstream expected;
+    expected << "Config path: " << config_path.generic_string() << '\n';
+    expected << "Source: built-in defaults\n";
+    expected << "Prompt: minimal\n";
+    expected << "Default name: nobody\n";
+    expected << "Enabled commands: \n";
+    expected << "Notes: \n";
+
+    CHECK(starter::describe_config(config_path, config, false) == expected.str());
+}
+
+TEST_CASE("describe_config reports disk source from load results") {
+    starter::AppConfig config;
+    config.prompt = "team";
+    config.default_name = "Ada";
+    config.enabled_commands = {"doctor", "about", "config"};
+    config.notes = "loaded profile";
+    const starter::ConfigLoadResult loaded_config{config, true};
+    const auto config_path = fs::path("config") / "team.json";
+
+    std::ostringstream expected;
+    expected << "Config path: " << config_path.generic_string() << '\n';
+    expected << "Source: disk\n";
+    expected << "Prompt: team\n";
+    expected << "Default name: Ada\n";
+    expected << "Enabled commands: doctor, about, config\n";
+    expected << "Notes: loaded profile\n";
+
+    CHECK(starter::describe_config(config_path, loaded_config) == expected.str());
+}
+
+TEST_CASE("describe_config formats a single enabled command without delimiters") {
+    starter::AppConfig config;
+    config.prompt = "solo";
+    config.default_name = "Grace";
+    config.enabled_commands = {"hello"};
+    config.notes = "single command";
+    const auto config_path = fs::path("solo.json");
+
+    std::ostringstream expected;
+    expected << "Config path: " << config_path.generic_string() << '\n';
+    expected << "Source: disk\n";
+    expected << "Prompt: solo\n";
+    expected << "Default name: Grace\n";
+    expected << "Enabled commands: hello\n";
+    expected << "Notes: single command\n";
+
+    CHECK(starter::describe_config(config_path, config, true) == expected.str());
+}
+
 TEST_CASE("config read failures use typed errors") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "missing.json";
