@@ -53,14 +53,15 @@ struct ConfiguredCliApp {
         std::ostream& err)
         : config_path(std::move(selected_config_path)),
           app(cli_app_description(project_info)) {
-        configure_cli_app(
-            app,
+        const CliAppContext context{
             project_info,
             config_path,
             out,
             err,
             command_executed,
-            shell_requested);
+            shell_requested,
+        };
+        configure_cli_app(app, context);
     }
 
     std::string config_path;

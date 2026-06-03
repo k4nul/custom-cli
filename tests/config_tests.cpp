@@ -209,14 +209,15 @@ struct CompletionAppFixture {
     std::vector<std::string> shell_commands = {"help", "exit", "quit"};
 
     CompletionAppFixture() {
-        starter::configure_cli_app(
-            app,
+        const starter::CliAppContext context{
             project_info,
             config_path,
             out,
             err,
             command_executed,
-            shell_requested);
+            shell_requested,
+        };
+        starter::configure_cli_app(app, context);
     }
 };
 

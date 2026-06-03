@@ -11,13 +11,17 @@ class App;
 
 namespace starter {
 
+struct CliAppContext {
+    const ProjectInfo& project_info;
+    std::string& config_path;
+    std::ostream& out;
+    std::ostream& err;
+    bool& command_executed;
+    bool& shell_requested;
+};
+
 void configure_cli_app(
     CLI::App& app,
-    const ProjectInfo& project_info,
-    std::string& config_path,
-    std::ostream& out,
-    std::ostream& err,
-    bool& command_executed,
-    bool& shell_requested);
+    const CliAppContext& context);
 
 }  // namespace starter

@@ -15,7 +15,7 @@
 
 - `Application`: owns one-shot execution, interactive shell mode, and global options
 - Root CLI app configurator: wires global options, the `shell` command, and built-in command
-  registrars for both dispatch and completion
+  registrars through `CliAppContext` for both dispatch and completion
 - Shell line reader: handles interactive input and completion; `Application` can receive a scripted
   reader for deterministic lifecycle tests
 - Command registrars: add subcommands to the root parser in one place
@@ -77,6 +77,12 @@ Command availability is controlled by compile-time CLI wiring.
 commands from `src/commands/` to `register_builtin_commands`. The
 `enabled_commands` config field is currently serialized and displayed, but it
 is not used as a runtime allowlist.
+
+The app layer passes parser assembly state through `CliAppContext`, which keeps
+project metadata, selected config path, streams, and dispatch flags together at
+the app/parser boundary. Command implementations receive the narrower
+`CommandRegistrationContext`, so command code does not depend on shell lifecycle
+state.
 
 The public command registrar header exposes the shared registration context and
 the single `register_builtin_commands` entry point used by `src/app/`. Individual
