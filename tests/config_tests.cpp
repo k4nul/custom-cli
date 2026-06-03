@@ -242,19 +242,14 @@ std::string quote_shell_path(const fs::path& path) {
     return "\"" + path.generic_string() + "\"";
 }
 
-std::string generated_config_template_notes() {
-    return "Rename values and trim sample commands once you start customizing the starter.";
-}
-
 void check_generated_config_template(const starter::AppConfig& config) {
     const auto project_info = starter::load_project_info();
-    const starter::AppConfig defaults;
+    const auto expected = starter::make_generated_config_template(project_info.prompt_label);
 
-    CHECK(config.prompt == project_info.prompt_label);
-    CHECK(config.default_name == defaults.default_name);
-    CHECK(config.enabled_commands == defaults.enabled_commands);
-    CHECK(config.notes == generated_config_template_notes());
-    CHECK(config.notes != defaults.notes);
+    CHECK(config.prompt == expected.prompt);
+    CHECK(config.default_name == expected.default_name);
+    CHECK(config.enabled_commands == expected.enabled_commands);
+    CHECK(config.notes == expected.notes);
 }
 
 }  // namespace
@@ -407,6 +402,17 @@ TEST_CASE("config parsing ignores unknown top-level fields") {
     CHECK_FALSE(contains_text(serialized, "extra_commands"));
     CHECK(contains_text(serialized, R"("prompt": "custom")"));
     CHECK(contains_text(serialized, R"("enabled_commands": [)"));
+}
+
+TEST_CASE("generated config template applies prompt label and preserves default fields") {
+    const starter::AppConfig defaults;
+    const auto config = starter::make_generated_config_template("custom-prompt");
+
+    CHECK(config.prompt == "custom-prompt");
+    CHECK(config.default_name == defaults.default_name);
+    CHECK(config.enabled_commands == defaults.enabled_commands);
+    CHECK_FALSE(config.notes.empty());
+    CHECK(config.notes != defaults.notes);
 }
 
 TEST_CASE("describe_config reports built-in defaults source with an empty command list") {
@@ -1438,7 +1444,8 @@ TEST_CASE("config init generated template is immediately consumable by config sh
     const CurrentPathGuard current_path(temporary_directory.path());
     const auto config_path = temporary_directory.path() / "profiles" / "generated.json";
     const auto project_info = starter::load_project_info();
-    const starter::AppConfig defaults;
+    const auto expected_template =
+        starter::make_generated_config_template(project_info.prompt_label);
 
     const auto init_result = run_application({"--config", config_path.string(), "config", "init"});
     REQUIRE(init_result.exit_code == 0);
@@ -1450,12 +1457,12 @@ TEST_CASE("config init generated template is immediately consumable by config sh
     CHECK(show_result.exit_code == 0);
     CHECK(contains_text(show_result.out, "Config path: " + config_path.generic_string() + '\n'));
     CHECK(contains_text(show_result.out, "Source: disk\n"));
-    CHECK(contains_text(show_result.out, "Prompt: " + project_info.prompt_label + '\n'));
-    CHECK(contains_text(show_result.out, "Default name: " + defaults.default_name + '\n'));
+    CHECK(contains_text(show_result.out, "Prompt: " + expected_template.prompt + '\n'));
+    CHECK(contains_text(show_result.out, "Default name: " + expected_template.default_name + '\n'));
     CHECK(contains_text(
         show_result.out,
-        "Enabled commands: " + starter::join_tokens(defaults.enabled_commands, ", ") + '\n'));
-    CHECK(contains_text(show_result.out, "Notes: " + generated_config_template_notes() + '\n'));
+        "Enabled commands: " + starter::join_tokens(expected_template.enabled_commands, ", ") + '\n'));
+    CHECK(contains_text(show_result.out, "Notes: " + expected_template.notes + '\n'));
     CHECK(show_result.err.empty());
 }
 

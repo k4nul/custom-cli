@@ -40,14 +40,11 @@ void register_config_command(
     init_command->callback([&, init_options]() {
         command_executed = true;
 
-        AppConfig config_template;
-        config_template.prompt = project_info.prompt_label;
-        config_template.notes =
-            "Rename values and trim sample commands once you start customizing the starter.";
-
         const auto output_path = std::filesystem::path(
             init_options->output_path.empty() ? config_path : init_options->output_path);
-        write_config_template(output_path, config_template);
+        write_config_template(
+            output_path,
+            make_generated_config_template(project_info.prompt_label));
         out << "Wrote config template to " << output_path.generic_string() << '\n';
     });
 

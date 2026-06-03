@@ -36,6 +36,7 @@ struct ConfigLoadResult {
 };
 
 std::string serialize_config(const AppConfig& config);
+AppConfig make_generated_config_template(std::string_view prompt_label);
 AppConfig parse_config(std::string_view text);
 AppConfig load_config_or_throw(const std::filesystem::path& path);
 ConfigLoadResult load_config_with_source(const std::filesystem::path& path);

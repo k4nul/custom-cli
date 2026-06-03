@@ -47,6 +47,8 @@ namespace {
 using json = nlohmann::json;
 
 constexpr std::size_t max_config_file_size_bytes = 1024U * 1024U;
+constexpr std::string_view generated_config_template_notes =
+    "Rename values and trim sample commands once you start customizing the starter.";
 
 std::string join_commands(const std::vector<std::string>& commands) {
     std::ostringstream stream;
@@ -167,6 +169,13 @@ void inspect_config_file_for_write(const std::filesystem::path& path) {
 std::string serialize_config(const AppConfig& config) {
     const json document = config;
     return document.dump(2) + '\n';
+}
+
+AppConfig make_generated_config_template(std::string_view prompt_label) {
+    AppConfig config_template;
+    config_template.prompt = std::string(prompt_label);
+    config_template.notes = std::string(generated_config_template_notes);
+    return config_template;
 }
 
 AppConfig parse_config(std::string_view text) {
