@@ -135,6 +135,33 @@ std::string read_config_text(
     return text;
 }
 
+void inspect_config_file_for_write(const std::filesystem::path& path) {
+    std::error_code error;
+    const auto status = std::filesystem::symlink_status(path, error);
+    if (error) {
+        if (error == std::errc::no_such_file_or_directory) {
+            return;
+        }
+        throw ConfigWriteError(
+            "failed to inspect config output path: " + path.generic_string() + ": "
+            + error.message());
+    }
+
+    if (!std::filesystem::exists(status)) {
+        return;
+    }
+
+    if (std::filesystem::is_symlink(status)) {
+        throw ConfigWriteError(
+            "config output path must not be a symlink: " + path.generic_string());
+    }
+
+    if (!std::filesystem::is_regular_file(status)) {
+        throw ConfigWriteError(
+            "config output path is not a regular file: " + path.generic_string());
+    }
+}
+
 }  // namespace
 
 std::string serialize_config(const AppConfig& config) {
@@ -195,6 +222,8 @@ void write_config_template(const std::filesystem::path& path, const AppConfig& c
             "failed to prepare config directory for " + path.generic_string() + ": "
             + error.what());
     }
+
+    inspect_config_file_for_write(path);
 
     std::ofstream output(path, std::ios::trunc);
     if (!output) {

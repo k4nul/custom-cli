@@ -649,6 +649,52 @@ TEST_CASE("write_config_template truncates stale config contents") {
     CHECK_FALSE(contains_text(text, "stale"));
 }
 
+TEST_CASE("write_config_template rejects non-regular output targets") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "starter.json";
+    fs::create_directories(config_path);
+    bool caught = false;
+
+    try {
+        starter::write_config_template(config_path, starter::AppConfig{});
+    } catch (const starter::ConfigWriteError& error) {
+        caught = true;
+        CHECK(contains_text(error.what(), "config output path is not a regular file"));
+        CHECK(contains_text(error.what(), config_path.generic_string()));
+    }
+
+    CHECK(caught);
+    CHECK(fs::is_directory(config_path));
+}
+
+TEST_CASE("write_config_template refuses symlink output targets") {
+    TemporaryDirectory temporary_directory;
+    const auto target_path = temporary_directory.path() / "target.json";
+    const auto config_path = temporary_directory.path() / "starter.json";
+    write_text_file(target_path, "target contents\n");
+    std::error_code error;
+    fs::create_symlink(target_path, config_path, error);
+    if (error) {
+        MESSAGE("Skipping symlink output test: " << error.message());
+        return;
+    }
+    bool caught = false;
+
+    try {
+        starter::write_config_template(config_path, starter::AppConfig{});
+    } catch (const starter::ConfigWriteError& write_error) {
+        caught = true;
+        CHECK(contains_text(write_error.what(), "config output path must not be a symlink"));
+        CHECK(contains_text(write_error.what(), config_path.generic_string()));
+    }
+
+    CHECK(caught);
+    std::ifstream input(target_path);
+    std::ostringstream buffer;
+    buffer << input.rdbuf();
+    CHECK(buffer.str() == "target contents\n");
+}
+
 TEST_CASE("application accepts hello subcommand options from argv order") {
     const auto result = run_application({"hello", "--name", "starter user"});
 

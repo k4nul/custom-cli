@@ -99,7 +99,9 @@ Options and arguments:
 
 Writes a JSON config template. If `--output` is omitted, the command writes to
 the active config path, including a path supplied through the global `--config`
-option. If `--output` is supplied, that output path wins for the write.
+option. If `--output` is supplied, that output path wins for the write. Existing
+regular files are overwritten, but existing symlinks and non-regular targets are
+refused.
 
 ```bash
 ./build/cli-starter --config ./config/local.json config init

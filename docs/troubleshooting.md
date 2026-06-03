@@ -285,8 +285,10 @@ project prompt label instead.
 ## `config init` Cannot Write The Config File
 
 `config init` creates parent directories for the target path, then truncates and
-writes the JSON file. If it reports a write failure, check that the parent path
-is writable and that the target is not a directory or locked by another process.
+writes the JSON file when the target is new or an existing regular file. It
+refuses existing symlink and non-regular targets. If it reports a write failure,
+check that the parent path is writable and that the target is not a directory,
+symlink, or locked by another process.
 
 Prefer the ignored local config path for experiments:
 
