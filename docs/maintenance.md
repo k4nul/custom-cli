@@ -240,6 +240,26 @@ Keep the documentation set internally consistent:
 - `third_party/README.md`: vendored dependency versions, source URLs, license
   links, and dependency update guidance.
 
+Start documentation maintenance by recording the same artifact preflight used
+for validation:
+
+```bash
+git status --short
+git diff --name-only
+git ls-files 'build-local-*' '.sandbox-user/*'
+```
+
+When tracked artifact paths are still present, keep write-capable documentation
+work limited to the artifact-hygiene, validation-reporting, and cleanup-boundary
+instructions that prevent misleading maintenance reports. Queue unrelated
+wording polish until the cleanup package removes the tracked generated files and
+`repository_hygiene` can pass from a fresh ignored build tree.
+
+For a documentation-only patch, include the changed documentation paths in the
+maintenance report. This repository has no dedicated Markdown lint or link
+checker, so docs-only validation is a scoped review against the local source,
+CMake, CTest, and CI evidence that owns the documented behavior.
+
 When a command, config field, CMake cache variable, or validation path changes,
 update the nearest docs in the same change. When a known test gap is closed,
 move it from `docs/testing.md`'s gap list into the current coverage summary.

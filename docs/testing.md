@@ -136,6 +136,31 @@ For Visual Studio-style multi-config layouts:
 .\build\Debug\starter_tests.exe
 ```
 
+## Documentation-Only Validation
+
+This repository does not define a Markdown lint, link-check, or docs-only test
+command. For a documentation-only change, collect evidence that the patch scope
+is documentation-only and that the repository artifact gate state is understood:
+
+```bash
+git status --short
+git diff --name-only
+git ls-files 'build-local-*' '.sandbox-user/*'
+git ls-files 'build-local-*' '.sandbox-user/*' | cut -d/ -f1 | sort | uniq -c
+```
+
+When docs describe validation commands, CI behavior, command output, config
+rules, or artifact cleanup, cross-check the wording against the local evidence
+that owns that behavior, such as `CMakeLists.txt`,
+`.github/workflows/ci.yml`, `cmake/repository_hygiene_test.cmake`,
+`cmake/cli_smoke_test.cmake`, and the relevant source files.
+
+If the artifact preflight prints tracked paths that still exist in the checkout,
+do not report an unfiltered CTest pass for a documentation-only patch. Either
+report validation as blocked by artifact hygiene, or run the focused non-hygiene
+CTest entries only when current source-behavior evidence is needed and label
+that result as partial validation.
+
 ## Current Coverage
 
 `tests/config_tests.cpp` covers the starter's reusable behavior:

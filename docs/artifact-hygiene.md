@@ -35,6 +35,14 @@ The `git ls-files` command should print no paths after cleanup. If it prints
 paths, do not use historical binaries, CTest files, Visual Studio telemetry, or
 sandbox files from those locations as evidence for the current source tree.
 
+`git ls-files` reports paths that are still tracked in the index. The
+`repository_hygiene` CTest entry then checks whether those tracked paths still
+exist in the checkout. Keep `git status --short` beside the listing in reports
+so reviewers can distinguish a clean checkout, staged deletions, and a dirty
+working tree where tracked files have been removed from disk but not committed.
+Untracked ignored build trees, local configs, and sandbox telemetry are not the
+cleanup target; remove only the tracked generated paths reported by this gate.
+
 For planning only, this breakdown helps identify which top-level generated
 families are still tracked:
 
@@ -58,6 +66,9 @@ documentation polish, dependency policy, or CI expansion until
 Artifact-hygiene documentation that keeps this runbook accurate is directly
 related to the cleanup package. Do not mix the actual artifact removal with
 command, config, dependency, or unrelated test behavior changes.
+Documentation-only changes that clarify this gate, validation reporting, or the
+cleanup boundary are acceptable as part of artifact-hygiene maintenance; smaller
+unrelated wording fixes should be queued behind the cleanup package.
 
 ## Cleanup Package
 
@@ -107,6 +118,10 @@ they keep the cleanup instructions accurate.
   or validation runs outside a Git worktree.
 - Report full validation as passing only after the artifact gate prints no paths
   and the unfiltered CMake/CTest flow passes from a fresh ignored build tree.
+- For documentation-only artifact-hygiene changes, report the changed
+  documentation paths and the artifact preflight output. There is no
+  repository-defined Markdown lint or link-check command, so do not replace the
+  artifact gate with a nonexistent docs-only validator.
 
 When the skip state is ambiguous in normal CTest output, run the hygiene entry
 verbosely or include the Git preflight in the report:
