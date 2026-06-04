@@ -3,17 +3,28 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstdio>
 #include <cstddef>
 #include <exception>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <ios>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
+#include <streambuf>
 #include <string>
+#include <string_view>
 #include <system_error>
 #include <utility>
 #include <vector>
+
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 #include <CLI/CLI.hpp>
 
@@ -84,6 +95,35 @@ public:
 private:
     fs::path original_path_;
 };
+
+class StandardInputRedirect {
+public:
+    explicit StandardInputRedirect(std::istream& input)
+        : original_state_(std::cin.rdstate()),
+          original_buffer_(std::cin.rdbuf(input.rdbuf())) {
+        std::cin.clear();
+    }
+
+    StandardInputRedirect(const StandardInputRedirect&) = delete;
+    StandardInputRedirect& operator=(const StandardInputRedirect&) = delete;
+
+    ~StandardInputRedirect() {
+        std::cin.rdbuf(original_buffer_);
+        std::cin.clear(original_state_);
+    }
+
+private:
+    std::ios::iostate original_state_;
+    std::streambuf* original_buffer_;
+};
+
+bool stdin_is_interactive_for_tests() {
+#ifdef _WIN32
+    return _isatty(_fileno(stdin)) != 0;
+#else
+    return isatty(STDIN_FILENO) != 0;
+#endif
+}
 
 struct ApplicationRunResult {
     int exit_code = 0;
@@ -1193,6 +1233,67 @@ TEST_CASE("interactive shell reports command failures and keeps the session aliv
 
     std::error_code ignored;
     CHECK_FALSE(fs::exists(output_path, ignored));
+}
+
+TEST_CASE("fallback shell line reader emits prompt and reads redirected stdin") {
+    if (stdin_is_interactive_for_tests()) {
+        MESSAGE("Skipping fallback stdin test while stdin is interactive.");
+        return;
+    }
+
+    std::istringstream input("hello --name Ada\n");
+    const StandardInputRedirect stdin_redirect(input);
+    std::ostringstream out;
+    bool completion_requested = false;
+
+    const auto line = starter::read_shell_line(
+        "starter> ",
+        out,
+        [&](std::string_view, std::size_t) {
+            completion_requested = true;
+            return starter::CompletionResult{};
+        });
+
+    REQUIRE(line.has_value());
+    CHECK(*line == "hello --name Ada");
+    CHECK(out.str() == "starter> ");
+    CHECK_FALSE(completion_requested);
+}
+
+TEST_CASE("fallback shell line reader preserves blank and whitespace-only lines") {
+    if (stdin_is_interactive_for_tests()) {
+        MESSAGE("Skipping fallback stdin test while stdin is interactive.");
+        return;
+    }
+
+    std::istringstream input("\n  \t  \n");
+    const StandardInputRedirect stdin_redirect(input);
+    std::ostringstream out;
+
+    const auto blank_line = starter::read_shell_line("starter> ", out, {});
+    const auto whitespace_line = starter::read_shell_line("starter> ", out, {});
+
+    REQUIRE(blank_line.has_value());
+    REQUIRE(whitespace_line.has_value());
+    CHECK(blank_line->empty());
+    CHECK(*whitespace_line == "  \t  ");
+    CHECK(out.str() == "starter> starter> ");
+}
+
+TEST_CASE("fallback shell line reader returns EOF after writing the prompt") {
+    if (stdin_is_interactive_for_tests()) {
+        MESSAGE("Skipping fallback stdin test while stdin is interactive.");
+        return;
+    }
+
+    std::istringstream input;
+    const StandardInputRedirect stdin_redirect(input);
+    std::ostringstream out;
+
+    const auto line = starter::read_shell_line("starter> ", out, {});
+
+    CHECK_FALSE(line.has_value());
+    CHECK(out.str() == "starter> ");
 }
 
 TEST_CASE("interactive shell exposes command completion through line reader") {
