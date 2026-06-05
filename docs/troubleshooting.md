@@ -236,11 +236,13 @@ config-backed commands. `config init` writes to that path unless an explicit
 
 ```bash
 ./build/cli-starter --config ./config/local.json config init
-./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
+./build/cli-starter --config ./config/local.json config init --output ./config/template.local.json
 ```
 
 Use `--output` when you want to create a template without changing the active
-config path for the command.
+config path for the command. Prefer ignored paths such as `config/local.json` or
+`config/*.local.json` for local experiments; an arbitrary output path creates a
+normal worktree file that can appear in `git status`.
 
 The generated file starts from the current `AppConfig` defaults, then applies
 the configured prompt label and generated-template `notes` value. It is not a

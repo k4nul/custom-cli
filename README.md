@@ -138,8 +138,13 @@ to that path unless `--output <path>` is supplied:
 ```bash
 ./build/cli-starter --config ./config/local.json config init
 ./build/cli-starter --config ./config/local.json hello
-./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
+./build/cli-starter --config ./config/local.json config init --output ./config/template.local.json
 ```
+
+Prefer ignored local paths such as `config/local.json` or
+`config/*.local.json` for experiments. If you write a template somewhere else,
+the generated file may show up in `git status` and should be cleaned up or
+committed intentionally.
 
 `config init` starts from the current `AppConfig` defaults, then applies the configured prompt label
 and generated-template `notes` value. It is not a byte-for-byte copy of the checked-in template, so
@@ -438,8 +443,12 @@ starter> exit
 ```bash
 ./build/cli-starter --config ./config/local.json config init
 ./build/cli-starter --config ./config/local.json hello
-./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
+./build/cli-starter --config ./config/local.json config init --output ./config/template.local.json
 ```
+
+실험용 파일은 `config/local.json` 또는 `config/*.local.json`처럼 ignore되는 로컬 경로에
+쓰는 것이 좋습니다. 다른 위치에 템플릿을 쓰면 생성된 파일이 `git status`에 나타날 수 있으므로
+정리하거나 의도적으로 커밋해야 합니다.
 
 `config init`은 현재 `AppConfig` 기본값에서 시작한 뒤 설정된 프롬프트 레이블과 생성용
 `notes` 값을 적용해 템플릿을 만듭니다. 체크인된 템플릿을 byte-for-byte로 복사하는 방식이

@@ -100,13 +100,17 @@ Options and arguments:
 Writes a JSON config template. If `--output` is omitted, the command writes to
 the active config path, including a path supplied through the global `--config`
 option. If `--output` is supplied, that output path wins for the write. Existing
-regular files are overwritten, but existing symlinks and non-regular targets are
-refused.
+parent directories are created when needed, existing regular files are
+overwritten, and existing symlinks or non-regular targets are refused.
 
 ```bash
 ./build/cli-starter --config ./config/local.json config init
-./build/cli-starter --config ./config/local.json config init --output ./starter-template.json
+./build/cli-starter --config ./config/local.json config init --output ./config/template.local.json
 ```
+
+For local experiments, prefer ignored paths such as `config/local.json` or
+`config/*.local.json`. A template written to an arbitrary output path is a normal
+worktree file and can dirty `git status`.
 
 Options:
 
