@@ -1504,6 +1504,67 @@ TEST_CASE("enabled commands does not gate commands that ignore config") {
     CHECK(result.err.empty());
 }
 
+TEST_CASE("config init without global config writes the default config path") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto project_info = starter::load_project_info();
+    const auto default_config_path = starter::default_config_path(project_info);
+    const auto generated_config_path = temporary_directory.path() / default_config_path;
+
+    const auto result = run_application({"config", "init"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Wrote config template to " + default_config_path.generic_string() + '\n');
+    CHECK(result.err.empty());
+    CHECK(fs::exists(generated_config_path));
+
+    const auto config = starter::load_config_or_throw(generated_config_path);
+    check_generated_config_template(config);
+}
+
+TEST_CASE("config show without global config reads the default config path") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto project_info = starter::load_project_info();
+    const auto default_config_path = starter::default_config_path(project_info);
+    const auto disk_config_path = temporary_directory.path() / default_config_path;
+
+    starter::AppConfig config;
+    config.prompt = "default-profile";
+    config.default_name = "Ada";
+    config.enabled_commands = {"hello", "config"};
+    config.notes = "default path profile";
+    starter::write_config_template(disk_config_path, config);
+
+    const auto result = run_application({"config", "show"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Config path: " + default_config_path.generic_string() + '\n'));
+    CHECK(contains_text(result.out, "Source: disk\n"));
+    CHECK(contains_text(result.out, "Prompt: default-profile\n"));
+    CHECK(contains_text(result.out, "Default name: Ada\n"));
+    CHECK(contains_text(result.out, "Enabled commands: hello, config\n"));
+    CHECK(contains_text(result.out, "Notes: default path profile\n"));
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("config-backed hello without global config reads the default config path") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto project_info = starter::load_project_info();
+    const auto config_path = temporary_directory.path() / starter::default_config_path(project_info);
+
+    starter::AppConfig config;
+    config.default_name = "Ada";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"hello"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, Ada.\n");
+    CHECK(result.err.empty());
+}
+
 TEST_CASE("config init honors global config path by default") {
     TemporaryDirectory temporary_directory;
     const CurrentPathGuard current_path(temporary_directory.path());
