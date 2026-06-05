@@ -27,7 +27,7 @@ void register_doctor_command(
         const auto check_path = [&](const char* label, const std::filesystem::path& path) {
             const bool exists = std::filesystem::exists(path);
             out << '[' << (exists ? "ok" : "missing") << "] " << label << ": "
-                << path.generic_string() << '\n';
+                << escape_for_display(path.generic_string()) << '\n';
             layout_ok = layout_ok && exists;
         };
 
@@ -40,14 +40,14 @@ void register_doctor_command(
         const auto path = std::filesystem::path(config_path);
         const auto loaded_config = load_config_with_source(path);
         out << '[' << (loaded_config.loaded_from_disk ? "ok" : "warn")
-            << "] config: " << path.generic_string();
+            << "] config: " << escape_for_display(path.generic_string());
         if (loaded_config.loaded_from_disk) {
             out << " loaded from disk\n";
         } else {
             out << " missing; built-in defaults are active\n";
         }
-        out << "[info] prompt: " << loaded_config.config.prompt << '\n';
-        out << "[info] default name: " << loaded_config.config.default_name << '\n';
+        out << "[info] prompt: " << escape_for_display(loaded_config.config.prompt) << '\n';
+        out << "[info] default name: " << escape_for_display(loaded_config.config.default_name) << '\n';
         out << (layout_ok ? "Starter layout looks healthy.\n"
                           : "Starter layout is missing recommended files.\n");
     });

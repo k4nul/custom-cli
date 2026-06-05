@@ -455,6 +455,14 @@ TEST_CASE("generated config template applies prompt label and preserves default 
     CHECK(config.notes != defaults.notes);
 }
 
+TEST_CASE("escape_for_display leaves printable text unchanged and escapes controls") {
+    CHECK(starter::escape_for_display("starter") == "starter");
+    CHECK(starter::escape_for_display("line\nprompt\rname\tvalue")
+        == "line\\nprompt\\rname\\tvalue");
+    CHECK(starter::escape_for_display(std::string("nul", 3) + '\0' + "\x1b" + "\x7f")
+        == "nul\\x00\\x1b\\x7f");
+}
+
 TEST_CASE("describe_config reports built-in defaults source with an empty command list") {
     starter::AppConfig config;
     config.prompt = "minimal";
@@ -511,6 +519,23 @@ TEST_CASE("describe_config formats a single enabled command without delimiters")
     expected << "Notes: single command\n";
 
     CHECK(starter::describe_config(config_path, config, true) == expected.str());
+}
+
+TEST_CASE("describe_config escapes config-controlled display values") {
+    starter::AppConfig config;
+    config.prompt = "ops\nprod";
+    config.default_name = "Ada\rAdmin";
+    config.enabled_commands = {"hello", "doctor\tcheck"};
+    config.notes = std::string("note") + '\0' + "\x1b";
+    const auto config_path = fs::path("profiles") / "team.json";
+
+    const auto description = starter::describe_config(config_path, config, true);
+
+    CHECK(contains_text(description, "Config path: profiles/team.json\n"));
+    CHECK(contains_text(description, "Prompt: ops\\nprod\n"));
+    CHECK(contains_text(description, "Default name: Ada\\rAdmin\n"));
+    CHECK(contains_text(description, "Enabled commands: hello, doctor\\tcheck\n"));
+    CHECK(contains_text(description, "Notes: note\\x00\\x1b\n"));
 }
 
 TEST_CASE("config read failures use typed errors") {
@@ -1019,6 +1044,22 @@ TEST_CASE("interactive shell reuses disk config and recovers from malformed inpu
     CHECK(result.prompts == std::vector<std::string>{"custom> ", "custom> ", "custom> ", "custom> "});
 }
 
+TEST_CASE("interactive shell escapes control characters in disk prompt") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+    starter::AppConfig config;
+    config.prompt = "ops\nprod";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", config_path.string(), "shell"},
+        {"exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"ops\\nprod> "});
+}
+
 TEST_CASE("interactive shell config show uses startup config path") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "profiles" / "shell.json";
@@ -1417,6 +1458,21 @@ TEST_CASE("application reads custom config path for config-backed commands") {
     CHECK(result.err.empty());
 }
 
+TEST_CASE("config-backed hello escapes control characters in disk default name") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+
+    starter::AppConfig config;
+    config.default_name = "Ada\nAdmin";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"--config", config_path.string(), "hello"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, Ada\\nAdmin.\n");
+    CHECK(result.err.empty());
+}
+
 TEST_CASE("config-backed hello supports enthusiastic default name") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "custom.json";
@@ -1444,6 +1500,14 @@ TEST_CASE("explicit hello name overrides disk config default") {
 
     CHECK(result.exit_code == 0);
     CHECK(result.out == "Hello, Ada.\n");
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("explicit hello name escapes control characters") {
+    const auto result = run_application({"hello", "--name", "Ada\nAdmin"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, Ada\\nAdmin.\n");
     CHECK(result.err.empty());
 }
 
@@ -1870,6 +1934,25 @@ TEST_CASE("doctor reports disk config and missing recommended layout") {
     CHECK(contains_text(result.out, "[info] prompt: project\n"));
     CHECK(contains_text(result.out, "[info] default name: Ada\n"));
     CHECK(contains_text(result.out, "Starter layout is missing recommended files.\n"));
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("doctor escapes control characters in config-derived diagnostics") {
+    TemporaryDirectory temporary_directory;
+    create_recommended_starter_layout(temporary_directory.path());
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const auto config_path = temporary_directory.path() / "config" / "local.json";
+
+    starter::AppConfig config;
+    config.prompt = "ops\nprod";
+    config.default_name = "Ada\rAdmin";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"--config", config_path.string(), "doctor"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "[info] prompt: ops\\nprod\n"));
+    CHECK(contains_text(result.out, "[info] default name: Ada\\rAdmin\n"));
     CHECK(result.err.empty());
 }
 

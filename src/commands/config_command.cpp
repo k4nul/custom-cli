@@ -45,7 +45,8 @@ void register_config_command(
         write_config_template(
             output_path,
             make_generated_config_template(project_info.prompt_label));
-        out << "Wrote config template to " << output_path.generic_string() << '\n';
+        out << "Wrote config template to "
+            << escape_for_display(output_path.generic_string()) << '\n';
     });
 
     auto* show_command = config_command->add_subcommand(

@@ -15,6 +15,38 @@
 
 namespace starter {
 
+std::string escape_for_display(std::string_view value) {
+    std::string escaped;
+    escaped.reserve(value.size());
+
+    for (const char character : value) {
+        const auto byte = static_cast<unsigned char>(character);
+        switch (byte) {
+        case '\n':
+            escaped += "\\n";
+            break;
+        case '\r':
+            escaped += "\\r";
+            break;
+        case '\t':
+            escaped += "\\t";
+            break;
+        default:
+            if (byte < 0x20 || byte == 0x7F) {
+                constexpr char hex_digits[] = "0123456789abcdef";
+                escaped += "\\x";
+                escaped.push_back(hex_digits[(byte >> 4U) & 0x0FU]);
+                escaped.push_back(hex_digits[byte & 0x0FU]);
+            } else {
+                escaped.push_back(character);
+            }
+            break;
+        }
+    }
+
+    return escaped;
+}
+
 void to_json(nlohmann::json& document, const AppConfig& config) {
     document = nlohmann::json{
         {"prompt", config.prompt},
@@ -56,9 +88,13 @@ std::string join_commands(const std::vector<std::string>& commands) {
         if (index != 0) {
             stream << ", ";
         }
-        stream << commands[index];
+        stream << escape_for_display(commands[index]);
     }
     return stream.str();
+}
+
+std::string display_path(const std::filesystem::path& path) {
+    return escape_for_display(path.generic_string());
 }
 
 bool config_file_exists(const std::filesystem::path& path) {
@@ -66,7 +102,7 @@ bool config_file_exists(const std::filesystem::path& path) {
     const bool exists = std::filesystem::exists(path, error);
     if (error) {
         throw ConfigReadError(
-            "failed to inspect config file: " + path.generic_string() + ": " + error.message());
+            "failed to inspect config file: " + display_path(path) + ": " + error.message());
     }
     return exists;
 }
@@ -74,7 +110,7 @@ bool config_file_exists(const std::filesystem::path& path) {
 std::string config_file_too_large_message(
     const std::filesystem::path& path,
     std::uintmax_t observed_size) {
-    return "config file is too large: " + path.generic_string() + " ("
+    return "config file is too large: " + display_path(path) + " ("
         + std::to_string(observed_size) + " bytes, max "
         + std::to_string(max_config_file_size_bytes) + " bytes)";
 }
@@ -84,17 +120,17 @@ std::uintmax_t inspect_config_file_for_read(const std::filesystem::path& path) {
     const bool regular_file = std::filesystem::is_regular_file(path, error);
     if (error) {
         throw ConfigReadError(
-            "failed to inspect config file: " + path.generic_string() + ": "
+            "failed to inspect config file: " + display_path(path) + ": "
             + error.message());
     }
     if (!regular_file) {
-        throw ConfigReadError("config path is not a regular file: " + path.generic_string());
+        throw ConfigReadError("config path is not a regular file: " + display_path(path));
     }
 
     const auto file_size = std::filesystem::file_size(path, error);
     if (error) {
         throw ConfigReadError(
-            "failed to inspect config file: " + path.generic_string() + ": "
+            "failed to inspect config file: " + display_path(path) + ": "
             + error.message());
     }
     if (file_size > max_config_file_size_bytes) {
@@ -108,7 +144,7 @@ std::string read_config_text(
     std::uintmax_t inspected_size) {
     std::ifstream input(path, std::ios::binary);
     if (!input) {
-        throw ConfigReadError("failed to open config file: " + path.generic_string());
+        throw ConfigReadError("failed to open config file: " + display_path(path));
     }
 
     std::string text;
@@ -132,7 +168,7 @@ std::string read_config_text(
     }
 
     if (input.bad()) {
-        throw ConfigReadError("failed to read config file: " + path.generic_string());
+        throw ConfigReadError("failed to read config file: " + display_path(path));
     }
     return text;
 }
@@ -145,7 +181,7 @@ void inspect_config_file_for_write(const std::filesystem::path& path) {
             return;
         }
         throw ConfigWriteError(
-            "failed to inspect config output path: " + path.generic_string() + ": "
+            "failed to inspect config output path: " + display_path(path) + ": "
             + error.message());
     }
 
@@ -155,12 +191,12 @@ void inspect_config_file_for_write(const std::filesystem::path& path) {
 
     if (std::filesystem::is_symlink(status)) {
         throw ConfigWriteError(
-            "config output path must not be a symlink: " + path.generic_string());
+            "config output path must not be a symlink: " + display_path(path));
     }
 
     if (!std::filesystem::is_regular_file(status)) {
         throw ConfigWriteError(
-            "config output path is not a regular file: " + path.generic_string());
+            "config output path is not a regular file: " + display_path(path));
     }
 }
 
@@ -197,7 +233,7 @@ AppConfig parse_config(std::string_view text) {
 
 AppConfig load_config_or_throw(const std::filesystem::path& path) {
     if (!config_file_exists(path)) {
-        throw ConfigReadError("failed to open config file: " + path.generic_string());
+        throw ConfigReadError("failed to open config file: " + display_path(path));
     }
 
     const auto inspected_size = inspect_config_file_for_read(path);
@@ -228,7 +264,7 @@ void write_config_template(const std::filesystem::path& path, const AppConfig& c
         }
     } catch (const std::filesystem::filesystem_error& error) {
         throw ConfigWriteError(
-            "failed to prepare config directory for " + path.generic_string() + ": "
+            "failed to prepare config directory for " + display_path(path) + ": "
             + error.what());
     }
 
@@ -236,12 +272,12 @@ void write_config_template(const std::filesystem::path& path, const AppConfig& c
 
     std::ofstream output(path, std::ios::trunc);
     if (!output) {
-        throw ConfigWriteError("failed to write config file: " + path.generic_string());
+        throw ConfigWriteError("failed to write config file: " + display_path(path));
     }
 
     output << serialize_config(config);
     if (!output) {
-        throw ConfigWriteError("failed to write config file: " + path.generic_string());
+        throw ConfigWriteError("failed to write config file: " + display_path(path));
     }
 }
 
@@ -256,12 +292,12 @@ std::string describe_config(
     const AppConfig& config,
     bool loaded_from_disk) {
     std::ostringstream stream;
-    stream << "Config path: " << path.generic_string() << '\n';
+    stream << "Config path: " << display_path(path) << '\n';
     stream << "Source: " << (loaded_from_disk ? "disk" : "built-in defaults") << '\n';
-    stream << "Prompt: " << config.prompt << '\n';
-    stream << "Default name: " << config.default_name << '\n';
+    stream << "Prompt: " << escape_for_display(config.prompt) << '\n';
+    stream << "Default name: " << escape_for_display(config.default_name) << '\n';
     stream << "Enabled commands: " << join_commands(config.enabled_commands) << '\n';
-    stream << "Notes: " << config.notes << '\n';
+    stream << "Notes: " << escape_for_display(config.notes) << '\n';
     return stream.str();
 }
 

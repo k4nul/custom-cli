@@ -213,6 +213,8 @@ to regular files no larger than 1 MiB. Malformed JSON, a non-object JSON
 document, wrong field types, non-regular config paths, or oversized config files
 are reported as config errors. Unknown top-level fields are ignored and are
 omitted from generated or serialized config output.
+When config values or selected config paths are printed in diagnostics, control
+characters are escaped so logs and interactive terminals remain readable.
 
 ## Exit Statuses
 

@@ -38,12 +38,12 @@ void register_hello_command(
         command_executed = true;
 
         const auto loaded_config = load_config_with_source(std::filesystem::path(config_path));
-        const auto selected_name =
-            options->name.empty() ? loaded_config.config.default_name : options->name;
+        const auto selected_name = escape_for_display(
+            options->name.empty() ? loaded_config.config.default_name : options->name);
 
         out << "Hello, " << selected_name << (options->enthusiastic ? "!" : ".") << '\n';
         if (!loaded_config.loaded_from_disk && options->name.empty()) {
-            out << "Tip: run `config init` to generate " << config_path
+            out << "Tip: run `config init` to generate " << escape_for_display(config_path)
                 << " and customize the default name.\n";
         }
     });

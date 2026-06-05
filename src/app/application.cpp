@@ -24,7 +24,7 @@ namespace starter {
 namespace {
 
 std::string shell_prompt_for(const AppConfig& config, const ProjectInfo& project_info) {
-    return config.prompt.empty() ? project_info.prompt_label : config.prompt;
+    return escape_for_display(config.prompt.empty() ? project_info.prompt_label : config.prompt);
 }
 
 std::string cli_app_description(const ProjectInfo& project_info) {
@@ -172,7 +172,8 @@ int Application::run_shell(const std::filesystem::path& config_path) {
     out_ << project_info_.display_name << " " << project_info_.version << '\n';
     out_ << "Interactive mode. Type 'help' to inspect commands or 'exit' to quit.\n";
     if (!loaded_config.loaded_from_disk) {
-        out_ << "Using built-in defaults until " << config_path.generic_string() << " exists.\n";
+        out_ << "Using built-in defaults until "
+             << escape_for_display(config_path.generic_string()) << " exists.\n";
     }
 
     const auto shell_config_path = config_path.string();
