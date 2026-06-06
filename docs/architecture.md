@@ -62,6 +62,10 @@ completion is scoped to the active command when the current token starts with
 The line reader performs completion only for an interactive terminal. If stdin
 is not interactive, or raw terminal mode cannot be enabled on POSIX systems, it
 falls back to ordinary line reads without interactive completion.
+In raw interactive mode, the reader normalizes terminal key input before editing
+the command buffer: implemented keys such as `Tab`, Enter, backspace, `Ctrl-C`,
+and `Ctrl-D` keep their behavior, while ANSI/VT special-key escape sequences
+such as arrow keys are consumed and ignored.
 
 ## Extension Points
 

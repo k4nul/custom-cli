@@ -11,6 +11,7 @@
 #include <conio.h>
 #include <io.h>
 #else
+#include <sys/select.h>
 #include <termios.h>
 #include <unistd.h>
 #endif
@@ -25,6 +26,8 @@ constexpr int backspace_key = 8;
 constexpr int delete_key = 127;
 constexpr int ctrl_c = 3;
 constexpr int ctrl_d = 4;
+constexpr int escape_key = 27;
+constexpr std::size_t max_escape_sequence_bytes = 16;
 
 bool stdin_is_interactive() {
 #ifdef _WIN32
@@ -68,21 +71,47 @@ private:
 };
 #endif
 
-int read_key() {
+#ifndef _WIN32
+std::optional<int> read_pending_key_after_escape() {
+    fd_set read_set;
+    FD_ZERO(&read_set);
+    FD_SET(STDIN_FILENO, &read_set);
+
+    timeval timeout{};
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 25000;
+
+    const int ready = select(STDIN_FILENO + 1, &read_set, nullptr, nullptr, &timeout);
+    if (ready <= 0 || !FD_ISSET(STDIN_FILENO, &read_set)) {
+        return std::nullopt;
+    }
+    return std::getchar();
+}
+#endif
+
+std::optional<int> read_key() {
 #ifdef _WIN32
     const int key = _getch();
     if (key == 0 || key == 224) {
         (void)_getch();
-        return 0;
+        return std::nullopt;
     }
     return key;
 #else
-    return std::getchar();
+    return normalize_shell_line_key(std::getchar(), read_pending_key_after_escape);
 #endif
 }
 
 bool is_printable(int key) {
     return key >= 32 && key != delete_key;
+}
+
+bool is_ansi_escape_sequence_starter(int key) {
+    return key == '[' || key == 'O';
+}
+
+bool is_ansi_escape_sequence_final(int key) {
+    return key >= 0x40 && key <= 0x7E;
 }
 
 void redraw_line(
@@ -121,6 +150,39 @@ std::optional<std::string> read_fallback_line(const std::string& prompt, std::os
 
 }  // namespace
 
+std::optional<int> normalize_shell_line_key(
+    int key,
+    const PendingKeyReader& read_pending_key) {
+    if (key != escape_key) {
+        return key;
+    }
+
+    if (!read_pending_key) {
+        return std::nullopt;
+    }
+
+    const auto sequence_starter = read_pending_key();
+    if (!sequence_starter.has_value()) {
+        return std::nullopt;
+    }
+
+    if (!is_ansi_escape_sequence_starter(*sequence_starter)) {
+        return *sequence_starter;
+    }
+
+    for (std::size_t index = 0; index < max_escape_sequence_bytes; ++index) {
+        const auto sequence_byte = read_pending_key();
+        if (!sequence_byte.has_value()) {
+            return std::nullopt;
+        }
+        if (is_ansi_escape_sequence_final(*sequence_byte)) {
+            return std::nullopt;
+        }
+    }
+
+    return std::nullopt;
+}
+
 std::optional<std::string> read_shell_line(
     const std::string& prompt,
     std::ostream& out,
@@ -143,7 +205,11 @@ std::optional<std::string> read_shell_line(
     out.flush();
 
     while (true) {
-        const int key = read_key();
+        const auto maybe_key = read_key();
+        if (!maybe_key.has_value()) {
+            continue;
+        }
+        const int key = *maybe_key;
         if (key == EOF || key == ctrl_c || (key == ctrl_d && line.empty())) {
             return std::nullopt;
         }

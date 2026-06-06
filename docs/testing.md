@@ -209,8 +209,10 @@ that result as partial validation.
 - no-match completion requests that leave the line unchanged,
 - edited-input priming after the line changes,
 - trailing-space subcommand suggestions,
-- shared-prefix completion priming, and
-- primed-state reset after replacement and listing actions.
+- shared-prefix completion priming,
+- primed-state reset after replacement and listing actions, and
+- shell key normalization for ordinary printable keys, bare `Esc`, CSI
+  sequences such as arrow keys and delete, and SS3 sequences such as home.
 
 The `cli_starter_smoke` CTest entry covers the built executable success path for
 `--version`, `about`, `doctor`, config initialization and display, `hello`, and
@@ -241,7 +243,8 @@ not become source or validation evidence again.
 
 Add focused coverage when work touches these areas:
 
-- raw terminal line editing behavior that depends on platform TTY APIs,
+- raw terminal line editing behavior that depends on platform TTY APIs beyond
+  the deterministic key-normalization helper,
 - true interactive terminal completion and platform key-reading behavior beyond
   the redirected shell smoke cases and injected scripted shell reader used by
   unit tests,

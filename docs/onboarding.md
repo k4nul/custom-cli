@@ -123,6 +123,9 @@ adds shell-only `help`, `exit`, and `quit` commands and provides `Tab`
 completion for root commands, subcommands, and options when stdin is an
 interactive terminal. Redirected shell input still works, but it uses plain line
 reading without interactive completion.
+Arrow keys and other terminal special keys are ignored rather than inserted into
+the command line; this starter does not provide cursor movement or command
+history.
 
 If you start the shell with a config path, that path remains the session
 default:

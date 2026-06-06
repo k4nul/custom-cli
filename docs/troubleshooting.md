@@ -308,6 +308,10 @@ Re-enter the command with matching quotes:
 starter> hello --name "Ada Lovelace"
 ```
 
+Arrow keys and other terminal special keys are ignored in interactive mode. They
+do not move the cursor, recall command history, or add escape-sequence text to
+the command line.
+
 ## Exit Status Reference
 
 The starter reserves these application-level exit statuses:

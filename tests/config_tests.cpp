@@ -292,6 +292,25 @@ void check_generated_config_template(const starter::AppConfig& config) {
     CHECK(config.notes == expected.notes);
 }
 
+struct NormalizedKeyProbe {
+    std::optional<int> key;
+    std::size_t consumed_pending_keys = 0;
+};
+
+NormalizedKeyProbe normalize_key_with_pending(
+    int key,
+    const std::vector<int>& pending_keys) {
+    std::size_t next_key = 0;
+    auto read_pending_key = [&]() -> std::optional<int> {
+        if (next_key >= pending_keys.size()) {
+            return std::nullopt;
+        }
+        return pending_keys[next_key++];
+    };
+
+    return {starter::normalize_shell_line_key(key, read_pending_key), next_key};
+}
+
 }  // namespace
 
 TEST_CASE("tokenizer preserves quoted groups") {
@@ -1335,6 +1354,45 @@ TEST_CASE("fallback shell line reader returns EOF after writing the prompt") {
 
     CHECK_FALSE(line.has_value());
     CHECK(out.str() == "starter> ");
+}
+
+TEST_CASE("shell line key normalization consumes ANSI special-key sequences") {
+    constexpr int escape = 27;
+
+    const auto left_arrow = normalize_key_with_pending(escape, {'[', 'D'});
+    CHECK_FALSE(left_arrow.key.has_value());
+    CHECK(left_arrow.consumed_pending_keys == 2);
+
+    const auto delete_sequence = normalize_key_with_pending(escape, {'[', '3', '~'});
+    CHECK_FALSE(delete_sequence.key.has_value());
+    CHECK(delete_sequence.consumed_pending_keys == 3);
+
+    const auto modified_left_arrow =
+        normalize_key_with_pending(escape, {'[', '1', ';', '5', 'D'});
+    CHECK_FALSE(modified_left_arrow.key.has_value());
+    CHECK(modified_left_arrow.consumed_pending_keys == 5);
+
+    const auto home_sequence = normalize_key_with_pending(escape, {'O', 'H'});
+    CHECK_FALSE(home_sequence.key.has_value());
+    CHECK(home_sequence.consumed_pending_keys == 2);
+}
+
+TEST_CASE("shell line key normalization preserves ordinary printable keys") {
+    constexpr int escape = 27;
+
+    const auto printable = normalize_key_with_pending('x', {});
+    REQUIRE(printable.key.has_value());
+    CHECK(*printable.key == 'x');
+    CHECK(printable.consumed_pending_keys == 0);
+
+    const auto bare_escape = normalize_key_with_pending(escape, {});
+    CHECK_FALSE(bare_escape.key.has_value());
+    CHECK(bare_escape.consumed_pending_keys == 0);
+
+    const auto escaped_printable = normalize_key_with_pending(escape, {'x'});
+    REQUIRE(escaped_printable.key.has_value());
+    CHECK(*escaped_printable.key == 'x');
+    CHECK(escaped_printable.consumed_pending_keys == 1);
 }
 
 TEST_CASE("interactive shell exposes command completion through line reader") {

@@ -77,6 +77,8 @@ The interactive shell supports command, subcommand, and option completion when
 it is attached to an interactive terminal. If stdin is redirected, or
 interactive key reading is unavailable, the shell still accepts commands but
 reads plain lines without `Tab` completion.
+Arrow keys and other terminal special-key escape sequences are ignored; the
+starter does not implement cursor movement or command history.
 
 - Press `Tab` when there is one match to complete it.
 - Press `Tab` when several matches share a longer prefix to complete that shared prefix.
@@ -382,6 +384,8 @@ starter> exit
 인터랙티브 셸이 interactive terminal에 연결되어 있을 때 명령, 하위명령, 옵션 자동완성을
 지원합니다. stdin이 redirect되었거나 interactive key input을 사용할 수 없으면 셸은 계속 명령을
 받지만 `Tab` 자동완성 없이 일반 줄 입력으로 동작합니다.
+화살표 키 같은 terminal special-key escape sequence는 무시됩니다. 이 starter는 커서 이동이나
+명령 history 기능을 구현하지 않습니다.
 
 - 후보가 하나뿐이면 `Tab`으로 완성합니다.
 - 후보가 여러 개라도 더 긴 공통 prefix가 있으면 `Tab`으로 그 지점까지 완성합니다.

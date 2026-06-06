@@ -187,6 +187,8 @@ terminal and interactive key reading is available. On non-Windows builds this
 requires POSIX raw terminal mode; on Windows it uses console key reads.
 Redirected input still works, but it uses ordinary line reads without `Tab`
 completion.
+Terminal special-key escape sequences, such as arrow-key input, are consumed and
+ignored because cursor movement and command history are not implemented.
 
 Completion candidates come from a fresh CLI11 parser configured with the same
 commands and global options as normal dispatch. Root completion includes
