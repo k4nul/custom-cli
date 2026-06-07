@@ -200,6 +200,8 @@ that result as partial validation.
 - visible subcommand alias completion, including alias reuse as the active command context,
 - completion filtering for hidden, silent, and disabled subcommands,
 - scoped option completion for root options, `hello`, and `config init`,
+- command-context completion after recognized global options such as
+  `--config <path>` and `-c <path>`,
 - completion filtering for hidden and positional options,
 - completion fallback to root options when earlier shell context is malformed,
 - active command option context after option values, including quoted values,

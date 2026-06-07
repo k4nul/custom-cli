@@ -84,6 +84,38 @@ const CLI::App* find_subcommand(const CLI::App& app, const std::string& token) {
     return nullptr;
 }
 
+std::string option_lookup_name(const std::string& token) {
+    if (starts_with(token, "--")) {
+        const auto equals = token.find('=');
+        if (equals != std::string::npos) {
+            return token.substr(0, equals);
+        }
+        return token;
+    }
+
+    if (starts_with(token, "-") && token.size() > 2) {
+        return token.substr(0, 2);
+    }
+
+    return token;
+}
+
+bool option_has_inline_value(const std::string& token) {
+    if (starts_with(token, "--")) {
+        return token.find('=') != std::string::npos;
+    }
+
+    return starts_with(token, "-") && token.size() > 2;
+}
+
+const CLI::Option* find_option(const CLI::App& app, const std::string& token) {
+    return app.get_option_no_throw(option_lookup_name(token));
+}
+
+bool option_expects_separate_value(const CLI::Option& option, const std::string& token) {
+    return option.get_items_expected_max() > 0 && !option_has_inline_value(token);
+}
+
 void append_option_names(const CLI::App& app, std::vector<std::string>& candidates) {
     const auto options = app.get_options([](const CLI::Option* option) {
         return option != nullptr && option->nonpositional() && !option->get_group().empty();
@@ -189,21 +221,43 @@ void prime_tab_completion(
     state.prefix = std::move(prefix);
 }
 
-const CLI::App& command_context_for(
+struct CompletionContext {
+    const CLI::App* app = nullptr;
+    bool expects_option_value = false;
+};
+
+CompletionContext completion_context_for(
     const CLI::App& app,
     const std::vector<std::string>& context_tokens) {
     const CLI::App* current = &app;
-    for (const auto& token : context_tokens) {
-        if (starts_with(token, "-")) {
+    for (std::size_t index = 0; index < context_tokens.size(); ++index) {
+        const auto& token = context_tokens[index];
+        if (token == "--") {
             break;
         }
+
+        if (starts_with(token, "-")) {
+            const auto* option = find_option(*current, token);
+            if (option == nullptr) {
+                break;
+            }
+
+            if (option_expects_separate_value(*option, token)) {
+                if (index + 1 >= context_tokens.size()) {
+                    return {current, true};
+                }
+                ++index;
+            }
+            continue;
+        }
+
         const auto* next = find_subcommand(*current, token);
         if (next == nullptr) {
             break;
         }
         current = next;
     }
-    return *current;
+    return {current, false};
 }
 
 bool is_root_context(const CLI::App& root, const CLI::App& current) {
@@ -228,9 +282,15 @@ CompletionResult resolve_completion(
     const std::vector<std::string>& shell_commands) {
     auto result = make_base_result(line, cursor);
     const auto context_tokens = completed_tokens_before(line, result.replace_begin);
-    const auto& current_app = command_context_for(app, context_tokens);
+    const auto context = completion_context_for(app, context_tokens);
+    const auto& current_app = *context.app;
 
     std::vector<std::string> candidates;
+    if (context.expects_option_value) {
+        result.candidates = {};
+        return result;
+    }
+
     if (starts_with(result.prefix, "-")) {
         append_option_names(current_app, candidates);
     } else {

@@ -92,6 +92,7 @@ Examples:
 - If only `hello` matches `he`, `he<Tab>` completes to `hello`.
 - `config s<Tab>` completes to `config show`.
 - `hello --n<Tab>` completes to `hello --name`.
+- `--config ./config/local.json hello --n<Tab>` still completes to `--name`.
 
 ## Built-In Commands
 
@@ -399,6 +400,7 @@ starter> exit
 - `he`에 매칭되는 후보가 `hello` 하나뿐이면 `he<Tab>`은 `hello`로 완성됩니다.
 - `config s<Tab>`은 `config show`로 완성됩니다.
 - `hello --n<Tab>`은 `hello --name`으로 완성됩니다.
+- `--config ./config/local.json hello --n<Tab>`도 `--name`으로 완성됩니다.
 
 ## 기본 명령
 

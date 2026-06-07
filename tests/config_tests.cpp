@@ -1487,6 +1487,48 @@ TEST_CASE("interactive shell scopes completion probes through application comman
     CHECK(cursor_scoped_completion.candidates == std::vector<std::string>{"init"});
 }
 
+TEST_CASE("interactive shell scopes completion after global config options") {
+    TemporaryDirectory temporary_directory;
+    const CurrentPathGuard current_path(temporary_directory.path());
+    const std::string long_config_hello_options_line = "--config ./config/local.json hello --";
+    const std::string short_config_hello_options_line = "-c ./config/local.json hello --";
+    const std::string inline_config_subcommands_line = "--config=./config/local.json config ";
+    const std::string pending_config_value_line = "--config ";
+
+    const auto result = run_application_with_completion_probes(
+        {},
+        {
+            {long_config_hello_options_line, long_config_hello_options_line.size()},
+            {short_config_hello_options_line, short_config_hello_options_line.size()},
+            {inline_config_subcommands_line, inline_config_subcommands_line.size()},
+            {pending_config_value_line, pending_config_value_line.size()},
+        });
+
+    CHECK(result.run.exit_code == 0);
+    CHECK(result.run.err.empty());
+    REQUIRE(result.completions.size() == 4);
+
+    const auto& long_config_hello_options = result.completions[0];
+    CHECK(contains(long_config_hello_options.candidates, "--name"));
+    CHECK(contains(long_config_hello_options.candidates, "--enthusiastic"));
+    CHECK_FALSE(contains(long_config_hello_options.candidates, "--config"));
+    CHECK_FALSE(contains(long_config_hello_options.candidates, "--output"));
+
+    const auto& short_config_hello_options = result.completions[1];
+    CHECK(contains(short_config_hello_options.candidates, "--name"));
+    CHECK(contains(short_config_hello_options.candidates, "--enthusiastic"));
+    CHECK_FALSE(contains(short_config_hello_options.candidates, "--config"));
+    CHECK_FALSE(contains(short_config_hello_options.candidates, "--output"));
+
+    const auto& inline_config_subcommands = result.completions[2];
+    CHECK(inline_config_subcommands.prefix.empty());
+    CHECK(inline_config_subcommands.candidates == std::vector<std::string>{"init", "show"});
+
+    const auto& pending_config_value = result.completions[3];
+    CHECK(pending_config_value.prefix.empty());
+    CHECK(pending_config_value.candidates.empty());
+}
+
 TEST_CASE("about command reports starter metadata") {
     const auto project_info = starter::load_project_info();
     const auto result = run_application({"about"});

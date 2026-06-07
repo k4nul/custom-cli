@@ -57,7 +57,9 @@ Completion is derived from a fresh CLI11 parser configured by the same
 the registered CLI commands plus shell-only `help`, `exit`, and `quit`.
 Subcommand completion follows the current command context, while option
 completion is scoped to the active command when the current token starts with
-`-`.
+`-`. Context resolution skips recognized options and their consumed values, so
+global options such as `--config ./config/local.json` can appear before the
+command path without trapping later completion at the root parser.
 
 The line reader performs completion only for an interactive terminal. If stdin
 is not interactive, or raw terminal mode cannot be enabled on POSIX systems, it

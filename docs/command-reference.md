@@ -194,7 +194,10 @@ Completion candidates come from a fresh CLI11 parser configured with the same
 commands and global options as normal dispatch. Root completion includes
 registered commands plus shell-only `help`, `exit`, and `quit`. Subcommand
 completion follows the current command context, and option completion is scoped
-to the active command.
+to the active command. Recognized options and their values are skipped while
+resolving that context, so a shell line such as
+`--config ./config/local.json hello --n` completes `hello` options rather than
+falling back to root commands.
 
 ## Config Reference
 
