@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0.0",
+  "project": "custom-cli",
+  "current_phase": "completion-gate-repair",
+  "next_phase": "starter-template-maintenance",
+  "transition": {
+    "intent": "Repair the missing completion checker before treating the CLI starter as complete or maintenance-only.",
+    "mode": "blocked-until-local-completion-check-exists",
+    "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build",
+    "transition_validation_command": "python3 tests/check_project_completion.py",
+    "decision_rule": "Do not infer completion from prose. The referenced completion checker must exist and pass."
+  },
+  "phase_model": [
+    {
+      "id": "completion-gate-repair",
+      "purpose": "Align the automation prompt with real repository validation by creating or replacing the missing completion check.",
+      "allowed_work": [
+        "completion checker repair",
+        "CMake validation fixes",
+        "focused C++ starter tests",
+        "documentation alignment"
+      ],
+      "blocked_work": [
+        "large product rewrite",
+        "renaming the starter without explicit scope",
+        "dependency replacement",
+        "publishing binaries"
+      ],
+      "exit_criteria": [
+        "tests/check_project_completion.py exists",
+        "the completion checker passes",
+        "CMake build and CTest pass",
+        "automation prompt no longer points at a missing command"
+      ]
+    },
+    {
+      "id": "starter-template-maintenance",
+      "purpose": "Maintain the CLI starter after completion criteria are machine-checkable.",
+      "allowed_work": [
+        "maintenance-audit",
+        "docs-update",
+        "security-review",
+        "small tests for existing behavior"
+      ],
+      "blocked_work": [
+        "broad new CLI feature work without explicit task"
+      ],
+      "exit_criteria": [
+        "a new starter feature scope is explicitly selected"
+      ]
+    }
+  ],
+  "required_gates": [
+    {
+      "id": "completion-checker-exists",
+      "status": "blocked",
+      "required_for_transition": true,
+      "description": "The local automation prompt requires tests/check_project_completion.py, but that file is currently absent.",
+      "evidence": [
+        ".codex/cron-prompt.txt",
+        "tests/check_project_completion.py"
+      ],
+      "on_failure": "Create a dependency-free completion checker or update the prompt and phase gate together."
+    },
+    {
+      "id": "cmake-build-passes",
+      "status": "machine-check",
+      "required_for_transition": true,
+      "description": "The C++ starter must configure, build, and pass CTest.",
+      "evidence": [
+        "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON",
+        "cmake --build build",
+        "ctest --test-dir build"
+      ]
+    },
+    {
+      "id": "starter-docs-match-behavior",
+      "status": "manual-check",
+      "required_for_transition": true,
+      "description": "README and command reference should match actual starter behavior after completion checker repair.",
+      "evidence": [
+        "README.md",
+        "docs/"
+      ]
+    },
+    {
+      "id": "no-unrequested-publish",
+      "status": "passed",
+      "required_for_transition": true,
+      "description": "Automation must not publish binaries or push unless explicitly requested.",
+      "evidence": [
+        ".codex/cron-prompt.txt"
+      ]
+    }
+  ]
+}
