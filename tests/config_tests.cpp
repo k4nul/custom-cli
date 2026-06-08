@@ -415,6 +415,58 @@ TEST_CASE("config parsing rejects wrong-type fields") {
     }
 }
 
+TEST_CASE("config parsing rejects oversized text fields") {
+    constexpr std::size_t oversized_text_size = 4097U;
+    const std::string oversized_text(oversized_text_size, 'x');
+
+    {
+        starter::AppConfig config;
+        config.prompt = oversized_text;
+        CHECK_THROWS_WITH_AS(
+            starter::parse_config(starter::serialize_config(config)),
+            "config field prompt exceeds 4096 bytes",
+            starter::ConfigParseError);
+    }
+
+    {
+        starter::AppConfig config;
+        config.default_name = oversized_text;
+        CHECK_THROWS_WITH_AS(
+            starter::parse_config(starter::serialize_config(config)),
+            "config field default_name exceeds 4096 bytes",
+            starter::ConfigParseError);
+    }
+
+    {
+        starter::AppConfig config;
+        config.notes = oversized_text;
+        CHECK_THROWS_WITH_AS(
+            starter::parse_config(starter::serialize_config(config)),
+            "config field notes exceeds 4096 bytes",
+            starter::ConfigParseError);
+    }
+}
+
+TEST_CASE("config parsing rejects oversized enabled command metadata") {
+    {
+        starter::AppConfig config;
+        config.enabled_commands.assign(65U, "hello");
+        CHECK_THROWS_WITH_AS(
+            starter::parse_config(starter::serialize_config(config)),
+            "config field enabled_commands exceeds 64 entries",
+            starter::ConfigParseError);
+    }
+
+    {
+        starter::AppConfig config;
+        config.enabled_commands = {std::string(257U, 'c')};
+        CHECK_THROWS_WITH_AS(
+            starter::parse_config(starter::serialize_config(config)),
+            "config field enabled_commands entry exceeds 256 bytes",
+            starter::ConfigParseError);
+    }
+}
+
 TEST_CASE("config parsing rejects non-object documents") {
     const std::vector<std::string> invalid_configs = {
         "[]",

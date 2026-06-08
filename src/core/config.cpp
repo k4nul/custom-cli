@@ -15,6 +15,37 @@
 
 namespace starter {
 
+namespace {
+
+constexpr std::size_t max_config_text_field_bytes = 4096U;
+constexpr std::size_t max_enabled_commands = 64U;
+constexpr std::size_t max_enabled_command_bytes = 256U;
+
+void reject_oversized_string(
+    const std::string& field_name,
+    const std::string& value,
+    std::size_t max_size) {
+    if (value.size() > max_size) {
+        throw ConfigParseError(
+            "config field " + field_name + " exceeds "
+            + std::to_string(max_size) + " bytes");
+    }
+}
+
+void reject_oversized_enabled_commands(const std::vector<std::string>& commands) {
+    if (commands.size() > max_enabled_commands) {
+        throw ConfigParseError(
+            "config field enabled_commands exceeds "
+            + std::to_string(max_enabled_commands) + " entries");
+    }
+
+    for (const auto& command : commands) {
+        reject_oversized_string("enabled_commands entry", command, max_enabled_command_bytes);
+    }
+}
+
+}  // namespace
+
 std::string escape_for_display(std::string_view value) {
     std::string escaped;
     escaped.reserve(value.size());
@@ -62,15 +93,19 @@ void from_json(const nlohmann::json& document, AppConfig& config) {
 
     if (const auto iterator = document.find("prompt"); iterator != document.end()) {
         config.prompt = iterator->get<std::string>();
+        reject_oversized_string("prompt", config.prompt, max_config_text_field_bytes);
     }
     if (const auto iterator = document.find("default_name"); iterator != document.end()) {
         config.default_name = iterator->get<std::string>();
+        reject_oversized_string("default_name", config.default_name, max_config_text_field_bytes);
     }
     if (const auto iterator = document.find("enabled_commands"); iterator != document.end()) {
         config.enabled_commands = iterator->get<std::vector<std::string>>();
+        reject_oversized_enabled_commands(config.enabled_commands);
     }
     if (const auto iterator = document.find("notes"); iterator != document.end()) {
         config.notes = iterator->get<std::string>();
+        reject_oversized_string("notes", config.notes, max_config_text_field_bytes);
     }
 }
 
