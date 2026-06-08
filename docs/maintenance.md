@@ -45,6 +45,18 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
+For phase-transition readiness, also run the dependency-free completion checker:
+
+```bash
+python3 tests/check_project_completion.py
+```
+
+The checker confirms that completion evidence is machine-checkable: phase gate
+statuses are eligible for evaluation, CMake/CTest and CI wiring are still
+present, the command surface is reflected in tests and docs, the config template
+has the expected starter fields, and the tracked artifact preflight is clean.
+It is a transition gate, not a substitute for the CMake/CTest baseline.
+
 The tracked CI workflow at `.github/workflows/ci.yml` mirrors this validation on
 Linux and Windows. CI builds with `--parallel`; the Windows job builds and tests
 the `Debug` configuration. See [docs/ci.md](ci.md) for workflow triggers, exact

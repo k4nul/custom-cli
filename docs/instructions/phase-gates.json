@@ -4,8 +4,8 @@
   "current_phase": "completion-gate-repair",
   "next_phase": "starter-template-maintenance",
   "transition": {
-    "intent": "Repair the missing completion checker before treating the CLI starter as complete or maintenance-only.",
-    "mode": "blocked-until-local-completion-check-exists",
+    "intent": "Use the local completion checker before treating the CLI starter as complete or maintenance-only.",
+    "mode": "ready-when-local-completion-check-passes",
     "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build",
     "transition_validation_command": "python3 tests/check_project_completion.py",
     "decision_rule": "Do not infer completion from prose. The referenced completion checker must exist and pass."
@@ -53,12 +53,12 @@
   "required_gates": [
     {
       "id": "completion-checker-exists",
-      "status": "blocked",
+      "status": "machine-check",
       "required_for_transition": true,
-      "description": "The local automation prompt requires tests/check_project_completion.py, but that file is currently absent.",
+      "description": "The local automation prompt requires tests/check_project_completion.py, and the transition command now validates that checker and its covered evidence.",
       "evidence": [
-        ".codex/cron-prompt.txt",
-        "tests/check_project_completion.py"
+        "tests/check_project_completion.py",
+        "python3 tests/check_project_completion.py"
       ],
       "on_failure": "Create a dependency-free completion checker or update the prompt and phase gate together."
     },
@@ -75,12 +75,13 @@
     },
     {
       "id": "starter-docs-match-behavior",
-      "status": "manual-check",
+      "status": "machine-check",
       "required_for_transition": true,
       "description": "README and command reference should match actual starter behavior after completion checker repair.",
       "evidence": [
         "README.md",
-        "docs/"
+        "docs/",
+        "tests/check_project_completion.py"
       ]
     },
     {
