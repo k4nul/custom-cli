@@ -110,21 +110,25 @@ validation on Linux and Windows. See [docs/ci.md](ci.md) for workflow triggers,
 job commands, and CI failure triage. Report local results from the flow above
 before publishing source changes.
 
-## Completion Gate Checker
+## Completion Evidence Checker
 
 The phase manifest uses a dependency-free completion checker to keep completion
-state machine-checkable instead of relying on prose-only handoff notes:
+state machine-checkable instead of relying on prose-only handoff notes. Run it
+when preparing a phase transition and when confirming the current maintenance
+state:
 
 ```bash
 python3 tests/check_project_completion.py
 ```
 
-The checker verifies that the phase manifest can be evaluated, the CMake/CTest
-and CI wiring is present, the registered command surface is represented in
-tests and command documentation, the config template has the expected fields,
-and the tracked local artifact preflight is clean. It does not replace the
-baseline CMake/CTest flow; run it with the baseline validation when preparing a
-phase-transition report.
+The checker verifies that the phase manifest can be evaluated in its
+transition-ready shape, post-transition maintenance shape, or a future
+transition shape with a concrete transition command. It also verifies that the
+CMake/CTest and CI wiring is present, the registered command surface is
+represented in tests and command documentation, the config template has the
+expected fields, and the tracked local artifact preflight is clean. It does not
+replace the baseline CMake/CTest flow; run it with baseline validation when
+preparing a phase-transition report or maintenance evidence report.
 
 For multi-config generators, build and test the same configuration:
 

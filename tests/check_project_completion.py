@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Validate that the CLI starter completion gate is machine-checkable.
+"""Validate that the CLI starter completion evidence is machine-checkable.
 
-This script is intentionally dependency-free so the phase controller can run it
-before selecting the phase-transition task. It checks the repository metadata,
-test wiring, documentation anchors, and artifact hygiene preflight that make the
-starter safe to treat as complete enough for maintenance-only rotation.
+This script is intentionally dependency-free so automation can run it before a
+phase transition and after the project has entered maintenance. It checks the
+repository metadata, test wiring, documentation anchors, and artifact hygiene
+preflight that make the starter safe to keep in maintenance-only rotation.
 """
 
 from __future__ import annotations
@@ -20,6 +20,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PASSING_GATE_STATUSES = {"passed", "machine-check", "waived"}
 EXPECTED_COMMANDS = ("about", "hello", "echo", "config", "doctor", "shell")
 EXPECTED_GLOBAL_OPTIONS = ("--version", "--help", "--help-all", "--config")
+COMPLETION_REPAIR_PHASE = "completion-gate-repair"
+MAINTENANCE_PHASE = "starter-template-maintenance"
+COMPLETION_CHECK_COMMAND = "python3 tests/check_project_completion.py"
+BASELINE_VALIDATION_COMMAND = (
+    "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON "
+    "&& cmake --build build && ctest --test-dir build"
+)
 
 
 def read_text(path: Path) -> str:
@@ -101,16 +108,51 @@ def check_phase_manifest(blockers: list[str]) -> None:
     manifest = read_json(manifest_path)
     if manifest.get("project") != "custom-cli":
         blockers.append("phase manifest project must be custom-cli")
-    if manifest.get("current_phase") != "completion-gate-repair":
-        blockers.append("phase manifest current_phase must remain completion-gate-repair until phase-transition")
-    if manifest.get("next_phase") != "starter-template-maintenance":
-        blockers.append("phase manifest next_phase must be starter-template-maintenance")
 
     transition = manifest.get("transition")
     if not isinstance(transition, dict):
         blockers.append("phase manifest transition must be an object")
-    elif transition.get("transition_validation_command") != "python3 tests/check_project_completion.py":
-        blockers.append("phase manifest transition_validation_command must run this checker")
+        transition = {}
+
+    current_phase = str(manifest.get("current_phase") or "")
+    next_phase = str(manifest.get("next_phase") or "")
+    transition_mode = str(transition.get("mode") or "")
+    transition_validation_command = str(transition.get("transition_validation_command") or "")
+    if current_phase == COMPLETION_REPAIR_PHASE:
+        if next_phase != MAINTENANCE_PHASE:
+            blockers.append("phase manifest next_phase must be starter-template-maintenance before phase-transition")
+        if transition_validation_command != COMPLETION_CHECK_COMMAND:
+            blockers.append("phase manifest transition_validation_command must run this checker before phase-transition")
+    elif current_phase == MAINTENANCE_PHASE:
+        if next_phase:
+            if transition_mode == "maintenance-no-pending-transition":
+                blockers.append("phase manifest transition mode must change when next_phase is selected")
+            if not transition_validation_command:
+                blockers.append("phase manifest transition_validation_command must be set when next_phase is selected")
+        else:
+            if transition_mode != "maintenance-no-pending-transition":
+                blockers.append("phase manifest transition mode must be maintenance-no-pending-transition")
+            if transition.get("validation_command") != BASELINE_VALIDATION_COMMAND:
+                blockers.append("phase manifest validation_command must run the baseline CMake/CTest flow")
+            if transition_validation_command:
+                blockers.append("phase manifest transition_validation_command must be empty during maintenance")
+    else:
+        blockers.append(
+            "phase manifest current_phase must be completion-gate-repair or starter-template-maintenance"
+        )
+
+    phase_model = manifest.get("phase_model")
+    if not isinstance(phase_model, list):
+        blockers.append("phase manifest phase_model must be a list")
+    else:
+        phase_ids = {
+            str(phase.get("id") or "")
+            for phase in phase_model
+            if isinstance(phase, dict)
+        }
+        for phase_id in (COMPLETION_REPAIR_PHASE, MAINTENANCE_PHASE):
+            if phase_id not in phase_ids:
+                blockers.append(f"phase manifest phase_model is missing phase: {phase_id}")
 
     gates = manifest.get("required_gates")
     if not isinstance(gates, list):
@@ -305,7 +347,7 @@ def collect_blockers() -> list[str]:
 def main() -> int:
     blockers = collect_blockers()
     if blockers:
-        print("phase transition blocked:")
+        print("completion check blocked:")
         for blocker in blockers:
             print(f"- {blocker}")
         return 1

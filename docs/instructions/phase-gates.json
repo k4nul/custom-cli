@@ -55,12 +55,12 @@
       "id": "completion-checker-exists",
       "status": "machine-check",
       "required_for_transition": true,
-      "description": "The local automation prompt requires tests/check_project_completion.py, and the transition command now validates that checker and its covered evidence.",
+      "description": "The local automation evidence includes tests/check_project_completion.py, and the checker validates transition-ready, post-transition maintenance, and future-transition phase shapes.",
       "evidence": [
         "tests/check_project_completion.py",
         "python3 tests/check_project_completion.py"
       ],
-      "on_failure": "Create a dependency-free completion checker or update the prompt and phase gate together."
+      "on_failure": "Create or repair the dependency-free completion checker, or update the prompt and phase gate together."
     },
     {
       "id": "cmake-build-passes",
@@ -77,7 +77,7 @@
       "id": "starter-docs-match-behavior",
       "status": "machine-check",
       "required_for_transition": true,
-      "description": "README and command reference should match actual starter behavior after completion checker repair.",
+      "description": "README and command reference should match actual starter behavior while the completion checker remains aligned with the active phase manifest.",
       "evidence": [
         "README.md",
         "docs/",
