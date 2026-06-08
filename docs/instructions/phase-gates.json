@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0.0",
   "project": "custom-cli",
-  "current_phase": "completion-gate-repair",
-  "next_phase": "starter-template-maintenance",
+  "current_phase": "starter-template-maintenance",
+  "next_phase": "",
   "transition": {
-    "intent": "Use the local completion checker before treating the CLI starter as complete or maintenance-only.",
-    "mode": "ready-when-local-completion-check-passes",
+    "intent": "Keep the CLI starter in maintenance after the completion checker has passed.",
+    "mode": "maintenance-no-pending-transition",
     "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build",
-    "transition_validation_command": "python3 tests/check_project_completion.py",
-    "decision_rule": "Do not infer completion from prose. The referenced completion checker must exist and pass."
+    "transition_validation_command": "",
+    "decision_rule": "Select a new next_phase and transition_validation_command before routing another phase-transition."
   },
   "phase_model": [
     {
