@@ -183,7 +183,7 @@ std::string read_config_text(
     }
 
     std::string text;
-    text.reserve(static_cast<std::size_t>(inspected_size));
+    text.reserve(inspected_size);
 
     std::array<char, 4096> buffer{};
     while (input) {
@@ -197,7 +197,7 @@ std::string read_config_text(
         if (text.size() > max_config_file_size_bytes - incoming_size) {
             throw ConfigReadError(config_file_too_large_message(
                 path,
-                static_cast<std::uintmax_t>(text.size() + incoming_size)));
+                text.size() + incoming_size));
         }
         text.append(buffer.data(), incoming_size);
     }
