@@ -158,6 +158,17 @@ cmake -S . -B build \
   -DCLI_STARTER_BUILD_TESTS=ON
 ```
 
+You can generate and validate that command with the repository-local
+instantiation workflow:
+
+```bash
+python3 scripts/instantiate_template.py \
+  --binary-name my-cli \
+  --display-name "My CLI" \
+  --config-file my-cli.json \
+  --prompt-label mycli
+```
+
 Those values are written into the generated project config header in the build
 tree. The checked-in JSON template remains in `config/cli-starter.json` until
 you intentionally rename or replace it.

@@ -18,6 +18,8 @@ config/*.local.json
 *.p12
 *.user
 *.suo
+__pycache__/
+*.pyc
 AGENTS.md
 .codex/
 docs/management/

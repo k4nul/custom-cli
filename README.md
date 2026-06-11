@@ -217,6 +217,15 @@ wins; an empty loaded `prompt` falls back to `CLI_STARTER_PROMPT_LABEL`.
 The command parser is CLI11, so commands can use CLI11 options, flags, positional arguments, and
 nested subcommands.
 
+## Template Instantiation
+
+After copying the starter, use [scripts/instantiate_template.py](scripts/instantiate_template.py)
+to turn the rename checklist into an executable plan. The script validates safe
+binary/config/prompt names, prints the CMake cache-variable command, and can
+write the matching `config/<name>.json` file for the copied project. See
+[docs/template-instantiation.md](docs/template-instantiation.md) for the full
+workflow and test command.
+
 ## Project Layout
 
 - `src/app/`: application lifecycle, dispatch, and interactive shell flow
@@ -225,6 +234,7 @@ nested subcommands.
 - `include/starter/`: public headers for the starter
 - `cmake/`: templates for generated project metadata and CTest scripts
 - `config/`: checked-in config template
+- `scripts/`: local starter instantiation helpers
 - `tests/`: starter behavior tests
 - `third_party/`: vendored header-only dependencies and license files
 - `docs/`: project overview, onboarding, command reference, architecture, testing,

@@ -85,9 +85,11 @@ def check_required_paths(blockers: list[str]) -> None:
         "docs/command-reference.md",
         "docs/instructions/phase-gates.json",
         "docs/maintenance.md",
+        "docs/template-instantiation.md",
         "docs/testing.md",
         "include/starter/app/application.hpp",
         "include/starter/app/cli_app.hpp",
+        "scripts/instantiate_template.py",
         "include/starter/core/config.hpp",
         "include/starter/core/completion.hpp",
         "src/app/application.cpp",
@@ -97,6 +99,7 @@ def check_required_paths(blockers: list[str]) -> None:
         "src/core/completion.cpp",
         "tests/check_project_completion.py",
         "tests/config_tests.cpp",
+        "tests/instantiate_template_tests.py",
         "third_party/README.md",
     )
     for path_text in required_paths:
@@ -312,6 +315,37 @@ def check_config_template(blockers: list[str]) -> None:
             blockers.append(f"config/cli-starter.json enabled_commands omits {command}")
 
 
+def check_template_instantiation_workflow(blockers: list[str]) -> None:
+    require_contains(
+        REPO_ROOT / "scripts/instantiate_template.py",
+        (
+            "CLI_STARTER_BINARY_NAME",
+            "CLI_STARTER_DISPLAY_NAME",
+            "CLI_STARTER_CONFIG_FILE",
+            "CLI_STARTER_PROMPT_LABEL",
+            "write_config_template",
+        ),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "tests/instantiate_template_tests.py",
+        (
+            "test_plan_derives_safe_defaults_from_binary_name",
+            "test_write_config_template_creates_config_file_and_refuses_unforced_overwrite",
+        ),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "docs/template-instantiation.md",
+        (
+            "python3 scripts/instantiate_template.py",
+            "python3 tests/instantiate_template_tests.py",
+            "--write-config",
+        ),
+        blockers,
+    )
+
+
 def check_artifact_hygiene(blockers: list[str]) -> None:
     result = run_git_ls_files(("build-local-*", ".sandbox-user/*"))
     if result.returncode != 0:
@@ -334,6 +368,7 @@ def collect_blockers() -> list[str]:
         check_tests_and_smoke_coverage,
         check_documentation_alignment,
         check_config_template,
+        check_template_instantiation_workflow,
         check_artifact_hygiene,
     )
     for check in checks:
