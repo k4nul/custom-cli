@@ -16,6 +16,14 @@ It includes:
 - Example commands that demonstrate options, positional arguments, subcommands, and validation
 - Vendored header-only dependencies for command parsing, JSON, and tests
 
+## Open Source
+
+This repository is prepared for public collaboration under the [MIT License](LICENSE).
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before opening issues or pull requests.
+Vendored dependencies keep their upstream licenses under `third_party/licenses/`.
+Do not commit generated build directories, `.sandbox-user/`, or local config files.
+
 ## Requirements
 
 - CMake 3.18 or newer

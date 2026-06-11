@@ -10,6 +10,12 @@ CMakeUserPresets.json
 Testing/
 config/local.json
 config/*.local.json
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
 *.user
 *.suo
 AGENTS.md
