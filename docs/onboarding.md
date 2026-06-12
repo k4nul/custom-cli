@@ -53,7 +53,7 @@ entry:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
 ```
 
 After the artifact preflight prints no paths, use the unfiltered flow:
@@ -186,9 +186,10 @@ The `cli_starter_smoke` CTest entry checks the built executable's success path,
 including `--version`, `about`, `doctor`, config initialization and display,
 `hello`, and numbered `echo`, and it fails if a success case returns a non-zero
 status, misses the expected stdout pattern, or writes to stderr. It also feeds
-redirected stdin into the default shell and the explicit `shell` subcommand so
-the built executable covers the banner, prompts, shell help, command dispatch,
-and config-backed prompt/default-name flow. Representative failure paths cover
+redirected stdin into the default shell, the explicit `shell` subcommand, and
+an empty-prompt shell config so the built executable covers the banner, prompts,
+shell help, command dispatch, prompt-label fallback, and config-backed
+prompt/default-name flow. Representative failure paths cover
 parser errors and bad config input, where the command must fail, leave stdout
 empty, and print the expected stderr guidance. When a copied project
 intentionally changes display metadata, about text, command registration,

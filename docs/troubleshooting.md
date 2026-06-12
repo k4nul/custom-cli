@@ -117,7 +117,7 @@ artifact gate is dirty, and report it with the artifact preflight output:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
 ```
 
 Removing tracked generated files changes repository contents and should be done

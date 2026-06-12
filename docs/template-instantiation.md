@@ -39,3 +39,10 @@ Validate this workflow with:
 ```bash
 python3 tests/instantiate_template_tests.py
 ```
+
+The normal CMake/CTest validation flow also runs these tests through the
+`template_instantiation_workflow` CTest entry:
+
+```bash
+ctest --test-dir build --output-on-failure -R '^template_instantiation_workflow$'
+```

@@ -967,7 +967,10 @@ TEST_CASE("interactive shell runs no-argv sessions through the normal dispatch p
     CHECK(result.exit_code == 0);
     CHECK(contains_text(result.out, project_info.display_name + " " + project_info.version + "\n"));
     CHECK(contains_text(result.out, "Interactive mode. Type 'help' to inspect commands or 'exit' to quit.\n"));
-    CHECK(contains_text(result.out, "Using built-in defaults until config/cli-starter.json exists.\n"));
+    CHECK(contains_text(
+        result.out,
+        "Using built-in defaults until " + starter::default_config_path(project_info).generic_string()
+            + " exists.\n"));
     CHECK(contains_text(result.out, "Usage:"));
     CHECK(contains_text(result.out, "Hello, Ada.\n"));
     CHECK(result.err.empty());
@@ -1005,6 +1008,7 @@ TEST_CASE("interactive shell reports malformed startup config before prompting")
 TEST_CASE("interactive shell falls back to project prompt when disk prompt is empty") {
     TemporaryDirectory temporary_directory;
     const auto config_path = temporary_directory.path() / "custom.json";
+    const auto project_info = starter::load_project_info();
 
     starter::AppConfig config;
     config.prompt = "";
@@ -1019,7 +1023,8 @@ TEST_CASE("interactive shell falls back to project prompt when disk prompt is em
     CHECK(contains_text(result.out, "Hello, Grace.\n"));
     CHECK_FALSE(contains_text(result.out, "Using built-in defaults"));
     CHECK(result.err.empty());
-    CHECK(result.prompts == std::vector<std::string>{"starter> ", "starter> "});
+    const auto prompt = project_info.prompt_label + "> ";
+    CHECK(result.prompts == std::vector<std::string>{prompt, prompt});
 }
 
 TEST_CASE("interactive shell rejects wrong-type startup config before prompting") {

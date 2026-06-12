@@ -28,10 +28,11 @@ Do not commit generated build directories, `.sandbox-user/`, or local config fil
 
 - CMake 3.18 or newer
 - A C++17 compiler
+- Python 3 for the template instantiation workflow test
 - Git for reportable full validation, because the repository hygiene check and
   artifact inspection use `git ls-files`
 
-On Linux, `cmake`, `g++` or `clang++`, and `ctest` are enough for the normal build and test flow.
+On Linux, `cmake`, `g++` or `clang++`, `ctest`, and `python3` are enough for the normal build and test flow.
 On Windows, use Visual Studio, Build Tools for Visual Studio, or another CMake-supported C++ toolchain.
 
 ## Quick Start
@@ -242,9 +243,9 @@ workflow and test command.
 
 ## Testing
 
-For normal starter behavior tests, including the doctest suite, built-executable smoke checks, and
-repository hygiene checks, first inspect the tracked legacy artifact patterns that the hygiene check
-enforces:
+For normal starter behavior tests, including the doctest suite, template-instantiation workflow,
+built-executable smoke checks, and repository hygiene checks, first inspect the tracked legacy
+artifact patterns that the hygiene check enforces:
 
 ```bash
 git ls-files 'build-local-*' '.sandbox-user/*'
@@ -265,7 +266,7 @@ ignored `build/` tree and filter out only the hygiene entry:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
 ```
 
 Label that result as partial validation and include the artifact preflight output in the report.
@@ -284,10 +285,14 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-This unfiltered CTest run covers the registered entries: `starter_tests`, `cli_starter_smoke`, and
-`repository_hygiene`. The smoke entry exercises built-executable success commands and representative
-parser/config failure paths, plus redirected default and explicit shell sessions, so stdout and
-stderr routing and basic shell dispatch stay visible in normal validation.
+This unfiltered CTest run covers the registered entries: `starter_tests`,
+`template_instantiation_workflow`, `cli_starter_smoke`, and
+`repository_hygiene`. The template-instantiation entry runs the Python rename
+workflow tests through the CMake-discovered Python 3 interpreter. The smoke
+entry exercises built-executable success commands and representative
+parser/config failure paths, plus redirected default, explicit-config, and
+empty-prompt shell sessions, so stdout and stderr routing, prompt fallback, and
+basic shell dispatch stay visible in normal validation.
 The tracked GitHub Actions workflow at [.github/workflows/ci.yml](.github/workflows/ci.yml) runs the
 same CMake/CTest validation on Linux and Windows.
 Because CI runs unfiltered CTest, tracked `build-local-*` or `.sandbox-user/*` paths make CI fail in
@@ -346,12 +351,13 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 
 - CMake 3.18 이상
 - C++17 컴파일러
+- template instantiation workflow 테스트를 위한 Python 3
 - 전체 검증을 보고하려면 Git이 필요합니다. repository hygiene check와 artifact 점검이
   `git ls-files`를 사용합니다.
 
-Linux에서는 보통 `cmake`, `g++` 또는 `clang++`, `ctest`만 있으면 빌드와 테스트가
-가능합니다. Windows에서는 Visual Studio, Visual Studio Build Tools, 또는 CMake가 지원하는
-C++ 툴체인을 사용하면 됩니다.
+Linux에서는 보통 `cmake`, `g++` 또는 `clang++`, `ctest`, `python3`가 있으면 빌드와
+테스트가 가능합니다. Windows에서는 Visual Studio, Visual Studio Build Tools, 또는 CMake가
+지원하는 C++ 툴체인을 사용하면 됩니다.
 
 ## 빠른 시작
 
@@ -546,7 +552,9 @@ cmake -S . -B build \
 
 ## 테스트
 
-doctest suite, 빌드된 실행 파일 smoke check, repository hygiene check를 포함한 일반적인 스타터 동작 테스트는 먼저 hygiene check가 검사하는 tracked legacy artifact pattern을 확인합니다.
+doctest suite, template-instantiation workflow, 빌드된 실행 파일 smoke check, repository hygiene
+check를 포함한 일반적인 스타터 동작 테스트는 먼저 hygiene check가 검사하는 tracked legacy artifact
+pattern을 확인합니다.
 
 ```bash
 git ls-files 'build-local-*' '.sandbox-user/*'
@@ -566,7 +574,7 @@ artifact gate가 dirty인 동안에도 현재 source behavior 증거가 필요�
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
 ```
 
 이 결과는 partial validation으로 표시하고, 보고서에는 artifact preflight 출력을 함께 남깁니다.
@@ -579,10 +587,12 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-필터를 걸지 않은 이 CTest 실행은 등록된 `starter_tests`, `cli_starter_smoke`, `repository_hygiene`를 포함합니다.
-`cli_starter_smoke`는 빌드된 실행 파일의 성공 명령과 대표적인 parser/config 실패 경로를 함께 실행해
-stdout과 stderr routing을 일반 검증에서 확인합니다. 또한 표준 입력 리다이렉션으로 기본 셸과
-명시적 `shell` 하위 명령을 실행해 기본 shell dispatch를 확인합니다.
+필터를 걸지 않은 이 CTest 실행은 등록된 `starter_tests`, `template_instantiation_workflow`,
+`cli_starter_smoke`, `repository_hygiene`를 포함합니다. `template_instantiation_workflow`는
+CMake가 찾은 Python 3 인터프리터로 rename workflow 테스트를 실행합니다. `cli_starter_smoke`는
+빌드된 실행 파일의 성공 명령과 대표적인 parser/config 실패 경로를 함께 실행해 stdout/stderr
+routing을 일반 검증에서 확인합니다. 또한 표준 입력 리다이렉션으로 기본 셸, 명시적 config
+셸, 빈 prompt config 셸을 실행해 prompt fallback과 기본 shell dispatch를 확인합니다.
 추적되는 GitHub Actions workflow인 [.github/workflows/ci.yml](.github/workflows/ci.yml)은 Linux와
 Windows에서 같은 CMake/CTest 검증을 실행합니다.
 CI는 필터를 걸지 않은 CTest를 실행하므로, tracked `build-local-*` 또는 `.sandbox-user/*`

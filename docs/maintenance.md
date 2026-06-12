@@ -17,14 +17,15 @@ If that command returns paths that still exist in the checkout, the full
 unfiltered CTest run is expected to fail in `repository_hygiene` until those
 tracked generated artifacts are removed. Record that state as blocked
 validation; do not use old build output or a filtered CTest run as a passing
-substitute. A focused run of `starter_tests` and `cli_starter_smoke` can support
-source-behavior investigation while the gate is dirty, but it must be labeled as
-partial validation and paired with the artifact preflight output:
+substitute. A focused run of `starter_tests`, `template_instantiation_workflow`,
+and `cli_starter_smoke` can support source-behavior investigation while the gate
+is dirty, but it must be labeled as partial validation and paired with the
+artifact preflight output:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
 ```
 
 When the artifact preflight prints paths, treat artifact cleanup as the next
@@ -56,10 +57,10 @@ The checker confirms that completion evidence is machine-checkable. It verifies
 that the active phase manifest is transition-ready, in the post-transition
 maintenance shape, or explicit about a future transition command. It also
 checks that phase gate statuses are eligible for evaluation, CMake/CTest and CI
-wiring are still present, the command surface is reflected in tests and docs,
-the config template has the expected starter fields, and the tracked artifact
-preflight is clean. It is a lifecycle evidence check, not a substitute for the
-CMake/CTest baseline.
+wiring are still present, the template instantiation workflow is tested, the
+command surface is reflected in tests and docs, the config template has the
+expected starter fields, and the tracked artifact preflight is clean. It is a
+lifecycle evidence check, not a substitute for the CMake/CTest baseline.
 
 The tracked CI workflow at `.github/workflows/ci.yml` mirrors this validation on
 Linux and Windows. CI builds with `--parallel`; the Windows job builds and tests
@@ -68,9 +69,11 @@ job commands, and failure triage.
 
 Keep both test flags explicit in maintenance reports. `CLI_STARTER_BUILD_TESTS`
 controls whether the project-specific CTest entries are registered:
-`starter_tests`, `cli_starter_smoke`, and `repository_hygiene`. `BUILD_TESTING`
-keeps CTest registration enabled through the repository's `include(CTest)`
-setup.
+`starter_tests`, `template_instantiation_workflow`, `cli_starter_smoke`, and
+`repository_hygiene`. `BUILD_TESTING` keeps CTest registration enabled through
+the repository's `include(CTest)` setup. CMake must find a Python 3 interpreter
+when starter tests are enabled because the template instantiation workflow test
+is registered through CTest.
 Git is required for `repository_hygiene` to prove the tracked artifact gate. If
 `git` is unavailable, that entry is skipped and should not be reported as a
 passing artifact hygiene check. Use a verbose hygiene-only CTest run, or include
@@ -95,17 +98,18 @@ configuration and filter only the non-hygiene entries:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|cli_starter_smoke)$"
+ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$"
 ```
 
-CTest includes a short built-executable smoke pass and a repository hygiene
-check for the tracked `build-local-*` and `.sandbox-user/*` legacy artifact
-patterns when running inside a Git worktree with `git` available. The smoke pass
-covers representative success commands, redirected default and explicit shell
-sessions, and failure routing for parser/config errors. After changes that
-affect the executable name, command registration, config paths, user-facing
-command behavior, shell startup or redirected shell behavior, or parse/config
-error text, these commands are useful for manual inspection too:
+CTest includes the template instantiation workflow test, a short
+built-executable smoke pass, and a repository hygiene check for the tracked
+`build-local-*` and `.sandbox-user/*` legacy artifact patterns when running
+inside a Git worktree with `git` available. The smoke pass covers representative
+success commands, redirected default, explicit-config, and empty-prompt shell
+sessions, prompt-label fallback, and failure routing for parser/config errors.
+After changes that affect the executable name, command registration, config
+paths, user-facing command behavior, shell startup or redirected shell behavior,
+or parse/config error text, these commands are useful for manual inspection too:
 
 ```bash
 ./build/cli-starter --version
@@ -180,8 +184,8 @@ package-manager bootstrap for normal builds. When updating a dependency:
 2. Update the vendored header files and the matching license file.
 3. Update `third_party/README.md` with the exact version and source.
 4. Re-run the unfiltered baseline validation flow so `starter_tests`,
-   `cli_starter_smoke`, and, in Git worktrees with `git` available,
-   `repository_hygiene` cover the update.
+   `template_instantiation_workflow`, `cli_starter_smoke`, and, in Git
+   worktrees with `git` available, `repository_hygiene` cover the update.
 5. Update user-facing docs only when dependency behavior changes build, test, or
    CLI usage.
 

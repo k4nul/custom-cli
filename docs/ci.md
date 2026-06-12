@@ -50,8 +50,8 @@ Use the same configure flags locally before reporting source changes. Collect
 reportable results from a build tree created for that validation pass; if
 `build/` already exists from an earlier run, remove it or choose another ignored
 build directory first. The unfiltered CTest run covers the registered entries
-from `CMakeLists.txt`: `starter_tests`, `cli_starter_smoke`, and
-`repository_hygiene`.
+from `CMakeLists.txt`: `starter_tests`, `template_instantiation_workflow`,
+`cli_starter_smoke`, and `repository_hygiene`.
 
 Start local reports with the artifact preflight:
 
@@ -75,7 +75,7 @@ Then run the non-hygiene entries from a fresh ignored build tree:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
 ```
 
 Do not filter CI's CTest command to hide the hygiene failure. The workflow is
@@ -85,7 +85,8 @@ by the cleanup runbook in `docs/artifact-hygiene.md`.
 ## Debugging Failures
 
 - If configure fails, reproduce the same `cmake -S . -B build` command and
-  confirm the local CMake version is at least 3.18.
+  confirm the local CMake version is at least 3.18 and that CMake can find a
+  Python 3 interpreter for `template_instantiation_workflow`.
 - If build fails, reproduce the same build layout as the failing job. Use
   `--config Debug` for Windows multi-config failures.
 - If `starter_tests` fails, run `ctest --test-dir build --output-on-failure -R
@@ -100,6 +101,14 @@ by the cleanup runbook in `docs/artifact-hygiene.md`.
 - If `cli_starter_smoke` fails, inspect the command path, stdout/stderr
   expectations, redirected shell behavior, and config examples in
   `cmake/cli_smoke_test.cmake`.
+- If `template_instantiation_workflow` fails, rerun that CTest entry and then
+  run the helper tests directly when investigating outside CTest:
+
+  ```bash
+  ctest --test-dir build --output-on-failure -R '^template_instantiation_workflow$'
+  python3 tests/instantiate_template_tests.py
+  ```
+
 - If `repository_hygiene` fails, run
   `git ls-files 'build-local-*' '.sandbox-user/*'` and follow
   `docs/artifact-hygiene.md`.

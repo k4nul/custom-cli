@@ -12,6 +12,8 @@ import unittest
 from pathlib import Path
 
 
+sys.dont_write_bytecode = True
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / "scripts" / "instantiate_template.py"
 SPEC = importlib.util.spec_from_file_location("instantiate_template", SCRIPT_PATH)

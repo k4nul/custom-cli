@@ -6,7 +6,7 @@
   "transition": {
     "intent": "Keep the CLI starter in maintenance after the completion checker has passed.",
     "mode": "maintenance-no-pending-transition",
-    "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build",
+    "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
     "transition_validation_command": "",
     "decision_rule": "Select a new next_phase and transition_validation_command before routing another phase-transition."
   },
@@ -70,7 +70,7 @@
       "evidence": [
         "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON",
         "cmake --build build",
-        "ctest --test-dir build"
+        "ctest --test-dir build --output-on-failure"
       ]
     },
     {

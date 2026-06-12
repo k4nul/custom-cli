@@ -12,10 +12,70 @@ if(NOT DEFINED CLI_STARTER_SMOKE_DIR)
     message(FATAL_ERROR "CLI_STARTER_SMOKE_DIR is required")
 endif()
 
+if(NOT DEFINED CLI_STARTER_BINARY_NAME)
+    set(CLI_STARTER_BINARY_NAME "cli-starter")
+endif()
+
+if(NOT DEFINED CLI_STARTER_DISPLAY_NAME)
+    set(CLI_STARTER_DISPLAY_NAME "CLI Starter")
+endif()
+
+if(NOT DEFINED CLI_STARTER_CONFIG_FILE)
+    set(CLI_STARTER_CONFIG_FILE "cli-starter.json")
+endif()
+
+if(NOT DEFINED CLI_STARTER_PROMPT_LABEL)
+    set(CLI_STARTER_PROMPT_LABEL "starter")
+endif()
+
+if(NOT DEFINED CLI_STARTER_PROJECT_VERSION)
+    set(CLI_STARTER_PROJECT_VERSION "0.1.0")
+endif()
+
 file(REMOVE_RECURSE "${CLI_STARTER_SMOKE_DIR}")
 file(MAKE_DIRECTORY "${CLI_STARTER_SMOKE_DIR}")
 
 set(SMOKE_CONFIG_PATH "${CLI_STARTER_SMOKE_DIR}/config/local.json")
+
+function(escape_cmake_regex output_var input)
+    string(REGEX REPLACE "([][\\.^$*+?(){}|])" "\\\\\\1" escaped "${input}")
+    set("${output_var}" "${escaped}" PARENT_SCOPE)
+endfunction()
+
+escape_cmake_regex(CLI_STARTER_DISPLAY_NAME_REGEX "${CLI_STARTER_DISPLAY_NAME}")
+escape_cmake_regex(CLI_STARTER_BINARY_NAME_REGEX "${CLI_STARTER_BINARY_NAME}")
+escape_cmake_regex(CLI_STARTER_CONFIG_FILE_REGEX "${CLI_STARTER_CONFIG_FILE}")
+escape_cmake_regex(CLI_STARTER_PROMPT_LABEL_REGEX "${CLI_STARTER_PROMPT_LABEL}")
+escape_cmake_regex(CLI_STARTER_PROJECT_VERSION_REGEX "${CLI_STARTER_PROJECT_VERSION}")
+
+function(run_cli_exact_smoke_case case_name expected_stdout)
+    execute_process(
+        COMMAND "${CLI_STARTER_EXECUTABLE}" ${ARGN}
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE stdout
+        ERROR_VARIABLE stderr
+    )
+
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR
+            "Smoke case '${case_name}' failed with exit code ${result}\n"
+            "stdout:\n${stdout}\n"
+            "stderr:\n${stderr}")
+    endif()
+
+    if(NOT stdout STREQUAL "${expected_stdout}")
+        message(FATAL_ERROR
+            "Smoke case '${case_name}' stdout did not match expected output\n"
+            "expected:\n${expected_stdout}\n"
+            "stdout:\n${stdout}")
+    endif()
+
+    if(NOT stderr STREQUAL "")
+        message(FATAL_ERROR
+            "Smoke case '${case_name}' wrote to stderr\n"
+            "stderr:\n${stderr}")
+    endif()
+endfunction()
 
 function(run_cli_smoke_case case_name expected_stdout_regex)
     execute_process(
@@ -138,8 +198,26 @@ function(run_cli_stdin_smoke_case case_name stdin_text)
     endif()
 endfunction()
 
-run_cli_smoke_case("version" "CLI Starter 0\\.1\\.0" --version)
-run_cli_smoke_case("about" "neutral CLI starter" about)
+run_cli_exact_smoke_case(
+    "version"
+    "${CLI_STARTER_DISPLAY_NAME} ${CLI_STARTER_PROJECT_VERSION}\n"
+    --version)
+run_cli_smoke_case(
+    "about display"
+    "${CLI_STARTER_DISPLAY_NAME_REGEX} ${CLI_STARTER_PROJECT_VERSION_REGEX}"
+    about)
+run_cli_smoke_case(
+    "about binary"
+    "Binary name: ${CLI_STARTER_BINARY_NAME_REGEX}"
+    about)
+run_cli_smoke_case(
+    "about config"
+    "Default config: config/${CLI_STARTER_CONFIG_FILE_REGEX}"
+    about)
+run_cli_smoke_case(
+    "about description"
+    "neutral CLI starter"
+    about)
 run_cli_smoke_case("doctor" "Starter layout looks healthy\\." doctor)
 run_cli_smoke_case("config init" "Wrote config template to .*config/local\\.json"
     --config "${SMOKE_CONFIG_PATH}" config init)
@@ -151,6 +229,7 @@ run_cli_smoke_case("echo numbered" "1\\. one" echo --numbered one two)
 run_cli_stdin_smoke_case("redirected default shell"
     "help\nhello --name Ada\nexit\n"
     STDOUT_MATCHES
+        "${CLI_STARTER_DISPLAY_NAME_REGEX} ${CLI_STARTER_PROJECT_VERSION_REGEX}"
         "Interactive mode\\. Type 'help' to inspect commands or 'exit' to quit\\."
         "Usage:"
         "Hello, Ada\\."
@@ -171,6 +250,22 @@ run_cli_stdin_smoke_case("redirected explicit shell"
         "Interactive mode\\. Type 'help' to inspect commands or 'exit' to quit\\."
         "scripted> "
         "Hello, Grace\\.")
+
+set(EMPTY_PROMPT_CONFIG_PATH "${CLI_STARTER_SMOKE_DIR}/config/empty-prompt.json")
+file(WRITE "${EMPTY_PROMPT_CONFIG_PATH}"
+    "{\n"
+    "  \"prompt\": \"\",\n"
+    "  \"default_name\": \"Turing\",\n"
+    "  \"enabled_commands\": [\"about\", \"hello\", \"echo\", \"config\", \"doctor\"],\n"
+    "  \"notes\": \"Smoke test empty prompt config.\"\n"
+    "}\n")
+run_cli_stdin_smoke_case("redirected empty-prompt shell"
+    "hello\nquit\n"
+    COMMAND --config "${EMPTY_PROMPT_CONFIG_PATH}" shell
+    STDOUT_MATCHES
+        "Interactive mode\\. Type 'help' to inspect commands or 'exit' to quit\\."
+        "${CLI_STARTER_PROMPT_LABEL_REGEX}> "
+        "Hello, Turing\\.")
 
 run_cli_failure_smoke_case("unknown command"
     STDERR_MATCHES "missing-command" "Run with --help"

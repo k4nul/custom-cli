@@ -3,14 +3,18 @@
 The starter uses CTest for test discovery and doctest for assertions. Most
 behavior tests link through the `starter_core` library, a CTest smoke case runs
 the built executable through representative success and failure paths, and a
+Python-backed instantiation case validates the starter rename workflow. A
 repository hygiene case blocks the tracked legacy artifact patterns it is
 configured to inspect.
 
 ## Test Targets
 
-`CMakeLists.txt` defines one test executable and three CTest entries:
+`CMakeLists.txt` defines one test executable and four CTest entries:
 
 - `starter_tests`: builds from `tests/config_tests.cpp`
+- `template_instantiation_workflow`: runs
+  `tests/instantiate_template_tests.py` through the CMake-discovered Python 3
+  interpreter
 - `cli_starter_smoke`: runs the built CLI through version, about, doctor,
   config, hello, echo, and redirected shell success checks, plus parse and
   config failure checks for executable-level stdout/stderr routing
@@ -23,6 +27,9 @@ The test target and CTest entries are created only when
 `BUILD_TESTING` value because the project includes `CTest`. Keep
 `BUILD_TESTING` enabled too; a cache or preset that turns it off can prevent
 CTest from registering tests even if the test target is compiled.
+CMake must be able to find a Python 3 interpreter when starter tests are
+enabled so `template_instantiation_workflow` can run portably on Linux and
+Windows.
 Git is also required for `repository_hygiene` to prove the tracked artifact gate;
 without `git`, that CTest entry skips instead of passing the gate.
 Because normal CTest output can summarize that early return as a successful test
@@ -64,7 +71,7 @@ use a fresh ignored build tree and run only the non-hygiene CTest entries:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
 ```
 
 Label that result as partial validation. Include the artifact preflight output
@@ -81,7 +88,7 @@ passes. For multi-config generators, build and test the same configuration:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|cli_starter_smoke)$"
+ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$"
 ```
 
 Use [docs/artifact-hygiene.md](artifact-hygiene.md) for the dedicated cleanup
@@ -102,8 +109,8 @@ ctest --test-dir build --output-on-failure
 ```
 
 Leave the CTest command unfiltered for reportable validation so
-`starter_tests`, `cli_starter_smoke`, and `repository_hygiene` run. Use focused
-doctest filters only for local iteration.
+`starter_tests`, `template_instantiation_workflow`, `cli_starter_smoke`, and
+`repository_hygiene` run. Use focused doctest filters only for local iteration.
 
 The tracked GitHub Actions workflow at `.github/workflows/ci.yml` mirrors this
 validation on Linux and Windows. See [docs/ci.md](ci.md) for workflow triggers,
@@ -245,7 +252,9 @@ It also covers redirected shell input through the real executable. The default
 shell smoke case feeds `help`, `hello --name Ada`, and `exit` through stdin and
 checks the interactive banner, prompt, help output, and command output. The
 explicit `shell` smoke case uses a generated config file to verify a disk-backed
-prompt and default `hello` name before `quit`.
+prompt and default `hello` name before `quit`. The empty-prompt shell smoke
+case verifies that a disk config with an empty `prompt` falls back to the
+configured project prompt label.
 
 The same smoke script also covers representative built-executable failure
 routing for an unknown command, missing `echo` text, an unknown `hello` option,
@@ -255,6 +264,12 @@ leave stdout empty, and match expected stderr patterns. When display metadata,
 about text, command registration, config behavior, shell startup behavior,
 redirected shell behavior, or parse/config error text changes, update
 `cmake/cli_smoke_test.cmake` with the related docs and tests.
+
+The `template_instantiation_workflow` CTest entry covers the standalone rename
+helper in `scripts/instantiate_template.py`. It verifies safe default
+derivation, explicit binary/display/config/prompt overrides, unsafe-name
+rejection, generated config writes, overwrite protection, forced rewrites, and
+JSON output for the printed validation plan.
 
 When it runs inside a Git worktree with `git` available, the
 `repository_hygiene` CTest entry checks the checkout for tracked legacy artifact

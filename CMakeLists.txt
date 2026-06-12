@@ -60,6 +60,8 @@ set_target_properties(
 cli_starter_enable_warnings(${CLI_STARTER_BINARY_NAME})
 
 if(CLI_STARTER_BUILD_TESTS)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+
     add_executable(starter_tests tests/config_tests.cpp)
     target_link_libraries(starter_tests PRIVATE starter_core)
     target_compile_features(starter_tests PRIVATE cxx_std_17)
@@ -67,10 +69,26 @@ if(CLI_STARTER_BUILD_TESTS)
 
     add_test(NAME starter_tests COMMAND starter_tests)
     add_test(
+        NAME template_instantiation_workflow
+        COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/instantiate_template_tests.py
+    )
+    set_tests_properties(
+        template_instantiation_workflow
+        PROPERTIES
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1"
+    )
+    add_test(
         NAME cli_starter_smoke
         COMMAND ${CMAKE_COMMAND}
             -DCLI_STARTER_EXECUTABLE=$<TARGET_FILE:${CLI_STARTER_BINARY_NAME}>
             -DCLI_STARTER_SMOKE_DIR=${CMAKE_CURRENT_BINARY_DIR}/ctest-smoke
+            "-DCLI_STARTER_BINARY_NAME=${CLI_STARTER_BINARY_NAME}"
+            "-DCLI_STARTER_DISPLAY_NAME=${CLI_STARTER_DISPLAY_NAME}"
+            "-DCLI_STARTER_CONFIG_FILE=${CLI_STARTER_CONFIG_FILE}"
+            "-DCLI_STARTER_PROMPT_LABEL=${CLI_STARTER_PROMPT_LABEL}"
+            "-DCLI_STARTER_PROJECT_VERSION=${PROJECT_VERSION}"
             -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cli_smoke_test.cmake
     )
     set_tests_properties(cli_starter_smoke PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

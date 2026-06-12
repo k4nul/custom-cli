@@ -25,8 +25,10 @@ MAINTENANCE_PHASE = "starter-template-maintenance"
 COMPLETION_CHECK_COMMAND = "python3 tests/check_project_completion.py"
 BASELINE_VALIDATION_COMMAND = (
     "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON "
-    "&& cmake --build build && ctest --test-dir build"
+    "&& cmake --build build && ctest --test-dir build --output-on-failure"
 )
+NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$"
+LEGACY_NON_HYGIENE_CTEST_FILTER = "^(starter_tests|cli_starter_smoke)$"
 
 
 def read_text(path: Path) -> str:
@@ -192,8 +194,11 @@ def check_cmake_and_ci_wiring(blockers: list[str]) -> None:
         (
             "add_library(starter_core",
             "add_executable(${CLI_STARTER_BINARY_NAME} src/main.cpp)",
+            "find_package(Python3 COMPONENTS Interpreter REQUIRED)",
             "add_executable(starter_tests tests/config_tests.cpp)",
             "add_test(NAME starter_tests COMMAND starter_tests)",
+            "NAME template_instantiation_workflow",
+            "PYTHONDONTWRITEBYTECODE=1",
             "NAME cli_starter_smoke",
             "NAME repository_hygiene",
             "CLI_STARTER_BUILD_TESTS",
@@ -253,13 +258,32 @@ def check_tests_and_smoke_coverage(blockers: list[str]) -> None:
             blockers.append(f"tests/config_tests.cpp is missing expected coverage: {expected}")
 
     smoke = read_text(REPO_ROOT / "cmake/cli_smoke_test.cmake")
-    for command in ("version", "about", "doctor", "config init", "config show", "hello", "echo numbered"):
-        if f'run_cli_smoke_case("{command}"' not in smoke:
+    expected_smoke_cases = {
+        "version": ("run_cli_exact_smoke_case", '"version"'),
+        "about display": ('"about display"',),
+        "about binary": ('"about binary"',),
+        "about config": ('"about config"',),
+        "doctor": ('run_cli_smoke_case("doctor"',),
+        "config init": ('run_cli_smoke_case("config init"',),
+        "config show": ('run_cli_smoke_case("config show"',),
+        "hello": ('run_cli_smoke_case("hello"',),
+        "echo numbered": ('run_cli_smoke_case("echo numbered"',),
+    }
+    for command, markers in expected_smoke_cases.items():
+        if not all(marker in smoke for marker in markers):
             blockers.append(f"cmake/cli_smoke_test.cmake is missing smoke case: {command}")
+    for dynamic_marker in (
+        "CLI_STARTER_DISPLAY_NAME",
+        "CLI_STARTER_BINARY_NAME",
+        "CLI_STARTER_CONFIG_FILE",
+        "CLI_STARTER_PROMPT_LABEL",
+    ):
+        if dynamic_marker not in smoke:
+            blockers.append(f"cmake/cli_smoke_test.cmake is missing dynamic metadata marker: {dynamic_marker}")
     for failure in ("unknown command", "missing echo text", "unknown hello option", "missing config subcommand"):
         if f'run_cli_failure_smoke_case("{failure}"' not in smoke:
             blockers.append(f"cmake/cli_smoke_test.cmake is missing failure smoke case: {failure}")
-    for shell_case in ("redirected default shell", "redirected explicit shell"):
+    for shell_case in ("redirected default shell", "redirected explicit shell", "redirected empty-prompt shell"):
         if f'run_cli_stdin_smoke_case("{shell_case}"' not in smoke:
             blockers.append(f"cmake/cli_smoke_test.cmake is missing shell smoke case: {shell_case}")
 
@@ -294,6 +318,25 @@ def check_documentation_alignment(blockers: list[str]) -> None:
             blockers.append(f"docs/testing.md is missing validation command: {validation_text}")
         if validation_text not in maintenance:
             blockers.append(f"docs/maintenance.md is missing validation command: {validation_text}")
+
+    documented_filter_paths = (
+        "README.md",
+        "docs/ci.md",
+        "docs/maintenance.md",
+        "docs/onboarding.md",
+        "docs/testing.md",
+        "docs/troubleshooting.md",
+    )
+    for path_text in documented_filter_paths:
+        content = read_text(REPO_ROOT / path_text)
+        if NON_HYGIENE_CTEST_FILTER not in content:
+            blockers.append(f"{path_text} does not document the current non-hygiene CTest filter")
+
+    markdown_paths = [REPO_ROOT / "README.md", *sorted((REPO_ROOT / "docs").glob("*.md"))]
+    for path in markdown_paths:
+        content = read_text(path)
+        if LEGACY_NON_HYGIENE_CTEST_FILTER in content:
+            blockers.append(f"{relative(path)} still documents the legacy non-hygiene CTest filter")
 
 
 def check_config_template(blockers: list[str]) -> None:
@@ -331,7 +374,9 @@ def check_template_instantiation_workflow(blockers: list[str]) -> None:
         REPO_ROOT / "tests/instantiate_template_tests.py",
         (
             "test_plan_derives_safe_defaults_from_binary_name",
+            "test_plan_preserves_explicit_display_config_and_prompt_values",
             "test_write_config_template_creates_config_file_and_refuses_unforced_overwrite",
+            "test_json_output_includes_commands_and_written_config_path",
         ),
         blockers,
     )
@@ -389,7 +434,7 @@ def main() -> int:
 
     print("completion check passed:")
     print("- phase manifest gates are machine-checkable")
-    print("- CMake, CTest, smoke, and CI wiring are present")
+    print("- CMake, CTest, template instantiation, smoke, and CI wiring are present")
     print("- command documentation covers the registered starter surface")
     print("- repository artifact hygiene preflight is clean")
     return 0
