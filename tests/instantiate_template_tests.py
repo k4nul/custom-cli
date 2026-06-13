@@ -130,6 +130,38 @@ class InstantiateTemplateTests(unittest.TestCase):
             instantiate_template.write_config_template(plan, repo_root, force=True)
             self.assertTrue(output_path.read_text(encoding="utf-8").startswith("{\n"))
 
+    def test_write_config_template_refuses_non_regular_output_path(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            output_path = repo_root / "config" / "my-cli.json"
+            output_path.mkdir(parents=True)
+
+            with self.assertRaisesRegex(instantiate_template.InstantiationError, "not a regular file"):
+                instantiate_template.write_config_template(plan, repo_root, force=True)
+
+            self.assertTrue(output_path.is_dir())
+
+    def test_write_config_template_refuses_symlink_output_path_even_with_force(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            target_path = repo_root / "outside.json"
+            target_path.write_text("outside\n", encoding="utf-8")
+            output_path = repo_root / "config" / "my-cli.json"
+            output_path.parent.mkdir()
+            try:
+                output_path.symlink_to(target_path)
+            except (NotImplementedError, OSError) as exc:
+                self.skipTest(f"symlink creation unavailable: {exc}")
+
+            with self.assertRaisesRegex(instantiate_template.InstantiationError, "must not be a symlink"):
+                instantiate_template.write_config_template(plan, repo_root, force=True)
+
+            self.assertEqual(target_path.read_text(encoding="utf-8"), "outside\n")
+
     def test_json_output_includes_commands_and_written_config_path(self) -> None:
         plan = instantiate_template.build_plan(make_args(display_name="My CLI"))
         payload = json.loads(instantiate_template.plan_as_json(plan, "config/my-cli.json"))

@@ -32,7 +32,8 @@ builds it, and runs the CTest suite with output-on-failure enabled.
 
 The script intentionally refuses path-like names, control characters, unsafe
 prompt labels, and non-JSON config file names. It also refuses to replace an
-existing config file unless `--force` is passed.
+existing config file unless `--force` is passed, and it refuses symlink or
+non-regular output paths before writing.
 
 Validate this workflow with:
 

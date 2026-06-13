@@ -144,12 +144,28 @@ def build_plan(args: argparse.Namespace) -> InstantiationPlan:
     )
 
 
+def inspect_config_output_path(output_path: Path, force: bool) -> None:
+    if output_path.is_symlink():
+        raise InstantiationError(f"{output_path} must not be a symlink")
+    if not output_path.exists():
+        return
+    if not output_path.is_file():
+        raise InstantiationError(f"{output_path} is not a regular file")
+    if not force:
+        raise InstantiationError(f"{output_path} already exists; pass --force to replace it")
+
+
 def write_config_template(plan: InstantiationPlan, repo_root: Path, force: bool) -> Path:
     output_path = repo_root / plan.config_path
-    if output_path.exists() and not force:
-        raise InstantiationError(f"{output_path} already exists; pass --force to replace it")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(plan.config_template, indent=2) + "\n", encoding="utf-8")
+    try:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise InstantiationError(f"failed to prepare config directory for {output_path}: {exc}") from exc
+    inspect_config_output_path(output_path, force)
+    try:
+        output_path.write_text(json.dumps(plan.config_template, indent=2) + "\n", encoding="utf-8")
+    except OSError as exc:
+        raise InstantiationError(f"failed to write config template to {output_path}: {exc}") from exc
     return output_path
 
 
