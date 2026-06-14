@@ -8,6 +8,7 @@ needs to get a local build, smoke test, and first customization loop working.
 - CMake 3.18 or newer
 - A C++17 compiler
 - `ctest`, which is provided with CMake
+- Python 3 for the template instantiation workflow test
 - Git when you need reportable full validation, because the artifact hygiene
   gate uses `git ls-files`
 
@@ -159,28 +160,31 @@ cmake -S . -B build \
 ```
 
 You can generate and validate that command with the repository-local
-instantiation workflow:
+instantiation workflow, and write the matching config template when the copied
+project is ready to use the renamed default config file:
 
 ```bash
 python3 scripts/instantiate_template.py \
   --binary-name my-cli \
   --display-name "My CLI" \
   --config-file my-cli.json \
-  --prompt-label mycli
+  --prompt-label mycli \
+  --write-config
 ```
 
 Those values are written into the generated project config header in the build
-tree. The checked-in JSON template remains in `config/cli-starter.json` until
-you intentionally rename or replace it.
+tree. The checked-in JSON template remains in `config/cli-starter.json` unless
+you intentionally rename or replace it; `--write-config` creates
+`config/my-cli.json` as the copied project's matching runtime template.
 
 `CLI_STARTER_CONFIG_FILE` changes the default runtime path under `config/`. If
-you set it to `my-cli.json`, copy or rename the template to
-`config/my-cli.json`, or pass `--config <path>` while the copied project is in
-transition. `CLI_STARTER_PROMPT_LABEL` is written by `config init` and is used
-when a loaded config has an empty `prompt`. If no config file exists, shell
-startup uses the built-in `AppConfig` prompt, currently `starter`, until that
-file exists. Update or regenerate the disk config's `prompt` when you want
-disk-backed shell sessions to use the renamed prompt consistently.
+you set it to `my-cli.json`, use the helper's `--write-config` path or pass
+`--config <path>` while the copied project is in transition.
+`CLI_STARTER_PROMPT_LABEL` is written by `config init` and is used when a loaded
+config has an empty `prompt`. If no config file exists, shell startup uses the
+built-in `AppConfig` prompt, currently `starter`, until that file exists. Update
+or regenerate the disk config's `prompt` when you want disk-backed shell
+sessions to use the renamed prompt consistently.
 
 The `cli_starter_smoke` CTest entry checks the built executable's success path,
 including `--version`, `about`, `doctor`, config initialization and display,

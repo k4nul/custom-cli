@@ -17,7 +17,8 @@ ctest --test-dir build --output-on-failure
 also controls CTest registration through `include(CTest)`. If a previous cache,
 toolchain, or preset disabled `BUILD_TESTING`, reconfigure with both flags set
 to `ON` instead of only rebuilding the old tree. A healthy tree registers
-`starter_tests`, `cli_starter_smoke`, and `repository_hygiene`.
+`starter_tests`, `template_instantiation_workflow`, `cli_starter_smoke`, and
+`repository_hygiene`.
 
 Use CTest discovery mode when you need to confirm registration without running
 the tests:
@@ -57,6 +58,22 @@ The smoke script runs built-executable success cases, redirected shell sessions,
 and representative parser/config failures. Inspect
 `cmake/cli_smoke_test.cmake` when failures point to changed command output,
 stderr routing, shell startup, config behavior, or executable layout.
+
+## Template Instantiation Workflow Fails
+
+Run the workflow entry by itself, then run the Python tests directly when the
+CTest output is not enough:
+
+```bash
+ctest --test-dir build --output-on-failure -R '^template_instantiation_workflow$'
+python3 tests/instantiate_template_tests.py
+```
+
+The helper rejects unsafe binary, display, config, prompt, build-directory, and
+repository-root values before writing config files or printing a validation
+command. If a display name fails, remove double quotes and backslashes; those
+characters cannot be written safely to the generated C++ project metadata
+header.
 
 ## `./build/cli-starter` Does Not Exist
 

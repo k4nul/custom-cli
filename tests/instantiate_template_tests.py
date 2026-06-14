@@ -118,6 +118,20 @@ class InstantiateTemplateTests(unittest.TestCase):
                 with self.assertRaises(instantiate_template.InstantiationError):
                     instantiate_template.build_plan(args)
 
+    def test_plan_rejects_display_names_that_cannot_be_written_to_project_header(self) -> None:
+        invalid_args = [
+            make_args(display_name='Ops "Control"'),
+            make_args(display_name=r"Ops\Control"),
+        ]
+
+        for args in invalid_args:
+            with self.subTest(args=args):
+                with self.assertRaisesRegex(
+                    instantiate_template.InstantiationError,
+                    "display name must not contain double quotes or backslashes",
+                ):
+                    instantiate_template.build_plan(args)
+
     def test_write_config_template_creates_config_file_and_refuses_unforced_overwrite(self) -> None:
         plan = instantiate_template.build_plan(make_args())
 
@@ -164,6 +178,46 @@ class InstantiateTemplateTests(unittest.TestCase):
 
             self.assertEqual(config_path.read_text(encoding="utf-8"), "not a directory\n")
 
+    def test_write_config_template_refuses_missing_repo_root(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir) / "missing"
+
+            with self.assertRaisesRegex(instantiate_template.InstantiationError, "repo root .* does not exist"):
+                instantiate_template.write_config_template(plan, repo_root, force=True)
+
+            self.assertFalse(repo_root.exists())
+
+    def test_write_config_template_refuses_non_directory_repo_root(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir) / "repo"
+            repo_root.write_text("not a directory\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(instantiate_template.InstantiationError, "repo root .* is not a directory"):
+                instantiate_template.write_config_template(plan, repo_root, force=True)
+
+            self.assertEqual(repo_root.read_text(encoding="utf-8"), "not a directory\n")
+
+    def test_write_config_template_refuses_symlink_repo_root(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            real_root = Path(temp_dir) / "repo"
+            real_root.mkdir()
+            repo_root = Path(temp_dir) / "repo-link"
+            try:
+                repo_root.symlink_to(real_root, target_is_directory=True)
+            except (NotImplementedError, OSError) as exc:
+                self.skipTest(f"symlink creation unavailable: {exc}")
+
+            with self.assertRaisesRegex(instantiate_template.InstantiationError, "repo root .* must not be a symlink"):
+                instantiate_template.write_config_template(plan, repo_root, force=True)
+
+            self.assertFalse((real_root / "config" / "my-cli.json").exists())
+
     def test_write_config_template_refuses_symlink_output_path_even_with_force(self) -> None:
         plan = instantiate_template.build_plan(make_args())
 
@@ -209,6 +263,24 @@ class InstantiateTemplateTests(unittest.TestCase):
         self.assertEqual(payload["display_name"], "My CLI")
         self.assertEqual(payload["config_path"], "config/my-cli.json")
         self.assertEqual(payload["wrote_config"], "config/my-cli.json")
+        self.assertEqual(
+            payload["cmake_command"],
+            [
+                "cmake",
+                "-S",
+                ".",
+                "-B",
+                "build-renamed",
+                "-DCLI_STARTER_BINARY_NAME=my-cli",
+                "-DCLI_STARTER_DISPLAY_NAME=My CLI",
+                "-DCLI_STARTER_CONFIG_FILE=my-cli.json",
+                "-DCLI_STARTER_PROMPT_LABEL=mycli",
+                "-DBUILD_TESTING=ON",
+                "-DCLI_STARTER_BUILD_TESTS=ON",
+            ],
+        )
+        self.assertEqual(payload["build_command"], ["cmake", "--build", "build-renamed"])
+        self.assertEqual(payload["ctest_command"], ["ctest", "--test-dir", "build-renamed", "--output-on-failure"])
         self.assertIn("ctest", payload["validation_command"])
         self.assertNotIn("'&&'", payload["validation_command"])
 
@@ -301,6 +373,25 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertIn("error:", stderr)
             self.assertIn("already exists; pass --force to replace it", stderr)
             self.assertEqual(config_path.read_text(encoding="utf-8"), "existing\n")
+
+    def test_main_write_config_refuses_missing_repo_root_without_creating_it(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir) / "missing"
+            exit_code, stdout, stderr = run_main(
+                [
+                    "--binary-name",
+                    "opsctl",
+                    "--repo-root",
+                    str(repo_root),
+                    "--write-config",
+                ]
+            )
+
+            self.assertEqual(exit_code, 2)
+            self.assertEqual(stdout, "")
+            self.assertIn("error:", stderr)
+            self.assertIn("repo root", stderr)
+            self.assertFalse(repo_root.exists())
 
     def test_main_force_json_replaces_existing_config(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

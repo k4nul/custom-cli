@@ -375,7 +375,10 @@ def check_template_instantiation_workflow(blockers: list[str]) -> None:
         (
             "test_plan_derives_safe_defaults_from_binary_name",
             "test_plan_preserves_explicit_display_config_and_prompt_values",
+            "test_plan_rejects_display_names_that_cannot_be_written_to_project_header",
             "test_write_config_template_creates_config_file_and_refuses_unforced_overwrite",
+            "test_write_config_template_refuses_missing_repo_root",
+            "test_write_config_template_refuses_symlink_repo_root",
             "test_write_config_template_refuses_non_directory_config_path",
             "test_write_config_template_refuses_symlink_config_directory",
             "test_json_output_includes_commands_and_written_config_path",

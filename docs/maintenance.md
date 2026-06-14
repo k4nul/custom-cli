@@ -183,8 +183,9 @@ for a copied starter. When changing `scripts/instantiate_template.py`:
 1. Keep CMake cache variable names aligned with `CMakeLists.txt` and
    `cmake/project_config.hpp.in`.
 2. Preserve safe-name and safe-output checks for path-like values, control
-   characters, non-JSON config files, existing files, symlinks, and
-   non-regular output paths.
+   characters, display names that cannot be written to the generated C++
+   project header, non-JSON config files, missing or symlinked repository
+   roots, existing files, symlinks, and non-regular output paths.
 3. Add or update tests in `tests/instantiate_template_tests.py`, then keep
    `tests/check_project_completion.py` aligned with any machine-checkable
    workflow expectation.

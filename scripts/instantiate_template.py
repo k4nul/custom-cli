@@ -97,6 +97,11 @@ def reject_control_characters(label: str, value: str) -> None:
         raise InstantiationError(f"{label} must not contain control characters")
 
 
+def reject_project_header_string_hazards(label: str, value: str) -> None:
+    if '"' in value or "\\" in value:
+        raise InstantiationError(f"{label} must not contain double quotes or backslashes")
+
+
 def require_token(label: str, value: str) -> str:
     if not value:
         raise InstantiationError(f"{label} is required")
@@ -114,6 +119,7 @@ def require_display_name(value: str) -> str:
     if not value.strip():
         raise InstantiationError("display name is required")
     reject_control_characters("display name", value)
+    reject_project_header_string_hazards("display name", value)
     return value
 
 
@@ -155,6 +161,15 @@ def inspect_config_output_path(output_path: Path, force: bool) -> None:
         raise InstantiationError(f"{output_path} already exists; pass --force to replace it")
 
 
+def inspect_repo_root(repo_root: Path) -> None:
+    if repo_root.is_symlink():
+        raise InstantiationError(f"repo root {repo_root} must not be a symlink")
+    if not repo_root.exists():
+        raise InstantiationError(f"repo root {repo_root} does not exist")
+    if not repo_root.is_dir():
+        raise InstantiationError(f"repo root {repo_root} is not a directory")
+
+
 def prepare_output_directory(output_directory: Path) -> None:
     if output_directory.is_symlink():
         raise InstantiationError(f"{output_directory} must not be a symlink")
@@ -173,6 +188,7 @@ def prepare_output_directory(output_directory: Path) -> None:
 
 
 def write_config_template(plan: InstantiationPlan, repo_root: Path, force: bool) -> Path:
+    inspect_repo_root(repo_root)
     output_path = repo_root / plan.config_path
     prepare_output_directory(output_path.parent)
     inspect_config_output_path(output_path, force)

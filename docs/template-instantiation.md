@@ -69,21 +69,31 @@ config. Then update docs and examples that still point at
 `config/cli-starter.json`, or keep the old template only while migration is
 intentional.
 
+After writing, inspect the local diff before committing:
+
+```bash
+git status --short
+cat config/my-cli.json
+```
+
 Then run the printed validation command. It configures the renamed executable,
 builds it, and runs the CTest suite with output-on-failure enabled.
 
 ## Safety Rules
 
 The script intentionally refuses path-like names, control characters, unsafe
-prompt labels, and non-JSON config file names. It also refuses to replace an
-existing config file unless `--force` is passed, refuses symlink or non-regular
-output files, and refuses a symlinked or non-directory `config/` path before
-writing. That keeps `--write-config` from following a copied checkout's
-unexpected local filesystem redirection.
+prompt labels, display names that cannot be written safely to the generated C++
+project header, and non-JSON config file names. It also refuses to create files
+under a missing, non-directory, or symlinked repository root, refuses to replace
+an existing config file unless `--force` is passed, refuses symlink or
+non-regular output files, and refuses a symlinked or non-directory `config/`
+path before writing. That keeps `--write-config` from following a copied
+checkout's unexpected local filesystem redirection.
 
 Safe token values must start with a letter or digit and then use only letters,
 digits, `.`, `_`, or `-`. `--display-name` may contain spaces, but it must not
-be blank or contain control characters. `--config-file` must end in `.json`.
+be blank, contain control characters, or contain double quotes or backslashes.
+`--config-file` must end in `.json`.
 
 Only use `--force` after checking the existing generated config. It replaces a
 regular file at `config/<name>.json`; it still refuses symlinks, directories,

@@ -191,10 +191,12 @@ cmake -S . -B build \
 ```
 
 After renaming, replace the sample commands with your own application behavior.
-If you change `CLI_STARTER_CONFIG_FILE`, copy or rename the JSON template to
-`config/<configured-name>` or pass `--config <path>` while you are migrating. If
-you change `CLI_STARTER_PROMPT_LABEL`, regenerate or update the JSON `prompt`
-field too when you want disk-backed shell sessions to use the same prompt.
+If you change `CLI_STARTER_CONFIG_FILE`, prefer
+`scripts/instantiate_template.py --write-config` to create the matching
+`config/<configured-name>` template, or pass `--config <path>` while you are
+migrating. If you change `CLI_STARTER_PROMPT_LABEL`, regenerate or update the
+JSON `prompt` field too when you want disk-backed shell sessions to use the
+same prompt.
 Without a config file, the shell uses the built-in `AppConfig` default prompt,
 currently `starter`, until that file exists. A non-empty loaded config `prompt`
 wins; an empty loaded `prompt` falls back to `CLI_STARTER_PROMPT_LABEL`.
@@ -222,8 +224,8 @@ nested subcommands.
 
 After copying the starter, use [scripts/instantiate_template.py](scripts/instantiate_template.py)
 to turn the rename checklist into an executable plan. The script validates safe
-binary/config/prompt names, prints the CMake cache-variable command, and can
-write the matching `config/<name>.json` file for the copied project. See
+binary/display/config/prompt names, prints the CMake cache-variable command, and
+can write the matching `config/<name>.json` file for the copied project. See
 [docs/template-instantiation.md](docs/template-instantiation.md) for the full
 workflow and test command.
 
@@ -512,12 +514,13 @@ cmake -S . -B build \
 ```
 
 이름을 바꾼 뒤에는 예제 명령을 실제 애플리케이션 동작으로 교체하면 됩니다.
-`CLI_STARTER_CONFIG_FILE`을 바꾸면 JSON 템플릿도 `config/<설정한-이름>`으로 복사하거나
-이름을 바꾸고, 전환 중에는 `--config <path>`를 사용합니다. `CLI_STARTER_PROMPT_LABEL`을
-바꾼 뒤 디스크 설정을 사용하는 셸에서도 같은 프롬프트를 쓰려면 JSON의 `prompt` 값을 다시
-생성하거나 함께 바꿉니다. 설정 파일이 없으면 셸은 파일이 생길 때까지 내장 `AppConfig`
-기본 프롬프트인 `starter`를 사용합니다. 로드된 설정 파일의 비어 있지 않은 `prompt` 값이
-우선하고, 로드된 `prompt` 값이 비어 있으면 `CLI_STARTER_PROMPT_LABEL`로 fallback됩니다.
+`CLI_STARTER_CONFIG_FILE`을 바꾸면 `scripts/instantiate_template.py --write-config`로
+`config/<설정한-이름>` 템플릿을 생성하거나, 전환 중에는 `--config <path>`를 사용합니다.
+`CLI_STARTER_PROMPT_LABEL`을 바꾼 뒤 디스크 설정을 사용하는 셸에서도 같은 프롬프트를
+쓰려면 JSON의 `prompt` 값을 다시 생성하거나 함께 바꿉니다. 설정 파일이 없으면 셸은
+파일이 생길 때까지 내장 `AppConfig` 기본 프롬프트인 `starter`를 사용합니다. 로드된 설정
+파일의 비어 있지 않은 `prompt` 값이 우선하고, 로드된 `prompt` 값이 비어 있으면
+`CLI_STARTER_PROMPT_LABEL`로 fallback됩니다.
 
 ## 명령 추가하기
 
@@ -537,6 +540,14 @@ cmake -S . -B build \
 명령 파서는 CLI11을 사용하므로 CLI11의 옵션, 플래그, 위치 인자, 중첩 하위명령 기능을
 그대로 활용할 수 있습니다.
 
+## 템플릿 인스턴스화
+
+스타터를 복사한 뒤 [scripts/instantiate_template.py](scripts/instantiate_template.py)를 사용해
+rename checklist를 실행 가능한 계획으로 바꿉니다. 이 스크립트는 안전한
+binary/display/config/prompt 이름을 검증하고, CMake cache 변수 명령을 출력하며, 복사한
+프로젝트에 맞는 `config/<name>.json` 파일을 쓸 수 있습니다. 전체 workflow와 테스트 명령은
+[docs/template-instantiation.md](docs/template-instantiation.md)를 참고하세요.
+
 ## 프로젝트 구조
 
 - `src/app/`: 애플리케이션 생명주기, 명령 dispatch, 인터랙티브 셸 흐름
@@ -545,6 +556,7 @@ cmake -S . -B build \
 - `include/starter/`: 스타터용 public header
 - `cmake/`: 생성되는 프로젝트 metadata용 템플릿과 CTest 스크립트
 - `config/`: 체크인된 설정 템플릿
+- `scripts/`: 로컬 스타터 인스턴스화 helper
 - `tests/`: 스타터 동작 테스트
 - `third_party/`: vendored header-only 의존성과 라이선스 파일
 - `docs/`: 프로젝트 개요, 온보딩, command reference, 아키텍처, 테스트, artifact hygiene,
