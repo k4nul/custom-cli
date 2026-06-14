@@ -59,6 +59,14 @@ class InstantiateTemplateTests(unittest.TestCase):
         self.assertIn(" && cmake --build build-renamed && ", plan.validation_command)
         self.assertEqual(plan.config_path.as_posix(), "config/my-cli.json")
 
+    def test_plan_derives_readable_defaults_from_mixed_separator_binary_names(self) -> None:
+        plan = instantiate_template.build_plan(make_args(binary_name="ops.team_cli"))
+
+        self.assertEqual(plan.display_name, "Ops Team Cli")
+        self.assertEqual(plan.config_file, "ops.team_cli.json")
+        self.assertEqual(plan.prompt_label, "opsteamcli")
+        self.assertEqual(plan.config_path.as_posix(), "config/ops.team_cli.json")
+
     def test_plan_preserves_explicit_display_config_and_prompt_values(self) -> None:
         plan = instantiate_template.build_plan(
             make_args(
@@ -250,6 +258,27 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertEqual(written["prompt"], "opsctl")
             self.assertEqual(written["enabled_commands"], ["about", "hello", "echo", "config", "doctor"])
 
+    def test_main_json_plan_without_write_config_reports_no_written_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            exit_code, stdout, stderr = run_main(
+                [
+                    "--binary-name",
+                    "opsctl",
+                    "--repo-root",
+                    str(repo_root),
+                    "--json",
+                ]
+            )
+
+            payload = json.loads(stdout)
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertEqual(payload["config_path"], "config/opsctl.json")
+            self.assertIsNone(payload["wrote_config"])
+            self.assertFalse((repo_root / "config" / "opsctl.json").exists())
+
     def test_main_refuses_unforced_config_overwrite(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             repo_root = Path(temp_dir)
@@ -272,6 +301,56 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertIn("error:", stderr)
             self.assertIn("already exists; pass --force to replace it", stderr)
             self.assertEqual(config_path.read_text(encoding="utf-8"), "existing\n")
+
+    def test_main_force_json_replaces_existing_config(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            config_path = repo_root / "config" / "opsctl.json"
+            config_path.parent.mkdir()
+            config_path.write_text("stale\n", encoding="utf-8")
+
+            exit_code, stdout, stderr = run_main(
+                [
+                    "--binary-name",
+                    "opsctl",
+                    "--repo-root",
+                    str(repo_root),
+                    "--write-config",
+                    "--force",
+                    "--json",
+                ]
+            )
+
+            payload = json.loads(stdout)
+            written = json.loads(config_path.read_text(encoding="utf-8"))
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertEqual(payload["wrote_config"], str(config_path))
+            self.assertEqual(written["prompt"], "opsctl")
+            self.assertEqual(written["default_name"], "world")
+            self.assertNotEqual(config_path.read_text(encoding="utf-8"), "stale\n")
+
+    def test_main_invalid_plan_does_not_create_config_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            exit_code, stdout, stderr = run_main(
+                [
+                    "--binary-name",
+                    "opsctl",
+                    "--prompt-label",
+                    "../ops",
+                    "--repo-root",
+                    str(repo_root),
+                    "--write-config",
+                ]
+            )
+
+            self.assertEqual(exit_code, 2)
+            self.assertEqual(stdout, "")
+            self.assertIn("error:", stderr)
+            self.assertIn("prompt label must be a file name, not a path", stderr)
+            self.assertFalse((repo_root / "config").exists())
 
 
 if __name__ == "__main__":
