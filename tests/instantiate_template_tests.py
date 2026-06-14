@@ -8,6 +8,7 @@ import contextlib
 import io
 import importlib.util
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -44,6 +45,16 @@ def run_main(argv: list[str]) -> tuple[int, str, str]:
     with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
         exit_code = instantiate_template.main(argv)
     return exit_code, stdout.getvalue(), stderr.getvalue()
+
+
+def run_script(argv: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(SCRIPT_PATH), *argv],
+        cwd=cwd,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
 
 
 class InstantiateTemplateTests(unittest.TestCase):
@@ -442,6 +453,50 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertIn("error:", stderr)
             self.assertIn("prompt label must be a file name, not a path", stderr)
             self.assertFalse((repo_root / "config").exists())
+
+    def test_script_entrypoint_help_exits_successfully_without_side_effects(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            result = run_script(["--help"], cwd=repo_root)
+
+            self.assertEqual(result.returncode, 0)
+            self.assertEqual(result.stderr, "")
+            self.assertIn("Generate the CMake and config steps", result.stdout)
+            self.assertIn("--write-config", result.stdout)
+            self.assertIn("--json", result.stdout)
+            self.assertFalse((repo_root / "config").exists())
+
+    def test_script_entrypoint_reports_argparse_errors_without_traceback(self) -> None:
+        result = run_script(["--write-config"])
+
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("the following arguments are required: --binary-name", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+
+    def test_script_entrypoint_write_config_defaults_to_current_working_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            result = run_script(
+                [
+                    "--binary-name",
+                    "opsctl",
+                    "--write-config",
+                    "--json",
+                ],
+                cwd=repo_root,
+            )
+
+            config_path = repo_root / "config" / "opsctl.json"
+            payload = json.loads(result.stdout)
+            written = json.loads(config_path.read_text(encoding="utf-8"))
+
+            self.assertEqual(result.returncode, 0)
+            self.assertEqual(result.stderr, "")
+            self.assertEqual(payload["config_path"], "config/opsctl.json")
+            self.assertEqual(payload["wrote_config"], "config/opsctl.json")
+            self.assertEqual(written["prompt"], "opsctl")
+            self.assertEqual(written["enabled_commands"], ["about", "hello", "echo", "config", "doctor"])
 
 
 if __name__ == "__main__":
