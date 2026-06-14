@@ -20,8 +20,8 @@ This directory vendors small header-only dependencies so the starter does not de
 - Record version changes in this file and update the matching license file under `licenses/`.
 - Update starter docs when a dependency change affects build, test, or user-facing CLI behavior.
 - Re-run starter verification after dependency updates. Keep the CTest invocation
-  unfiltered so the doctest suite, built-executable smoke check, and repository
-  hygiene check run:
+  unfiltered so the doctest suite, template instantiation workflow,
+  built-executable smoke check, and repository hygiene check run:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON

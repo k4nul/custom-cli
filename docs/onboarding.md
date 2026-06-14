@@ -161,7 +161,20 @@ cmake -S . -B build \
 
 You can generate and validate that command with the repository-local
 instantiation workflow, and write the matching config template when the copied
-project is ready to use the renamed default config file:
+project is ready to use the renamed default config file. Start with a dry plan
+before writing files so the derived display name, config file, prompt label, and
+validation command are visible:
+
+```bash
+python3 scripts/instantiate_template.py \
+  --binary-name my-cli \
+  --display-name "My CLI" \
+  --config-file my-cli.json \
+  --prompt-label mycli
+```
+
+Then add `--write-config` when the copied project is ready to commit
+`config/my-cli.json`:
 
 ```bash
 python3 scripts/instantiate_template.py \
@@ -185,6 +198,10 @@ config has an empty `prompt`. If no config file exists, shell startup uses the
 built-in `AppConfig` prompt, currently `starter`, until that file exists. Update
 or regenerate the disk config's `prompt` when you want disk-backed shell
 sessions to use the renamed prompt consistently.
+
+See [template-instantiation.md](template-instantiation.md) for the full
+copy-time workflow, including what the helper changes, what it intentionally
+leaves unchanged, and which docs and tests should move with helper changes.
 
 The `cli_starter_smoke` CTest entry checks the built executable's success path,
 including `--version`, `about`, `doctor`, config initialization and display,
@@ -229,6 +246,8 @@ tool's purpose.
   fields, shell behavior, and exit statuses
 - `docs/architecture.md`: component layout and command flow
 - `docs/testing.md`: test targets, validation commands, and coverage notes
+- `docs/template-instantiation.md`: copied-starter rename workflow, generated
+  config template behavior, safety rules, and validation commands
 - `docs/artifact-hygiene.md`: tracked local artifact gate and cleanup runbook
 - `docs/ci.md`: GitHub Actions triggers, job commands, and failure triage
 - `docs/troubleshooting.md`: common local build and runtime issues

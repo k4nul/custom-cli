@@ -196,6 +196,12 @@ The helper does not perform a full source-tree rename. Keep docs clear that
 internal identifiers such as `project(CLIStarter)`, `starter_core`,
 `include/starter/`, and the `starter` namespace remain until the copied project
 intentionally changes them.
+Keep copied-project documentation consistent with that boundary: committing a
+generated `config/<name>.json` template should be accompanied by README,
+command-reference, onboarding, testing, and troubleshooting updates only for
+references that now describe the copied project's intended default behavior.
+Starter internals and sample-command examples should stay as starter references
+until the source changes that own them land.
 
 ## Dependency Updates
 

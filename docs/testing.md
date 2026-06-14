@@ -272,7 +272,9 @@ rejection, display-name rejection for values that cannot be written to the
 generated C++ project header, generated config writes, overwrite protection,
 forced rewrites, missing or symlinked repository-root protection, non-regular
 or symlinked config output protection, and exact JSON argv output for the
-printed validation plan.
+printed validation plan. Pair helper changes with
+[template-instantiation.md](template-instantiation.md) updates so the documented
+copy-time workflow matches the executable plan and the CTest coverage.
 
 When it runs inside a Git worktree with `git` available, the
 `repository_hygiene` CTest entry checks the checkout for tracked legacy artifact

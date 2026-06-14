@@ -1,17 +1,37 @@
 # Template Instantiation
 
 Use `scripts/instantiate_template.py` after copying this starter into a new
-repository and before replacing the sample commands. The script keeps the rename
-workflow in one executable place: it validates safe project names, prints the
-CMake cache variables needed for the renamed build, and can write the matching
-`config/<name>.json` template.
+repository and before replacing the sample commands. The script keeps the first
+rename workflow in one executable place: it validates safe project names, prints
+the CMake cache variables needed for the renamed build, and can write the
+matching `config/<name>.json` template.
 
-This is the first step of instantiating a copied starter, not a whole-repository
-rename. It changes generated build metadata and can create the renamed config
-template. It does not rename `project(CLIStarter)`, `starter_core`,
-`include/starter/`, the `starter` namespace, documentation examples, or sample
-command behavior. Replace those intentionally when the copied project starts to
-become a real application.
+This is the supported first step of instantiating a copied starter, not a
+whole-repository rename. It changes generated build metadata and can create the
+renamed config template. It does not rename `project(CLIStarter)`,
+`starter_core`, `include/starter/`, the `starter` namespace, documentation
+examples, or sample command behavior. Replace those intentionally when the
+copied project starts to become a real application.
+
+## Workflow Summary
+
+Use this sequence in a copied checkout:
+
+1. Pick the public runtime names: executable name, display name, default config
+   file name, and shell prompt label.
+2. Run the helper without `--write-config` to inspect the generated CMake and
+   validation commands.
+3. Run the printed validation command from a fresh ignored build directory.
+4. Re-run the helper with `--write-config` when the copied project is ready to
+   use the renamed default config file.
+5. Inspect and commit the generated `config/<name>.json` template with any docs
+   and command examples that should now point at the renamed config.
+6. Replace internal source identifiers, namespaces, sample commands, and
+   documentation examples in separate intentional changes.
+
+Keep the plan step and the write step separate unless the copied project already
+has a clear rename decision. The dry plan is useful for checking derived
+defaults and command quoting without changing the checkout.
 
 ## Plan The Rename
 
@@ -37,6 +57,19 @@ Use `--json` when another local script needs the generated plan. The JSON
 output includes the CMake configure command, build command, CTest command, full
 validation command, config path, and written config path when `--write-config`
 is used.
+
+Example JSON plan:
+
+```bash
+python3 scripts/instantiate_template.py \
+  --binary-name my-cli \
+  --display-name "My CLI" \
+  --json
+```
+
+The JSON output is for local automation and review. It does not execute CMake,
+build the project, run CTest, or write files unless `--write-config` is also
+passed.
 
 ## Write The Config Template
 
@@ -69,6 +102,13 @@ config. Then update docs and examples that still point at
 `config/cli-starter.json`, or keep the old template only while migration is
 intentional.
 
+`--write-config` only creates or replaces the runtime config template. It does
+not update source files, CMake project names, command registration, README
+examples, command reference examples, CI commands, or test expectations. When
+the copied project switches to the renamed config by default, update those
+reader-facing references in the same documentation package that commits the new
+config template.
+
 After writing, inspect the local diff before committing:
 
 ```bash
@@ -78,6 +118,11 @@ cat config/my-cli.json
 
 Then run the printed validation command. It configures the renamed executable,
 builds it, and runs the CTest suite with output-on-failure enabled.
+
+If the copied checkout still has examples that refer to `cli-starter` or
+`config/cli-starter.json`, decide whether they are still intentional starter
+references or should be replaced by the copied project's names. Do not treat the
+helper as evidence that every repository reference has been renamed.
 
 ## Safety Rules
 
@@ -123,6 +168,34 @@ cmake --build build && \
 ctest --test-dir build --output-on-failure
 ```
 
+If the artifact preflight prints tracked paths, report the rename validation as
+blocked until those legacy generated artifacts are removed. The CTest
+`repository_hygiene` entry fails for matching tracked paths that still exist in
+the checkout; the completion checker treats any matching `git ls-files` output
+as a preflight blocker. Record the preflight output with the rename plan and
+treat artifact cleanup as a separate package. When source-behavior evidence is
+still needed before cleanup, run a fresh ignored build tree and filter only the
+non-hygiene entries:
+
+```bash
+cmake -S . -B build \
+  -DCLI_STARTER_BINARY_NAME=my-cli \
+  -DCLI_STARTER_DISPLAY_NAME="My CLI" \
+  -DCLI_STARTER_CONFIG_FILE=my-cli.json \
+  -DCLI_STARTER_PROMPT_LABEL=mycli \
+  -DBUILD_TESTING=ON \
+  -DCLI_STARTER_BUILD_TESTS=ON && \
+cmake --build build && \
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
+```
+
+Label that result as partial validation and include the artifact family counts
+when the preflight listing is long:
+
+```bash
+git ls-files 'build-local-*' '.sandbox-user/*' | cut -d/ -f1 | sort | uniq -c
+```
+
 For multi-config generators, build and test the same configuration:
 
 ```powershell
@@ -142,3 +215,12 @@ The normal CMake/CTest validation flow also runs these tests through the
 ```bash
 ctest --test-dir build --output-on-failure -R '^template_instantiation_workflow$'
 ```
+
+When the helper behavior changes, keep these files aligned in the same change:
+
+- `scripts/instantiate_template.py`
+- `tests/instantiate_template_tests.py`
+- `docs/template-instantiation.md`
+- `docs/onboarding.md`, when the first customization loop changes
+- `docs/testing.md` and `docs/maintenance.md`, when validation or maintenance
+  expectations change
