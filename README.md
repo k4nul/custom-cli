@@ -627,6 +627,7 @@ ctest --test-dir build -C Debug --output-on-failure
 - [docs/onboarding.md](docs/onboarding.md): 첫 로컬 빌드, smoke test, 커스터마이징 흐름
 - [docs/architecture.md](docs/architecture.md): 구조와 확장 지점
 - [docs/testing.md](docs/testing.md): CTest/doctest 검증 흐름과 테스트 범위
+- [docs/template-instantiation.md](docs/template-instantiation.md): 안전한 starter rename workflow
 - [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate와 cleanup runbook
 - [docs/ci.md](docs/ci.md): GitHub Actions trigger, job command, failure triage
 - [docs/troubleshooting.md](docs/troubleshooting.md): 로컬 설정과 실행 중 자주 겪는 문제

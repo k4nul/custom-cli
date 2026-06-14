@@ -175,6 +175,27 @@ aligned when changing defaults, prompt naming, or generated notes.
 
 `config/local.json` and `config/*.local.json` are ignored for local experiments.
 
+## Template Instantiation Changes
+
+Treat the standalone instantiation helper as the supported first rename step
+for a copied starter. When changing `scripts/instantiate_template.py`:
+
+1. Keep CMake cache variable names aligned with `CMakeLists.txt` and
+   `cmake/project_config.hpp.in`.
+2. Preserve safe-name and safe-output checks for path-like values, control
+   characters, non-JSON config files, existing files, symlinks, and
+   non-regular output paths.
+3. Add or update tests in `tests/instantiate_template_tests.py`, then keep
+   `tests/check_project_completion.py` aligned with any machine-checkable
+   workflow expectation.
+4. Update `docs/template-instantiation.md` when flags, generated config
+   contents, validation commands, or manual follow-through change.
+
+The helper does not perform a full source-tree rename. Keep docs clear that
+internal identifiers such as `project(CLIStarter)`, `starter_core`,
+`include/starter/`, and the `starter` namespace remain until the copied project
+intentionally changes them.
+
 ## Dependency Updates
 
 Header-only dependencies live under `third_party/`; this starter does not need a

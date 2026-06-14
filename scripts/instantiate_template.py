@@ -155,12 +155,26 @@ def inspect_config_output_path(output_path: Path, force: bool) -> None:
         raise InstantiationError(f"{output_path} already exists; pass --force to replace it")
 
 
+def prepare_output_directory(output_directory: Path) -> None:
+    if output_directory.is_symlink():
+        raise InstantiationError(f"{output_directory} must not be a symlink")
+    if output_directory.exists():
+        if not output_directory.is_dir():
+            raise InstantiationError(f"{output_directory} is not a directory")
+        return
+    try:
+        output_directory.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise InstantiationError(f"failed to prepare config directory {output_directory}: {exc}") from exc
+    if output_directory.is_symlink():
+        raise InstantiationError(f"{output_directory} must not be a symlink")
+    if not output_directory.is_dir():
+        raise InstantiationError(f"{output_directory} is not a directory")
+
+
 def write_config_template(plan: InstantiationPlan, repo_root: Path, force: bool) -> Path:
     output_path = repo_root / plan.config_path
-    try:
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-    except OSError as exc:
-        raise InstantiationError(f"failed to prepare config directory for {output_path}: {exc}") from exc
+    prepare_output_directory(output_path.parent)
     inspect_config_output_path(output_path, force)
     try:
         output_path.write_text(json.dumps(plan.config_template, indent=2) + "\n", encoding="utf-8")

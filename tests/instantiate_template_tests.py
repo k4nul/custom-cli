@@ -143,6 +143,19 @@ class InstantiateTemplateTests(unittest.TestCase):
 
             self.assertTrue(output_path.is_dir())
 
+    def test_write_config_template_refuses_non_directory_config_path(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            config_path = repo_root / "config"
+            config_path.write_text("not a directory\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(instantiate_template.InstantiationError, "is not a directory"):
+                instantiate_template.write_config_template(plan, repo_root, force=True)
+
+            self.assertEqual(config_path.read_text(encoding="utf-8"), "not a directory\n")
+
     def test_write_config_template_refuses_symlink_output_path_even_with_force(self) -> None:
         plan = instantiate_template.build_plan(make_args())
 
@@ -161,6 +174,25 @@ class InstantiateTemplateTests(unittest.TestCase):
                 instantiate_template.write_config_template(plan, repo_root, force=True)
 
             self.assertEqual(target_path.read_text(encoding="utf-8"), "outside\n")
+
+    def test_write_config_template_refuses_symlink_config_directory(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir) / "repo"
+            repo_root.mkdir()
+            outside_config = Path(temp_dir) / "outside-config"
+            outside_config.mkdir()
+            config_path = repo_root / "config"
+            try:
+                config_path.symlink_to(outside_config, target_is_directory=True)
+            except (NotImplementedError, OSError) as exc:
+                self.skipTest(f"symlink creation unavailable: {exc}")
+
+            with self.assertRaisesRegex(instantiate_template.InstantiationError, "must not be a symlink"):
+                instantiate_template.write_config_template(plan, repo_root, force=True)
+
+            self.assertFalse((outside_config / "my-cli.json").exists())
 
     def test_json_output_includes_commands_and_written_config_path(self) -> None:
         plan = instantiate_template.build_plan(make_args(display_name="My CLI"))

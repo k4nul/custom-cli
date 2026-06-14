@@ -268,8 +268,9 @@ redirected shell behavior, or parse/config error text changes, update
 The `template_instantiation_workflow` CTest entry covers the standalone rename
 helper in `scripts/instantiate_template.py`. It verifies safe default
 derivation, explicit binary/display/config/prompt overrides, unsafe-name
-rejection, generated config writes, overwrite protection, forced rewrites, and
-JSON output for the printed validation plan.
+rejection, generated config writes, overwrite protection, forced rewrites,
+non-regular or symlinked config output protection, and JSON output for the
+printed validation plan.
 
 When it runs inside a Git worktree with `git` available, the
 `repository_hygiene` CTest entry checks the checkout for tracked legacy artifact
