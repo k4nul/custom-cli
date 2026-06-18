@@ -77,6 +77,8 @@ def run_git_ls_files(patterns: tuple[str, ...]) -> subprocess.CompletedProcess[s
 
 def check_required_paths(blockers: list[str]) -> None:
     required_paths = (
+        ".editorconfig",
+        ".gitattributes",
         "CMakeLists.txt",
         "README.md",
         ".github/workflows/ci.yml",
@@ -190,6 +192,25 @@ def check_phase_manifest(blockers: list[str]) -> None:
 
 def check_cmake_and_ci_wiring(blockers: list[str]) -> None:
     require_contains(
+        REPO_ROOT / ".editorconfig",
+        (
+            "root = true",
+            "end_of_line = lf",
+            "insert_final_newline = true",
+            "trim_trailing_whitespace = true",
+        ),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / ".gitattributes",
+        (
+            "* text=auto eol=lf",
+            "*.bat text eol=crlf",
+            "*.cmd text eol=crlf",
+        ),
+        blockers,
+    )
+    require_contains(
         REPO_ROOT / "CMakeLists.txt",
         (
             "add_library(starter_core",
@@ -217,7 +238,7 @@ def check_cmake_and_ci_wiring(blockers: list[str]) -> None:
     )
     require_contains(
         REPO_ROOT / "cmake/repository_hygiene_test.cmake",
-        ("ls-files", '"build-local-*"', '".sandbox-user/*"'),
+        (".editorconfig", ".gitattributes", "ls-files", '"build-local-*"', '".sandbox-user/*"'),
         blockers,
     )
 

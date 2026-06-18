@@ -24,6 +24,25 @@ if(NOT git_result EQUAL 0 OR NOT git_stdout STREQUAL "true")
     return()
 endif()
 
+set(required_policy_files
+    ".editorconfig"
+    ".gitattributes"
+)
+
+set(missing_policy_files)
+foreach(policy_file IN LISTS required_policy_files)
+    if(NOT EXISTS "${CLI_STARTER_SOURCE_DIR}/${policy_file}")
+        list(APPEND missing_policy_files "${policy_file}")
+    endif()
+endforeach()
+
+if(missing_policy_files)
+    list(JOIN missing_policy_files "\n" missing_policy_files_text)
+    message(FATAL_ERROR
+        "Required repository editor and line-ending policy files are missing:\n"
+        "${missing_policy_files_text}")
+endif()
+
 execute_process(
     COMMAND "${GIT_EXECUTABLE}" -C "${CLI_STARTER_SOURCE_DIR}" ls-files "build-local-*" ".sandbox-user/*"
     RESULT_VARIABLE hygiene_result
