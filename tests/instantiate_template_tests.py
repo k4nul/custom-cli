@@ -93,6 +93,18 @@ class InstantiateTemplateTests(unittest.TestCase):
         self.assertEqual(plan.config_template["prompt"], "ops")
         self.assertEqual(plan.config_template["enabled_commands"], ["about", "hello", "echo", "config", "doctor"])
 
+    def test_plan_accepts_safe_punctuation_in_explicit_config_file(self) -> None:
+        plan = instantiate_template.build_plan(
+            make_args(
+                binary_name="opsctl",
+                config_file="ops.team_cli-v2.json",
+            )
+        )
+
+        self.assertEqual(plan.config_file, "ops.team_cli-v2.json")
+        self.assertEqual(plan.config_path.as_posix(), "config/ops.team_cli-v2.json")
+        self.assertIn("-DCLI_STARTER_CONFIG_FILE=ops.team_cli-v2.json", plan.cmake_command)
+
     def test_validation_command_shell_quotes_values_with_spaces(self) -> None:
         plan = instantiate_template.build_plan(make_args(binary_name="opsctl", display_name="Ops Control"))
 
@@ -113,6 +125,26 @@ class InstantiateTemplateTests(unittest.TestCase):
         for args in invalid_args:
             with self.subTest(args=args):
                 with self.assertRaises(instantiate_template.InstantiationError):
+                    instantiate_template.build_plan(args)
+
+    def test_plan_rejects_token_values_that_do_not_start_with_alnum(self) -> None:
+        invalid_args = [
+            make_args(binary_name="-opsctl"),
+            make_args(binary_name="_opsctl"),
+            make_args(binary_name=".opsctl"),
+            make_args(config_file="-opsctl.json"),
+            make_args(config_file="_opsctl.json"),
+            make_args(config_file=".opsctl.json"),
+            make_args(prompt_label="_ops"),
+            make_args(build_dir="-build"),
+        ]
+
+        for args in invalid_args:
+            with self.subTest(args=args):
+                with self.assertRaisesRegex(
+                    instantiate_template.InstantiationError,
+                    "must start with a letter or digit",
+                ):
                     instantiate_template.build_plan(args)
 
     def test_plan_rejects_blank_display_names_and_unsafe_build_directories(self) -> None:
@@ -315,6 +347,30 @@ class InstantiateTemplateTests(unittest.TestCase):
         self.assertIn("cmake -S . -B build-renamed", stdout)
         self.assertIn("Config template not written; pass --write-config to create it.", stdout)
 
+    def test_main_text_write_config_reports_written_path_and_content(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            exit_code, stdout, stderr = run_main(
+                [
+                    "--binary-name",
+                    "opsctl",
+                    "--repo-root",
+                    str(repo_root),
+                    "--write-config",
+                ]
+            )
+
+            config_path = repo_root / "config" / "opsctl.json"
+            written = json.loads(config_path.read_text(encoding="utf-8"))
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("Template instantiation plan", stdout)
+            self.assertIn(f"Wrote config template: {config_path}", stdout)
+            self.assertEqual(written["prompt"], "opsctl")
+            self.assertEqual(written["default_name"], "world")
+            self.assertEqual(written["enabled_commands"], ["about", "hello", "echo", "config", "doctor"])
+
     def test_main_json_write_config_uses_repo_root(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             repo_root = Path(temp_dir)
@@ -403,6 +459,30 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertIn("error:", stderr)
             self.assertIn("repo root", stderr)
             self.assertFalse(repo_root.exists())
+
+    def test_main_write_config_refuses_config_parent_file_without_traceback(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            config_path = repo_root / "config"
+            config_path.write_text("not a directory\n", encoding="utf-8")
+
+            exit_code, stdout, stderr = run_main(
+                [
+                    "--binary-name",
+                    "opsctl",
+                    "--repo-root",
+                    str(repo_root),
+                    "--write-config",
+                ]
+            )
+
+            self.assertEqual(exit_code, 2)
+            self.assertEqual(stdout, "")
+            self.assertIn("error:", stderr)
+            self.assertIn("is not a directory", stderr)
+            self.assertNotIn("Traceback", stderr)
+            self.assertEqual(config_path.read_text(encoding="utf-8"), "not a directory\n")
+            self.assertFalse((repo_root / "config" / "opsctl.json").exists())
 
     def test_main_force_json_replaces_existing_config(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
