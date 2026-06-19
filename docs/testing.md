@@ -129,13 +129,13 @@ python3 tests/check_project_completion.py
 ```
 
 The checker verifies that the phase manifest can be evaluated in its
-transition-ready shape, post-transition maintenance shape, or a future
-transition shape with a concrete transition command. It also verifies that the
-CMake/CTest and CI wiring is present, the registered command surface is
-represented in tests and command documentation, the config template has the
-expected fields, and the tracked local artifact preflight is clean. It does not
-replace the baseline CMake/CTest flow; run it with baseline validation when
-preparing a phase-transition report or maintenance evidence report.
+transition-ready shape, post-transition maintenance shape, or pending or
+completed maintenance closure shape with concrete transition evidence. It also
+verifies that the CMake/CTest and CI wiring is present, the registered command
+surface is represented in tests and command documentation, the config template
+has the expected fields, and the tracked local artifact preflight is clean. It
+does not replace the baseline CMake/CTest flow; run it with baseline validation
+when preparing a phase-transition report or maintenance evidence report.
 
 For multi-config generators, build and test the same configuration:
 

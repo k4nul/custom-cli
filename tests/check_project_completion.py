@@ -22,11 +22,15 @@ EXPECTED_COMMANDS = ("about", "hello", "echo", "config", "doctor", "shell")
 EXPECTED_GLOBAL_OPTIONS = ("--version", "--help", "--help-all", "--config")
 COMPLETION_REPAIR_PHASE = "completion-gate-repair"
 MAINTENANCE_PHASE = "starter-template-maintenance"
+MAINTENANCE_COMPLETE_PHASE = "starter-template-maintenance-complete"
 COMPLETION_CHECK_COMMAND = "python3 tests/check_project_completion.py"
 BASELINE_VALIDATION_COMMAND = (
     "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON "
     "&& cmake --build build && ctest --test-dir build --output-on-failure"
 )
+MAINTENANCE_NO_PENDING_MODE = "maintenance-no-pending-transition"
+MAINTENANCE_COMPLETION_PENDING_MODE = "maintenance-completion-pending"
+MAINTENANCE_COMPLETE_MODE = "maintenance-complete-no-pending-transition"
 NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$"
 LEGACY_NON_HYGIENE_CTEST_FILTER = "^(starter_tests|cli_starter_smoke)$"
 
@@ -138,18 +142,24 @@ def check_phase_manifest(blockers: list[str]) -> None:
             )
     elif current_phase == MAINTENANCE_PHASE:
         if next_phase:
-            if transition_mode == "maintenance-no-pending-transition":
+            if next_phase != MAINTENANCE_COMPLETE_PHASE:
                 blockers.append(
-                    "phase manifest transition mode must change when next_phase "
-                    "is selected"
+                    "phase manifest next_phase must be "
+                    "starter-template-maintenance-complete when closing "
+                    "maintenance"
                 )
-            if not transition_validation_command:
+            if transition_mode != MAINTENANCE_COMPLETION_PENDING_MODE:
+                blockers.append(
+                    "phase manifest transition mode must be "
+                    "maintenance-completion-pending when closing maintenance"
+                )
+            if transition_validation_command != COMPLETION_CHECK_COMMAND:
                 blockers.append(
                     "phase manifest transition_validation_command must be set "
-                    "when next_phase is selected"
+                    "to the completion checker when closing maintenance"
                 )
         else:
-            if transition_mode != "maintenance-no-pending-transition":
+            if transition_mode != MAINTENANCE_NO_PENDING_MODE:
                 blockers.append(
                     "phase manifest transition mode must be "
                     "maintenance-no-pending-transition"
@@ -164,10 +174,30 @@ def check_phase_manifest(blockers: list[str]) -> None:
                     "phase manifest transition_validation_command must be empty "
                     "during maintenance"
                 )
+    elif current_phase == MAINTENANCE_COMPLETE_PHASE:
+        if next_phase:
+            blockers.append(
+                "phase manifest next_phase must be empty after maintenance is complete"
+            )
+        if transition_mode != MAINTENANCE_COMPLETE_MODE:
+            blockers.append(
+                "phase manifest transition mode must be "
+                "maintenance-complete-no-pending-transition after maintenance is complete"
+            )
+        if transition.get("validation_command") != BASELINE_VALIDATION_COMMAND:
+            blockers.append(
+                "phase manifest validation_command must run the baseline "
+                "CMake/CTest flow after maintenance is complete"
+            )
+        if transition_validation_command:
+            blockers.append(
+                "phase manifest transition_validation_command must be empty "
+                "after maintenance is complete"
+            )
     else:
         blockers.append(
-            "phase manifest current_phase must be completion-gate-repair or "
-            "starter-template-maintenance"
+            "phase manifest current_phase must be completion-gate-repair, "
+            "starter-template-maintenance, or starter-template-maintenance-complete"
         )
 
     phase_model = manifest.get("phase_model")
@@ -179,7 +209,11 @@ def check_phase_manifest(blockers: list[str]) -> None:
             for phase in phase_model
             if isinstance(phase, dict)
         }
-        for phase_id in (COMPLETION_REPAIR_PHASE, MAINTENANCE_PHASE):
+        for phase_id in (
+            COMPLETION_REPAIR_PHASE,
+            MAINTENANCE_PHASE,
+            MAINTENANCE_COMPLETE_PHASE,
+        ):
             if phase_id not in phase_ids:
                 blockers.append(f"phase manifest phase_model is missing phase: {phase_id}")
 

@@ -2,13 +2,13 @@
   "schema_version": "1.0.0",
   "project": "custom-cli",
   "current_phase": "starter-template-maintenance",
-  "next_phase": "",
+  "next_phase": "starter-template-maintenance-complete",
   "transition": {
-    "intent": "Keep the CLI starter in maintenance after the completion checker has passed.",
-    "mode": "maintenance-no-pending-transition",
+    "intent": "Route the completed CLI starter maintenance target through a final validated phase transition.",
+    "mode": "maintenance-completion-pending",
     "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
-    "transition_validation_command": "",
-    "decision_rule": "Select a new next_phase and transition_validation_command before routing another phase-transition."
+    "transition_validation_command": "python3 tests/check_project_completion.py",
+    "decision_rule": "When the completion checker passes, route phase-transition to set current_phase to starter-template-maintenance-complete and clear next_phase."
   },
   "phase_model": [
     {
@@ -48,6 +48,22 @@
       "exit_criteria": [
         "a new starter feature scope is explicitly selected"
       ]
+    },
+    {
+      "id": "starter-template-maintenance-complete",
+      "purpose": "Pause routine write-capable automation after the starter template is complete and validation remains machine-checkable.",
+      "allowed_work": [
+        "read-only maintenance evidence",
+        "owner-selected new phase planning",
+        "critical security fixes"
+      ],
+      "blocked_work": [
+        "routine write-capable automation without a new selected scope",
+        "broad new CLI feature work without explicit task"
+      ],
+      "exit_criteria": [
+        "a new starter feature scope is explicitly selected and the phase manifest is reactivated"
+      ]
     }
   ],
   "required_gates": [
@@ -55,7 +71,7 @@
       "id": "completion-checker-exists",
       "status": "machine-check",
       "required_for_transition": true,
-      "description": "The local automation evidence includes tests/check_project_completion.py, and the checker validates transition-ready, post-transition maintenance, and future-transition phase shapes.",
+      "description": "The local automation evidence includes tests/check_project_completion.py, and the checker validates transition-ready, post-transition maintenance, and maintenance-closure phase shapes.",
       "evidence": [
         "tests/check_project_completion.py",
         "python3 tests/check_project_completion.py"

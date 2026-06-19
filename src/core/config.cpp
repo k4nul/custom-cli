@@ -132,12 +132,38 @@ std::string display_path(const std::filesystem::path& path) {
     return escape_for_display(path.generic_string());
 }
 
+std::string path_error_message(
+    std::string_view prefix,
+    const std::filesystem::path& path,
+    const std::error_code& error) {
+    return std::string(prefix) + display_path(path) + ": " + error.message();
+}
+
+std::string config_directory_error_message(
+    std::string_view prefix,
+    const std::filesystem::path& output_path,
+    const std::filesystem::path& directory,
+    std::string_view detail) {
+    return std::string(prefix) + display_path(output_path) + ": "
+        + display_path(directory) + std::string(detail);
+}
+
+[[noreturn]] void throw_config_file_inspection_error(
+    const std::filesystem::path& path,
+    const std::error_code& error) {
+    throw ConfigReadError(path_error_message("failed to inspect config file: ", path, error));
+}
+
+struct ConfigDirectoryInspection {
+    std::filesystem::file_status status;
+    bool missing = false;
+};
+
 bool config_file_exists(const std::filesystem::path& path) {
     std::error_code error;
     const bool exists = std::filesystem::exists(path, error);
     if (error) {
-        throw ConfigReadError(
-            "failed to inspect config file: " + display_path(path) + ": " + error.message());
+        throw_config_file_inspection_error(path, error);
     }
     return exists;
 }
@@ -154,9 +180,7 @@ std::uintmax_t inspect_config_file_for_read(const std::filesystem::path& path) {
     std::error_code error;
     const bool regular_file = std::filesystem::is_regular_file(path, error);
     if (error) {
-        throw ConfigReadError(
-            "failed to inspect config file: " + display_path(path) + ": "
-            + error.message());
+        throw_config_file_inspection_error(path, error);
     }
     if (!regular_file) {
         throw ConfigReadError("config path is not a regular file: " + display_path(path));
@@ -164,9 +188,7 @@ std::uintmax_t inspect_config_file_for_read(const std::filesystem::path& path) {
 
     const auto file_size = std::filesystem::file_size(path, error);
     if (error) {
-        throw ConfigReadError(
-            "failed to inspect config file: " + display_path(path) + ": "
-            + error.message());
+        throw_config_file_inspection_error(path, error);
     }
     if (file_size > max_config_file_size_bytes) {
         throw ConfigReadError(config_file_too_large_message(path, file_size));
@@ -208,38 +230,58 @@ std::string read_config_text(
     return text;
 }
 
-void inspect_or_create_config_output_directory(
+ConfigDirectoryInspection inspect_config_directory_status(
     const std::filesystem::path& directory,
     const std::filesystem::path& output_path) {
     std::error_code error;
     auto status = std::filesystem::symlink_status(directory, error);
-    bool missing = false;
-    if (error) {
-        if (error == std::errc::no_such_file_or_directory) {
-            error.clear();
-            missing = true;
-        } else {
-            throw ConfigWriteError(
-                "failed to inspect config directory for " + display_path(output_path) + ": "
-                + display_path(directory) + ": " + error.message());
-        }
+    if (!error) {
+        return {status, false};
     }
 
-    if (missing || !std::filesystem::exists(status)) {
-        error.clear();
-        std::filesystem::create_directory(directory, error);
-        if (error) {
-            throw ConfigWriteError(
-                "failed to prepare config directory for " + display_path(output_path) + ": "
-                + display_path(directory) + ": " + error.message());
-        }
+    if (error == std::errc::no_such_file_or_directory) {
+        return {status, true};
+    }
 
-        status = std::filesystem::symlink_status(directory, error);
-        if (error) {
-            throw ConfigWriteError(
-                "failed to inspect config directory for " + display_path(output_path) + ": "
-                + display_path(directory) + ": " + error.message());
-        }
+    throw ConfigWriteError(config_directory_error_message(
+        "failed to inspect config directory for ",
+        output_path,
+        directory,
+        ": " + error.message()));
+}
+
+std::filesystem::file_status create_and_inspect_config_directory(
+    const std::filesystem::path& directory,
+    const std::filesystem::path& output_path) {
+    std::error_code error;
+    std::filesystem::create_directory(directory, error);
+    if (error) {
+        throw ConfigWriteError(config_directory_error_message(
+            "failed to prepare config directory for ",
+            output_path,
+            directory,
+            ": " + error.message()));
+    }
+
+    auto status = std::filesystem::symlink_status(directory, error);
+    if (error) {
+        throw ConfigWriteError(config_directory_error_message(
+            "failed to inspect config directory for ",
+            output_path,
+            directory,
+            ": " + error.message()));
+    }
+    return status;
+}
+
+void inspect_or_create_config_output_directory(
+    const std::filesystem::path& directory,
+    const std::filesystem::path& output_path) {
+    auto inspection = inspect_config_directory_status(directory, output_path);
+    auto status = inspection.status;
+
+    if (inspection.missing || !std::filesystem::exists(status)) {
+        status = create_and_inspect_config_directory(directory, output_path);
     }
 
     if (std::filesystem::is_symlink(status)) {
@@ -248,9 +290,11 @@ void inspect_or_create_config_output_directory(
     }
 
     if (!std::filesystem::is_directory(status)) {
-        throw ConfigWriteError(
-            "failed to prepare config directory for " + display_path(output_path) + ": "
-            + display_path(directory) + " is not a directory");
+        throw ConfigWriteError(config_directory_error_message(
+            "failed to prepare config directory for ",
+            output_path,
+            directory,
+            " is not a directory"));
     }
 }
 
@@ -287,8 +331,7 @@ void inspect_config_file_for_write(const std::filesystem::path& path) {
             return;
         }
         throw ConfigWriteError(
-            "failed to inspect config output path: " + display_path(path) + ": "
-            + error.message());
+            path_error_message("failed to inspect config output path: ", path, error));
     }
 
     if (!std::filesystem::exists(status)) {
