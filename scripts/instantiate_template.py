@@ -110,7 +110,8 @@ def require_token(label: str, value: str) -> str:
         raise InstantiationError(f"{label} must be a file name, not a path")
     if value in {".", ".."} or not TOKEN_PATTERN.match(value):
         raise InstantiationError(
-            f"{label} must start with a letter or digit and use only letters, digits, '.', '_', or '-'"
+            f"{label} must start with a letter or digit and use only "
+            "letters, digits, '.', '_', or '-'"
         )
     return value
 
@@ -139,7 +140,10 @@ def build_plan(args: argparse.Namespace) -> InstantiationPlan:
     config_file = require_token("config file", args.config_file or f"{binary_name}.json")
     if not config_file.endswith(".json"):
         raise InstantiationError("config file must end with .json")
-    prompt_label = require_token("prompt label", args.prompt_label or derive_prompt_label(binary_name))
+    prompt_label = require_token(
+        "prompt label",
+        args.prompt_label or derive_prompt_label(binary_name),
+    )
     build_dir = require_token("build directory", args.build_dir)
     return InstantiationPlan(
         binary_name=binary_name,
@@ -180,7 +184,9 @@ def prepare_output_directory(output_directory: Path) -> None:
     try:
         output_directory.mkdir(parents=True, exist_ok=True)
     except OSError as exc:
-        raise InstantiationError(f"failed to prepare config directory {output_directory}: {exc}") from exc
+        raise InstantiationError(
+            f"failed to prepare config directory {output_directory}: {exc}"
+        ) from exc
     if output_directory.is_symlink():
         raise InstantiationError(f"{output_directory} must not be a symlink")
     if not output_directory.is_dir():
@@ -195,7 +201,9 @@ def write_config_template(plan: InstantiationPlan, repo_root: Path, force: bool)
     try:
         output_path.write_text(json.dumps(plan.config_template, indent=2) + "\n", encoding="utf-8")
     except OSError as exc:
-        raise InstantiationError(f"failed to write config template to {output_path}: {exc}") from exc
+        raise InstantiationError(
+            f"failed to write config template to {output_path}: {exc}"
+        ) from exc
     return output_path
 
 
@@ -218,7 +226,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         action="store_true",
         help="Write config/<config-file> with the renamed prompt label.",
     )
-    parser.add_argument("--force", action="store_true", help="Allow --write-config to replace an existing file.")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Allow --write-config to replace an existing file.",
+    )
     parser.add_argument("--json", action="store_true", help="Print the plan as JSON.")
     return parser.parse_args(argv)
 

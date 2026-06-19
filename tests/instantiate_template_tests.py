@@ -19,6 +19,7 @@ sys.dont_write_bytecode = True
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / "scripts" / "instantiate_template.py"
+EXPECTED_ENABLED_COMMANDS = ["about", "hello", "echo", "config", "doctor"]
 SPEC = importlib.util.spec_from_file_location("instantiate_template", SCRIPT_PATH)
 assert SPEC is not None
 instantiate_template = importlib.util.module_from_spec(SPEC)
@@ -91,7 +92,7 @@ class InstantiateTemplateTests(unittest.TestCase):
         self.assertIn("-DCLI_STARTER_DISPLAY_NAME=Ops Control", plan.cmake_command)
         self.assertIn("-DCLI_STARTER_CONFIG_FILE=ops.json", plan.cmake_command)
         self.assertEqual(plan.config_template["prompt"], "ops")
-        self.assertEqual(plan.config_template["enabled_commands"], ["about", "hello", "echo", "config", "doctor"])
+        self.assertEqual(plan.config_template["enabled_commands"], EXPECTED_ENABLED_COMMANDS)
 
     def test_plan_accepts_safe_punctuation_in_explicit_config_file(self) -> None:
         plan = instantiate_template.build_plan(
@@ -106,7 +107,9 @@ class InstantiateTemplateTests(unittest.TestCase):
         self.assertIn("-DCLI_STARTER_CONFIG_FILE=ops.team_cli-v2.json", plan.cmake_command)
 
     def test_validation_command_shell_quotes_values_with_spaces(self) -> None:
-        plan = instantiate_template.build_plan(make_args(binary_name="opsctl", display_name="Ops Control"))
+        plan = instantiate_template.build_plan(
+            make_args(binary_name="opsctl", display_name="Ops Control")
+        )
 
         self.assertIn("'-DCLI_STARTER_DISPLAY_NAME=Ops Control'", plan.validation_command)
         self.assertIn("-DCLI_STARTER_BINARY_NAME=opsctl", plan.validation_command)
@@ -186,7 +189,7 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertEqual(output_path, repo_root / "config" / "my-cli.json")
             self.assertEqual(written["prompt"], "mycli")
             self.assertEqual(written["default_name"], "world")
-            self.assertEqual(written["enabled_commands"], ["about", "hello", "echo", "config", "doctor"])
+            self.assertEqual(written["enabled_commands"], EXPECTED_ENABLED_COMMANDS)
 
             with self.assertRaises(instantiate_template.InstantiationError):
                 instantiate_template.write_config_template(plan, repo_root, force=False)
@@ -203,7 +206,10 @@ class InstantiateTemplateTests(unittest.TestCase):
             output_path = repo_root / "config" / "my-cli.json"
             output_path.mkdir(parents=True)
 
-            with self.assertRaisesRegex(instantiate_template.InstantiationError, "not a regular file"):
+            with self.assertRaisesRegex(
+                instantiate_template.InstantiationError,
+                "not a regular file",
+            ):
                 instantiate_template.write_config_template(plan, repo_root, force=True)
 
             self.assertTrue(output_path.is_dir())
@@ -216,7 +222,10 @@ class InstantiateTemplateTests(unittest.TestCase):
             config_path = repo_root / "config"
             config_path.write_text("not a directory\n", encoding="utf-8")
 
-            with self.assertRaisesRegex(instantiate_template.InstantiationError, "is not a directory"):
+            with self.assertRaisesRegex(
+                instantiate_template.InstantiationError,
+                "is not a directory",
+            ):
                 instantiate_template.write_config_template(plan, repo_root, force=True)
 
             self.assertEqual(config_path.read_text(encoding="utf-8"), "not a directory\n")
@@ -227,7 +236,10 @@ class InstantiateTemplateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             repo_root = Path(temp_dir) / "missing"
 
-            with self.assertRaisesRegex(instantiate_template.InstantiationError, "repo root .* does not exist"):
+            with self.assertRaisesRegex(
+                instantiate_template.InstantiationError,
+                "repo root .* does not exist",
+            ):
                 instantiate_template.write_config_template(plan, repo_root, force=True)
 
             self.assertFalse(repo_root.exists())
@@ -239,7 +251,10 @@ class InstantiateTemplateTests(unittest.TestCase):
             repo_root = Path(temp_dir) / "repo"
             repo_root.write_text("not a directory\n", encoding="utf-8")
 
-            with self.assertRaisesRegex(instantiate_template.InstantiationError, "repo root .* is not a directory"):
+            with self.assertRaisesRegex(
+                instantiate_template.InstantiationError,
+                "repo root .* is not a directory",
+            ):
                 instantiate_template.write_config_template(plan, repo_root, force=True)
 
             self.assertEqual(repo_root.read_text(encoding="utf-8"), "not a directory\n")
@@ -256,7 +271,10 @@ class InstantiateTemplateTests(unittest.TestCase):
             except (NotImplementedError, OSError) as exc:
                 self.skipTest(f"symlink creation unavailable: {exc}")
 
-            with self.assertRaisesRegex(instantiate_template.InstantiationError, "repo root .* must not be a symlink"):
+            with self.assertRaisesRegex(
+                instantiate_template.InstantiationError,
+                "repo root .* must not be a symlink",
+            ):
                 instantiate_template.write_config_template(plan, repo_root, force=True)
 
             self.assertFalse((real_root / "config" / "my-cli.json").exists())
@@ -275,7 +293,10 @@ class InstantiateTemplateTests(unittest.TestCase):
             except (NotImplementedError, OSError) as exc:
                 self.skipTest(f"symlink creation unavailable: {exc}")
 
-            with self.assertRaisesRegex(instantiate_template.InstantiationError, "must not be a symlink"):
+            with self.assertRaisesRegex(
+                instantiate_template.InstantiationError,
+                "must not be a symlink",
+            ):
                 instantiate_template.write_config_template(plan, repo_root, force=True)
 
             self.assertEqual(target_path.read_text(encoding="utf-8"), "outside\n")
@@ -294,7 +315,10 @@ class InstantiateTemplateTests(unittest.TestCase):
             except (NotImplementedError, OSError) as exc:
                 self.skipTest(f"symlink creation unavailable: {exc}")
 
-            with self.assertRaisesRegex(instantiate_template.InstantiationError, "must not be a symlink"):
+            with self.assertRaisesRegex(
+                instantiate_template.InstantiationError,
+                "must not be a symlink",
+            ):
                 instantiate_template.write_config_template(plan, repo_root, force=True)
 
             self.assertFalse((outside_config / "my-cli.json").exists())
@@ -323,7 +347,10 @@ class InstantiateTemplateTests(unittest.TestCase):
             ],
         )
         self.assertEqual(payload["build_command"], ["cmake", "--build", "build-renamed"])
-        self.assertEqual(payload["ctest_command"], ["ctest", "--test-dir", "build-renamed", "--output-on-failure"])
+        self.assertEqual(
+            payload["ctest_command"],
+            ["ctest", "--test-dir", "build-renamed", "--output-on-failure"],
+        )
         self.assertIn("ctest", payload["validation_command"])
         self.assertNotIn("'&&'", payload["validation_command"])
 
@@ -369,7 +396,7 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertIn(f"Wrote config template: {config_path}", stdout)
             self.assertEqual(written["prompt"], "opsctl")
             self.assertEqual(written["default_name"], "world")
-            self.assertEqual(written["enabled_commands"], ["about", "hello", "echo", "config", "doctor"])
+            self.assertEqual(written["enabled_commands"], EXPECTED_ENABLED_COMMANDS)
 
     def test_main_json_write_config_uses_repo_root(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -395,7 +422,7 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertEqual(payload["config_path"], "config/opsctl.json")
             self.assertEqual(payload["wrote_config"], str(config_path))
             self.assertEqual(written["prompt"], "opsctl")
-            self.assertEqual(written["enabled_commands"], ["about", "hello", "echo", "config", "doctor"])
+            self.assertEqual(written["enabled_commands"], EXPECTED_ENABLED_COMMANDS)
 
     def test_main_json_plan_without_write_config_reports_no_written_file(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -576,7 +603,7 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertEqual(payload["config_path"], "config/opsctl.json")
             self.assertEqual(payload["wrote_config"], "config/opsctl.json")
             self.assertEqual(written["prompt"], "opsctl")
-            self.assertEqual(written["enabled_commands"], ["about", "hello", "echo", "config", "doctor"])
+            self.assertEqual(written["enabled_commands"], EXPECTED_ENABLED_COMMANDS)
 
 
 if __name__ == "__main__":

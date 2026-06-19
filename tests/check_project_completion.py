@@ -127,25 +127,47 @@ def check_phase_manifest(blockers: list[str]) -> None:
     transition_validation_command = str(transition.get("transition_validation_command") or "")
     if current_phase == COMPLETION_REPAIR_PHASE:
         if next_phase != MAINTENANCE_PHASE:
-            blockers.append("phase manifest next_phase must be starter-template-maintenance before phase-transition")
+            blockers.append(
+                "phase manifest next_phase must be starter-template-maintenance "
+                "before phase-transition"
+            )
         if transition_validation_command != COMPLETION_CHECK_COMMAND:
-            blockers.append("phase manifest transition_validation_command must run this checker before phase-transition")
+            blockers.append(
+                "phase manifest transition_validation_command must run this "
+                "checker before phase-transition"
+            )
     elif current_phase == MAINTENANCE_PHASE:
         if next_phase:
             if transition_mode == "maintenance-no-pending-transition":
-                blockers.append("phase manifest transition mode must change when next_phase is selected")
+                blockers.append(
+                    "phase manifest transition mode must change when next_phase "
+                    "is selected"
+                )
             if not transition_validation_command:
-                blockers.append("phase manifest transition_validation_command must be set when next_phase is selected")
+                blockers.append(
+                    "phase manifest transition_validation_command must be set "
+                    "when next_phase is selected"
+                )
         else:
             if transition_mode != "maintenance-no-pending-transition":
-                blockers.append("phase manifest transition mode must be maintenance-no-pending-transition")
+                blockers.append(
+                    "phase manifest transition mode must be "
+                    "maintenance-no-pending-transition"
+                )
             if transition.get("validation_command") != BASELINE_VALIDATION_COMMAND:
-                blockers.append("phase manifest validation_command must run the baseline CMake/CTest flow")
+                blockers.append(
+                    "phase manifest validation_command must run the baseline "
+                    "CMake/CTest flow"
+                )
             if transition_validation_command:
-                blockers.append("phase manifest transition_validation_command must be empty during maintenance")
+                blockers.append(
+                    "phase manifest transition_validation_command must be empty "
+                    "during maintenance"
+                )
     else:
         blockers.append(
-            "phase manifest current_phase must be completion-gate-repair or starter-template-maintenance"
+            "phase manifest current_phase must be completion-gate-repair or "
+            "starter-template-maintenance"
         )
 
     phase_model = manifest.get("phase_model")
@@ -183,7 +205,10 @@ def check_phase_manifest(blockers: list[str]) -> None:
             continue
         status = str(gate.get("status") or "").strip().lower()
         if status not in PASSING_GATE_STATUSES:
-            blockers.append(f"required gate {gate_id or '<missing-id>'} has non-passing status {status or '<missing>'}")
+            blockers.append(
+                f"required gate {gate_id or '<missing-id>'} has non-passing "
+                f"status {status or '<missing>'}"
+            )
 
     missing_gate_ids = expected_gate_ids - seen_gate_ids
     for gate_id in sorted(missing_gate_ids):
@@ -264,7 +289,10 @@ def check_tests_and_smoke_coverage(blockers: list[str]) -> None:
     tests = read_text(REPO_ROOT / "tests/config_tests.cpp")
     test_case_count = len(re.findall(r"\bTEST_CASE\(", tests))
     if test_case_count < 80:
-        blockers.append(f"tests/config_tests.cpp has too few doctest cases for current coverage: {test_case_count}")
+        blockers.append(
+            "tests/config_tests.cpp has too few doctest cases for current "
+            f"coverage: {test_case_count}"
+        )
 
     for expected in (
         "application accepts hello subcommand options from argv order",
@@ -300,11 +328,23 @@ def check_tests_and_smoke_coverage(blockers: list[str]) -> None:
         "CLI_STARTER_PROMPT_LABEL",
     ):
         if dynamic_marker not in smoke:
-            blockers.append(f"cmake/cli_smoke_test.cmake is missing dynamic metadata marker: {dynamic_marker}")
-    for failure in ("unknown command", "missing echo text", "unknown hello option", "missing config subcommand"):
+            blockers.append(
+                "cmake/cli_smoke_test.cmake is missing dynamic metadata "
+                f"marker: {dynamic_marker}"
+            )
+    for failure in (
+        "unknown command",
+        "missing echo text",
+        "unknown hello option",
+        "missing config subcommand",
+    ):
         if f'run_cli_failure_smoke_case("{failure}"' not in smoke:
             blockers.append(f"cmake/cli_smoke_test.cmake is missing failure smoke case: {failure}")
-    for shell_case in ("redirected default shell", "redirected explicit shell", "redirected empty-prompt shell"):
+    for shell_case in (
+        "redirected default shell",
+        "redirected explicit shell",
+        "redirected empty-prompt shell",
+    ):
         if f'run_cli_stdin_smoke_case("{shell_case}"' not in smoke:
             blockers.append(f"cmake/cli_smoke_test.cmake is missing shell smoke case: {shell_case}")
 
@@ -420,7 +460,9 @@ def check_template_instantiation_workflow(blockers: list[str]) -> None:
 def check_artifact_hygiene(blockers: list[str]) -> None:
     result = run_git_ls_files(("build-local-*", ".sandbox-user/*"))
     if result.returncode != 0:
-        blockers.append(f"git artifact preflight failed: {result.stderr.strip() or 'unknown error'}")
+        blockers.append(
+            f"git artifact preflight failed: {result.stderr.strip() or 'unknown error'}"
+        )
         return
     tracked_artifacts = [line for line in result.stdout.splitlines() if line.strip()]
     if tracked_artifacts:
