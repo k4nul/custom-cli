@@ -837,6 +837,35 @@ TEST_CASE("write_config_template refuses symlink output targets") {
     CHECK(buffer.str() == "target contents\n");
 }
 
+TEST_CASE("write_config_template refuses symlink parent directories") {
+    TemporaryDirectory temporary_directory;
+    const auto config_root = temporary_directory.path() / "config";
+    const auto outside_root = temporary_directory.path() / "outside-config";
+    const auto symlink_parent = config_root / "linked";
+    const auto config_path = symlink_parent / "nested" / "starter.json";
+    fs::create_directories(config_root);
+    fs::create_directories(outside_root);
+    std::error_code error;
+    fs::create_directory_symlink(outside_root, symlink_parent, error);
+    if (error) {
+        MESSAGE("Skipping symlink parent test: " << error.message());
+        return;
+    }
+    bool caught = false;
+
+    try {
+        starter::write_config_template(config_path, starter::AppConfig{});
+    } catch (const starter::ConfigWriteError& write_error) {
+        caught = true;
+        CHECK(contains_text(write_error.what(), "config directory must not be a symlink"));
+        CHECK(contains_text(write_error.what(), symlink_parent.generic_string()));
+    }
+
+    CHECK(caught);
+    CHECK_FALSE(fs::exists(outside_root / "nested"));
+    CHECK_FALSE(fs::exists(config_path));
+}
+
 TEST_CASE("application accepts hello subcommand options from argv order") {
     const auto result = run_application({"hello", "--name", "starter user"});
 

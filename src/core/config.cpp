@@ -208,6 +208,77 @@ std::string read_config_text(
     return text;
 }
 
+void inspect_or_create_config_output_directory(
+    const std::filesystem::path& directory,
+    const std::filesystem::path& output_path) {
+    std::error_code error;
+    auto status = std::filesystem::symlink_status(directory, error);
+    bool missing = false;
+    if (error) {
+        if (error == std::errc::no_such_file_or_directory) {
+            error.clear();
+            missing = true;
+        } else {
+            throw ConfigWriteError(
+                "failed to inspect config directory for " + display_path(output_path) + ": "
+                + display_path(directory) + ": " + error.message());
+        }
+    }
+
+    if (missing || !std::filesystem::exists(status)) {
+        error.clear();
+        std::filesystem::create_directory(directory, error);
+        if (error) {
+            throw ConfigWriteError(
+                "failed to prepare config directory for " + display_path(output_path) + ": "
+                + display_path(directory) + ": " + error.message());
+        }
+
+        status = std::filesystem::symlink_status(directory, error);
+        if (error) {
+            throw ConfigWriteError(
+                "failed to inspect config directory for " + display_path(output_path) + ": "
+                + display_path(directory) + ": " + error.message());
+        }
+    }
+
+    if (std::filesystem::is_symlink(status)) {
+        throw ConfigWriteError(
+            "config directory must not be a symlink: " + display_path(directory));
+    }
+
+    if (!std::filesystem::is_directory(status)) {
+        throw ConfigWriteError(
+            "failed to prepare config directory for " + display_path(output_path) + ": "
+            + display_path(directory) + " is not a directory");
+    }
+}
+
+void prepare_config_output_directory(
+    const std::filesystem::path& directory,
+    const std::filesystem::path& output_path) {
+    if (directory.empty()) {
+        return;
+    }
+
+    std::filesystem::path current;
+    const auto root_name = directory.root_name();
+    const auto root_directory = directory.root_directory();
+
+    for (const auto& component : directory) {
+        if (component.empty()) {
+            continue;
+        }
+        current /= component;
+        if ((!root_name.empty() && component == root_name)
+            || (!root_directory.empty() && component == root_directory)) {
+            continue;
+        }
+
+        inspect_or_create_config_output_directory(current, output_path);
+    }
+}
+
 void inspect_config_file_for_write(const std::filesystem::path& path) {
     std::error_code error;
     const auto status = std::filesystem::symlink_status(path, error);
@@ -293,14 +364,8 @@ AppConfig load_config_or_default(const std::filesystem::path& path, bool* loaded
 }
 
 void write_config_template(const std::filesystem::path& path, const AppConfig& config) {
-    try {
-        if (path.has_parent_path() && !path.parent_path().empty()) {
-            std::filesystem::create_directories(path.parent_path());
-        }
-    } catch (const std::filesystem::filesystem_error& error) {
-        throw ConfigWriteError(
-            "failed to prepare config directory for " + display_path(path) + ": "
-            + error.what());
+    if (path.has_parent_path() && !path.parent_path().empty()) {
+        prepare_config_output_directory(path.parent_path(), path);
     }
 
     inspect_config_file_for_write(path);
