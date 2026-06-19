@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0.0",
   "project": "custom-cli",
-  "current_phase": "starter-template-maintenance",
-  "next_phase": "starter-template-maintenance-complete",
+  "current_phase": "starter-template-maintenance-complete",
+  "next_phase": "",
   "transition": {
-    "intent": "Route the completed CLI starter maintenance target through a final validated phase transition.",
-    "mode": "maintenance-completion-pending",
+    "intent": "Keep the completed CLI starter in maintenance-complete state until an owner selects a new starter feature scope.",
+    "mode": "maintenance-complete-no-pending-transition",
     "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
-    "transition_validation_command": "python3 tests/check_project_completion.py",
-    "decision_rule": "When the completion checker passes, route phase-transition to set current_phase to starter-template-maintenance-complete and clear next_phase."
+    "transition_validation_command": "",
+    "decision_rule": "Keep routine write-capable automation paused unless an owner selects a new phase scope and reactivates this manifest."
   },
   "phase_model": [
     {
