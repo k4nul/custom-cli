@@ -1,6 +1,5 @@
 #include "starter/app/cli_app.hpp"
 
-#include <ostream>
 #include <string>
 
 #include <CLI/CLI.hpp>
