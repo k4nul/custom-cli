@@ -1258,6 +1258,33 @@ TEST_CASE("interactive shell applies inline config overrides to one command") {
     CHECK(result.prompts == std::vector<std::string>{"session> ", "session> "});
 }
 
+TEST_CASE("interactive shell applies inline equals config overrides to one command") {
+    TemporaryDirectory temporary_directory;
+    const auto session_config_path = temporary_directory.path() / "session.json";
+    const auto alternate_config_path = temporary_directory.path() / "alternate.json";
+
+    starter::AppConfig session_config;
+    session_config.prompt = "session";
+    session_config.default_name = "Grace";
+    starter::write_config_template(session_config_path, session_config);
+
+    starter::AppConfig alternate_config;
+    alternate_config.prompt = "alternate";
+    alternate_config.default_name = "Ada";
+    starter::write_config_template(alternate_config_path, alternate_config);
+
+    const auto result = run_application_with_scripted_shell(
+        {"--config", session_config_path.string(), "shell"},
+        {"--config=" + quote_shell_path(alternate_config_path) + " hello", "hello", "exit"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Hello, Ada.\n"));
+    CHECK(contains_text(result.out, "Hello, Grace.\n"));
+    CHECK_FALSE(contains_text(result.out, "Using built-in defaults"));
+    CHECK(result.err.empty());
+    CHECK(result.prompts == std::vector<std::string>{"session> ", "session> ", "session> "});
+}
+
 TEST_CASE("interactive shell keeps startup config after inline config overrides") {
     TemporaryDirectory temporary_directory;
     const auto session_config_path = temporary_directory.path() / "session.json";
@@ -1641,6 +1668,44 @@ TEST_CASE("application reads custom config path for config-backed commands") {
 
     CHECK(result.exit_code == 0);
     CHECK(result.out == "Hello, Ada.\n");
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("application reads inline long config option for config-backed commands") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+
+    starter::AppConfig config;
+    config.default_name = "Ada";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"--config=" + config_path.string(), "hello"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(result.out == "Hello, Ada.\n");
+    CHECK(result.err.empty());
+}
+
+TEST_CASE("application reads short config option for config show") {
+    TemporaryDirectory temporary_directory;
+    const auto config_path = temporary_directory.path() / "custom.json";
+
+    starter::AppConfig config;
+    config.prompt = "ops";
+    config.default_name = "Ada";
+    config.enabled_commands = {"hello", "config"};
+    config.notes = "short option profile";
+    starter::write_config_template(config_path, config);
+
+    const auto result = run_application({"-c", config_path.string(), "config", "show"});
+
+    CHECK(result.exit_code == 0);
+    CHECK(contains_text(result.out, "Config path: " + config_path.generic_string() + '\n'));
+    CHECK(contains_text(result.out, "Source: disk\n"));
+    CHECK(contains_text(result.out, "Prompt: ops\n"));
+    CHECK(contains_text(result.out, "Default name: Ada\n"));
+    CHECK(contains_text(result.out, "Enabled commands: hello, config\n"));
+    CHECK(contains_text(result.out, "Notes: short option profile\n"));
     CHECK(result.err.empty());
 }
 
