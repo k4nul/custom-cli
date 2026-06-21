@@ -51,20 +51,25 @@ reportable results from a build tree created for that validation pass; if
 `build/` already exists from an earlier run, remove it or choose another ignored
 build directory first. The unfiltered CTest run covers the registered entries
 from `CMakeLists.txt`: `starter_tests`, `template_instantiation_workflow`,
-`cli_starter_smoke`, and `repository_hygiene`.
+`cli_starter_smoke`, and `repository_hygiene`. The hygiene entry requires
+`.editorconfig` and `.gitattributes`, then uses Git to inspect tracked local
+artifact paths.
 
-Start local reports with the artifact preflight:
+Start local reports with the policy-file and artifact preflight:
 
 ```bash
+test -f .editorconfig
+test -f .gitattributes
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
-When that command prints tracked paths that still exist in the checkout, CI is
-expected to fail in `repository_hygiene` until the dedicated artifact cleanup
-package removes them. Local source-behavior investigation can still run the
-non-hygiene entries, but report that result as partial validation and include
-the preflight output. When the listing is long, include the path count and
-top-level artifact families too:
+When either policy file is missing, or when the artifact command prints tracked
+paths that still exist in the checkout, CI is expected to fail in
+`repository_hygiene` until the dedicated cleanup package fixes the gate. Local
+source-behavior investigation can still run the non-hygiene entries, but report
+that result as partial validation and include the preflight output. When the
+artifact listing is long, include the path count and top-level artifact families
+too:
 
 ```bash
 git ls-files 'build-local-*' '.sandbox-user/*' | cut -d/ -f1 | sort | uniq -c
@@ -109,9 +114,10 @@ by the cleanup runbook in `docs/artifact-hygiene.md`.
   python3 tests/instantiate_template_tests.py
   ```
 
-- If `repository_hygiene` fails, run
-  `git ls-files 'build-local-*' '.sandbox-user/*'` and follow
-  `docs/artifact-hygiene.md`.
+- If `repository_hygiene` fails, first confirm `.editorconfig` and
+  `.gitattributes` are present, then run `git ls-files 'build-local-*'
+  '.sandbox-user/*'` and follow `docs/artifact-hygiene.md` for tracked generated
+  artifact cleanup.
 
 ## When To Update CI
 

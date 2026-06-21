@@ -172,6 +172,22 @@ The cleanup change should contain the removed generated files and any directly
 related documentation update only; it should not mix in command, config, or test
 behavior changes.
 
+## Repository Hygiene Fails For Policy Files
+
+`repository_hygiene` checks more than generated artifact paths. It also requires
+the repository policy files that keep editor behavior and line endings stable:
+
+```bash
+test -f .editorconfig
+test -f .gitattributes
+```
+
+If CTest reports missing policy files, restore those files before treating the
+artifact gate as clean. Do not replace the failure with a filtered CTest run;
+the unfiltered validation gate is passing only when the policy files are
+present, the tracked artifact query is clean, and the full CMake/CTest flow
+passes from a fresh ignored build tree.
+
 ## A Command Prints `Run with --help`
 
 CLI11 reports parse and validation failures through stderr. Common examples are

@@ -7,20 +7,23 @@ evidence.
 ## Baseline Validation
 
 Use the local CMake/CTest flow before reporting source changes. Start by
-checking the tracked legacy artifact patterns that `repository_hygiene` enforces:
+checking the policy files and tracked legacy artifact patterns that
+`repository_hygiene` enforces:
 
 ```bash
+test -f .editorconfig
+test -f .gitattributes
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
-If that command returns paths that still exist in the checkout, the full
-unfiltered CTest run is expected to fail in `repository_hygiene` until those
-tracked generated artifacts are removed. Record that state as blocked
+If a policy-file check fails, or if the artifact query returns paths that still
+exist in the checkout, the full unfiltered CTest run is expected to fail in
+`repository_hygiene` until the gate is fixed. Record that state as blocked
 validation; do not use old build output or a filtered CTest run as a passing
 substitute. A focused run of `starter_tests`, `template_instantiation_workflow`,
 and `cli_starter_smoke` can support source-behavior investigation while the gate
 is dirty, but it must be labeled as partial validation and paired with the
-artifact preflight output:
+preflight output:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
@@ -56,7 +59,6 @@ python3 tests/check_project_completion.py
 The checker confirms that completion evidence is machine-checkable. It verifies
 that the active phase manifest is transition-ready, in the post-transition
 maintenance shape, or explicit about a pending or completed maintenance
-closure transition. It also checks that phase gate statuses are eligible for evaluation, CMake/CTest and CI
 closure transition. It also checks that phase gate statuses are eligible for
 evaluation, CMake/CTest and CI wiring are still present, the template
 instantiation workflow is tested, the command surface is reflected in tests and
@@ -78,13 +80,17 @@ when starter tests are enabled because the template instantiation workflow test
 is registered through CTest.
 Git is required for `repository_hygiene` to prove the tracked artifact gate. If
 `git` is unavailable, that entry is skipped and should not be reported as a
-passing artifact hygiene check. Use a verbose hygiene-only CTest run, or include
-the `git` preflight commands, when normal CTest output does not make the skip
-state clear:
+passing artifact hygiene check. The same CTest entry also requires
+`.editorconfig` and `.gitattributes`; missing policy files are a hygiene failure
+even before artifact inspection. Use a verbose hygiene-only CTest run, or
+include the policy-file and `git` preflight commands, when normal CTest output
+does not make the state clear:
 
 ```bash
 command -v git
 git rev-parse --is-inside-work-tree
+test -f .editorconfig
+test -f .gitattributes
 ctest --test-dir build --output-on-failure -R '^repository_hygiene$' -V
 ```
 
@@ -280,6 +286,8 @@ Keep the documentation set internally consistent:
   customization loop.
 - `docs/architecture.md`: component layout, command flow, and extension points.
 - `docs/testing.md`: validation commands, current coverage, and test gaps.
+- `docs/template-instantiation.md`: copied-starter rename workflow, safety
+  rules, and validation commands.
 - `docs/artifact-hygiene.md`: tracked local artifact gate, cleanup sequence, and
   reporting states.
 - `docs/ci.md`: GitHub Actions triggers, job commands, and failure triage.
@@ -287,15 +295,19 @@ Keep the documentation set internally consistent:
 - `docs/maintenance.md`: maintainer validation, change checklists, artifact
   hygiene, and CI workflow expectations.
 - `docs/migration-from-legacy.md`: historical migration context.
+- `.github/ISSUE_TEMPLATE.md` and `.github/pull_request_template.md`: issue and
+  pull request intake checklists.
 - `third_party/README.md`: vendored dependency versions, source URLs, license
   links, and dependency update guidance.
 
-Start documentation maintenance by recording the same artifact preflight used
-for validation:
+Start documentation maintenance by recording the same policy-file and artifact
+preflight used for validation:
 
 ```bash
 git status --short
 git diff --name-only
+test -f .editorconfig
+test -f .gitattributes
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 

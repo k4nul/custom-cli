@@ -1,22 +1,30 @@
 # Artifact Hygiene
 
-This runbook covers the repository hygiene gate for historical local build and
-sandbox artifacts. The starter ignores these paths for new local work, but older
-checkouts can still contain tracked generated files that must be removed before
-full CTest validation can be reported as passing.
+This runbook covers the artifact portion of the repository hygiene gate for
+historical local build and sandbox artifacts. The same CTest entry also checks
+required repository policy files. The starter ignores generated paths for new
+local work, but older checkouts can still contain tracked generated files that
+must be removed before full CTest validation can be reported as passing.
 
 ## What The Gate Checks
 
 The `repository_hygiene` CTest entry is registered from `CMakeLists.txt` and
-implemented by `cmake/repository_hygiene_test.cmake`. When it runs inside a Git
-worktree with `git` available, it inspects tracked paths that match:
+implemented by `cmake/repository_hygiene_test.cmake`. It first requires the
+repository policy files that keep editor behavior and line endings stable:
+
+- `.editorconfig`
+- `.gitattributes`
+
+When it runs inside a Git worktree with `git` available, it also inspects
+tracked paths that match:
 
 - `build-local-*`
 - `.sandbox-user/*`
 
-The check fails when matching tracked paths still exist in the checkout. If
-`git` is not available, or the test is run outside a Git worktree, the hygiene
-script reports a skip instead of proving that the checkout is clean.
+The check fails when required policy files are missing, or when matching tracked
+artifact paths still exist in the checkout. If `git` is not available, or the
+test is run outside a Git worktree, the artifact inspection reports a skip
+instead of proving that the checkout is clean.
 CTest may still summarize that skip path as a successful test process because
 the script returns early. Treat it as a skipped gate, not a passed hygiene proof,
 unless the Git preflight succeeds and the tracked artifact query is clean.
@@ -27,13 +35,16 @@ Start every validation or cleanup report with the artifact gate:
 
 ```bash
 git status --short
+test -f .editorconfig
+test -f .gitattributes
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
 The `git status --short` output should be empty before a cleanup package starts.
-The `git ls-files` command should print no paths after cleanup. If it prints
-paths, do not use historical binaries, CTest files, Visual Studio telemetry, or
-sandbox files from those locations as evidence for the current source tree.
+Both policy-file checks should succeed. The `git ls-files` command should print
+no paths after cleanup. If it prints paths, do not use historical binaries,
+CTest files, Visual Studio telemetry, or sandbox files from those locations as
+evidence for the current source tree.
 
 `git ls-files` reports paths that are still tracked in the index. The
 `repository_hygiene` CTest entry then checks whether those tracked paths still
@@ -114,10 +125,13 @@ they keep the cleanup instructions accurate.
 
 - Report validation as blocked when `git ls-files 'build-local-*' '.sandbox-user/*'`
   prints paths that still exist in the checkout.
+- Report validation as blocked when `.editorconfig` or `.gitattributes` is
+  missing, because `repository_hygiene` fails before artifact inspection.
 - Report `repository_hygiene` as skipped, not passed, when `git` is unavailable
   or validation runs outside a Git worktree.
-- Report full validation as passing only after the artifact gate prints no paths
-  and the unfiltered CMake/CTest flow passes from a fresh ignored build tree.
+- Report full validation as passing only after the required policy files are
+  present, the artifact gate prints no paths, and the unfiltered CMake/CTest
+  flow passes from a fresh ignored build tree.
 - For documentation-only artifact-hygiene changes, report the changed
   documentation paths and the artifact preflight output. There is no
   repository-defined Markdown lint or link-check command, so do not replace the
@@ -129,5 +143,7 @@ verbosely or include the Git preflight in the report:
 ```bash
 command -v git
 git rev-parse --is-inside-work-tree
+test -f .editorconfig
+test -f .gitattributes
 ctest --test-dir build --output-on-failure -R '^repository_hygiene$' -V
 ```

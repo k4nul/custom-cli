@@ -246,19 +246,21 @@ workflow and test command.
 ## Testing
 
 For normal starter behavior tests, including the doctest suite, template-instantiation workflow,
-built-executable smoke checks, and repository hygiene checks, first inspect the tracked legacy
-artifact patterns that the hygiene check enforces:
+built-executable smoke checks, and repository hygiene checks, first confirm the required repository
+policy files and inspect the tracked legacy artifact patterns that the hygiene check enforces:
 
 ```bash
+test -f .editorconfig
+test -f .gitattributes
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
 Use a fresh ignored `build/` tree for validation. Do not cite historical `build-local-*` or
 `.sandbox-user/` artifacts as proof that the current source still builds or tests cleanly.
-If the artifact check returns paths that still exist in the checkout, `repository_hygiene` is
-expected to fail until those tracked generated artifacts are removed in a cleanup change. In that
-state, report full validation as blocked by artifact hygiene instead of replacing it with historical
-build output or a filtered test run. Use the cleanup sequence in
+If a policy-file check fails, or if the artifact check returns paths that still exist in the
+checkout, `repository_hygiene` is expected to fail until the gate is fixed. In that state, report
+full validation as blocked by repository hygiene instead of replacing it with historical build
+output or a filtered test run. Use the cleanup sequence in
 [docs/artifact-hygiene.md](docs/artifact-hygiene.md) only when that separate repository cleanup
 change is intentionally selected.
 
@@ -289,7 +291,9 @@ ctest --test-dir build --output-on-failure
 
 This unfiltered CTest run covers the registered entries: `starter_tests`,
 `template_instantiation_workflow`, `cli_starter_smoke`, and
-`repository_hygiene`. The template-instantiation entry runs the Python rename
+`repository_hygiene`. The hygiene entry requires `.editorconfig` and
+`.gitattributes`, then checks that tracked generated local artifacts are absent.
+The template-instantiation entry runs the Python rename
 workflow tests through the CMake-discovered Python 3 interpreter. The smoke
 entry exercises built-executable success commands and representative
 parser/config failure paths, plus redirected default, explicit-config, and
@@ -297,8 +301,9 @@ empty-prompt shell sessions, so stdout and stderr routing, prompt fallback, and
 basic shell dispatch stay visible in normal validation.
 The tracked GitHub Actions workflow at [.github/workflows/ci.yml](.github/workflows/ci.yml) runs the
 same CMake/CTest validation on Linux and Windows.
-Because CI runs unfiltered CTest, tracked `build-local-*` or `.sandbox-user/*` paths make CI fail in
-`repository_hygiene` until the artifact cleanup package removes them.
+Because CI runs unfiltered CTest, missing repository policy files or tracked `build-local-*` and
+`.sandbox-user/*` paths make CI fail in `repository_hygiene` until the cleanup package fixes the
+gate.
 See [docs/ci.md](docs/ci.md) for workflow triggers, job commands, and failure triage.
 Use the local flow above before reporting source changes.
 
@@ -325,6 +330,7 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 - [docs/onboarding.md](docs/onboarding.md): first local build, smoke test, and customization loop
 - [docs/architecture.md](docs/architecture.md): structure and extension points
 - [docs/testing.md](docs/testing.md): CTest/doctest validation flow and coverage notes
+- [docs/template-instantiation.md](docs/template-instantiation.md): copied-starter rename workflow
 - [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate and cleanup runbook
 - [docs/ci.md](docs/ci.md): GitHub Actions triggers, job commands, and failure triage
 - [docs/troubleshooting.md](docs/troubleshooting.md): common local setup and runtime issues

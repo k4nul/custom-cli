@@ -18,9 +18,10 @@ configured to inspect.
 - `cli_starter_smoke`: runs the built CLI through version, about, doctor,
   config, hello, echo, and redirected shell success checks, plus parse and
   config failure checks for executable-level stdout/stderr routing
-- `repository_hygiene`: when running inside a Git worktree with `git` available,
-  fails if tracked legacy artifact paths matching `build-local-*` or
-  `.sandbox-user/*` are still present in the checkout
+- `repository_hygiene`: requires `.editorconfig` and `.gitattributes`, then,
+  when running inside a Git worktree with `git` available, fails if tracked
+  legacy artifact paths matching `build-local-*` or `.sandbox-user/*` are still
+  present in the checkout
 
 The test target and CTest entries are created only when
 `CLI_STARTER_BUILD_TESTS` is enabled. That option defaults to CMake's
@@ -31,7 +32,9 @@ CMake must be able to find a Python 3 interpreter when starter tests are
 enabled so `template_instantiation_workflow` can run portably on Linux and
 Windows.
 Git is also required for `repository_hygiene` to prove the tracked artifact gate;
-without `git`, that CTest entry skips instead of passing the gate.
+without `git`, that CTest entry skips artifact inspection instead of passing the
+gate. Missing `.editorconfig` or `.gitattributes` is a hygiene failure before
+the Git-backed artifact inspection runs.
 Because normal CTest output can summarize that early return as a successful test
 process, prove skip reporting with the Git preflight or a verbose hygiene-only
 run when the environment is in doubt:
@@ -39,6 +42,8 @@ run when the environment is in doubt:
 ```bash
 command -v git
 git rev-parse --is-inside-work-tree
+test -f .editorconfig
+test -f .gitattributes
 ctest --test-dir build --output-on-failure -R '^repository_hygiene$' -V
 ```
 
@@ -172,6 +177,8 @@ is documentation-only and that the repository artifact gate state is understood:
 ```bash
 git status --short
 git diff --name-only
+test -f .editorconfig
+test -f .gitattributes
 git ls-files 'build-local-*' '.sandbox-user/*'
 git ls-files 'build-local-*' '.sandbox-user/*' | cut -d/ -f1 | sort | uniq -c
 ```
@@ -276,10 +283,11 @@ printed validation plan. Pair helper changes with
 [template-instantiation.md](template-instantiation.md) updates so the documented
 copy-time workflow matches the executable plan and the CTest coverage.
 
-When it runs inside a Git worktree with `git` available, the
-`repository_hygiene` CTest entry checks the checkout for tracked legacy artifact
-paths matching `build-local-*` and `.sandbox-user/*`, so old generated files do
-not become source or validation evidence again.
+The `repository_hygiene` CTest entry requires `.editorconfig` and
+`.gitattributes`. When it runs inside a Git worktree with `git` available, it
+also checks the checkout for tracked legacy artifact paths matching
+`build-local-*` and `.sandbox-user/*`, so old generated files do not become
+source or validation evidence again.
 
 ## Known Gaps
 
@@ -366,5 +374,6 @@ git ls-files 'build-local-*' '.sandbox-user/*'
 
 The command should print no paths after the cleanup. Then run the standard
 unfiltered CTest flow from a fresh ignored `build/` tree so
-`repository_hygiene` can confirm, in Git worktrees with `git` available, that
-tracked generated artifacts no longer block validation.
+`repository_hygiene` can confirm that required policy files are present and, in
+Git worktrees with `git` available, that tracked generated artifacts no longer
+block validation.

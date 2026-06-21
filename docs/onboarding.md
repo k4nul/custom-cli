@@ -9,8 +9,8 @@ needs to get a local build, smoke test, and first customization loop working.
 - A C++17 compiler
 - `ctest`, which is provided with CMake
 - Python 3 for the template instantiation workflow test
-- Git when you need reportable full validation, because the artifact hygiene
-  gate uses `git ls-files`
+- Git when you need reportable full validation, because the repository hygiene
+  gate uses `git ls-files` for tracked artifact inspection
 
 On Linux, a normal CMake toolchain with `g++` or `clang++` is enough. On
 Windows, use Visual Studio, Build Tools for Visual Studio, or another
@@ -33,16 +33,18 @@ they are present, rebuild into a fresh ignored build directory before validating
 behavior:
 
 ```bash
+test -f .editorconfig
+test -f .gitattributes
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
-If that command prints paths that still exist in the checkout, the unfiltered
-CTest run is expected to fail in `repository_hygiene` when tests run inside a Git
-worktree with `git` available. The check is scoped to those legacy tracked
+If either policy-file check fails, or if the artifact query prints paths that
+still exist in the checkout, the unfiltered CTest run is expected to fail in
+`repository_hygiene`. The artifact check is scoped to those legacy tracked
 artifact patterns until they are removed in a separate cleanup change. You can
 still rebuild into `build/` to inspect current source behavior, but report full
-validation as blocked by artifact hygiene instead of treating a filtered run or
-old artifact output as authoritative.
+validation as blocked by repository hygiene instead of treating a filtered run
+or old artifact output as authoritative.
 
 Use [docs/artifact-hygiene.md](artifact-hygiene.md) when that separate cleanup
 package is intentionally selected.

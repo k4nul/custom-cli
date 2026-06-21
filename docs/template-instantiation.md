@@ -146,15 +146,17 @@ and other non-regular paths.
 
 ## Validation
 
-Start with the repository artifact preflight used by the normal validation
-flow:
+Start with the repository policy-file and artifact preflight used by the normal
+validation flow:
 
 ```bash
+test -f .editorconfig
+test -f .gitattributes
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
-If that command prints no paths, run the validation command printed by the
-helper. It has this shape:
+If both policy files are present and the artifact command prints no paths, run
+the validation command printed by the helper. It has this shape:
 
 ```bash
 cmake -S . -B build \
@@ -168,14 +170,14 @@ cmake --build build && \
 ctest --test-dir build --output-on-failure
 ```
 
-If the artifact preflight prints tracked paths, report the rename validation as
-blocked until those legacy generated artifacts are removed. The CTest
-`repository_hygiene` entry fails for matching tracked paths that still exist in
-the checkout; the completion checker treats any matching `git ls-files` output
-as a preflight blocker. Record the preflight output with the rename plan and
-treat artifact cleanup as a separate package. When source-behavior evidence is
-still needed before cleanup, run a fresh ignored build tree and filter only the
-non-hygiene entries:
+If either policy file is missing, or if the artifact preflight prints tracked
+paths, report the rename validation as blocked until repository hygiene is
+fixed. The CTest `repository_hygiene` entry fails for missing policy files and
+for matching tracked paths that still exist in the checkout; the completion
+checker treats any matching `git ls-files` output as a preflight blocker. Record
+the preflight output with the rename plan and treat artifact cleanup as a
+separate package. When source-behavior evidence is still needed before cleanup,
+run a fresh ignored build tree and filter only the non-hygiene entries:
 
 ```bash
 cmake -S . -B build \
