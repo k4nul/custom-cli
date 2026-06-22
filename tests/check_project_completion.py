@@ -462,6 +462,8 @@ def check_template_instantiation_workflow(blockers: list[str]) -> None:
             "CLI_STARTER_CONFIG_FILE",
             "CLI_STARTER_PROMPT_LABEL",
             "write_config_template",
+            "run_validation",
+            "--run-validation",
         ),
         blockers,
     )
@@ -476,6 +478,8 @@ def check_template_instantiation_workflow(blockers: list[str]) -> None:
             "test_write_config_template_refuses_symlink_repo_root",
             "test_write_config_template_refuses_non_directory_config_path",
             "test_write_config_template_refuses_symlink_config_directory",
+            "test_run_validation_executes_generated_commands_from_repo_root",
+            "test_main_json_run_validation_reports_result",
             "test_json_output_includes_commands_and_written_config_path",
         ),
         blockers,
@@ -486,6 +490,7 @@ def check_template_instantiation_workflow(blockers: list[str]) -> None:
             "python3 scripts/instantiate_template.py",
             "python3 tests/instantiate_template_tests.py",
             "--write-config",
+            "--run-validation",
         ),
         blockers,
     )

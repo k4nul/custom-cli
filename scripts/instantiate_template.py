@@ -7,6 +7,7 @@ import argparse
 import json
 import re
 import shlex
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -75,6 +76,10 @@ class InstantiationPlan:
         )
 
     @property
+    def validation_commands(self) -> list[list[str]]:
+        return [self.cmake_command, self.build_command, self.ctest_command]
+
+    @property
     def config_template(self) -> dict[str, object]:
         return {
             "prompt": self.prompt_label,
@@ -86,6 +91,12 @@ class InstantiationPlan:
     @property
     def config_path(self) -> Path:
         return Path("config") / self.config_file
+
+
+@dataclass(frozen=True)
+class ValidationResult:
+    return_code: int
+    failed_command: tuple[str, ...] | None
 
 
 def shell_join(command: list[str]) -> str:
@@ -207,6 +218,31 @@ def write_config_template(plan: InstantiationPlan, repo_root: Path, force: bool)
     return output_path
 
 
+def run_validation(
+    plan: InstantiationPlan,
+    repo_root: Path,
+    runner=subprocess.run,
+) -> ValidationResult:
+    inspect_repo_root(repo_root)
+    for command in plan.validation_commands:
+        print(f"+ {shell_join(command)}", file=sys.stderr)
+        try:
+            result = runner(
+                command,
+                cwd=repo_root,
+                check=False,
+                stdout=sys.stderr,
+                stderr=sys.stderr,
+            )
+        except OSError as exc:
+            raise InstantiationError(
+                f"failed to run validation command {command[0]}: {exc}"
+            ) from exc
+        if result.returncode != 0:
+            return ValidationResult(result.returncode, tuple(command))
+    return ValidationResult(0, None)
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Generate the CMake and config steps for renaming a copied CLI starter."
@@ -219,7 +255,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument(
         "--repo-root",
         default=".",
-        help="Copied starter checkout where --write-config writes config/<name>.json.",
+        help=(
+            "Copied starter checkout used by --write-config and "
+            "--run-validation."
+        ),
     )
     parser.add_argument(
         "--write-config",
@@ -231,11 +270,20 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         action="store_true",
         help="Allow --write-config to replace an existing file.",
     )
+    parser.add_argument(
+        "--run-validation",
+        action="store_true",
+        help="Run the generated CMake, build, and CTest validation commands.",
+    )
     parser.add_argument("--json", action="store_true", help="Print the plan as JSON.")
     return parser.parse_args(argv)
 
 
-def plan_as_json(plan: InstantiationPlan, wrote_config: str | None) -> str:
+def plan_as_json(
+    plan: InstantiationPlan,
+    wrote_config: str | None,
+    validation_result: ValidationResult | None = None,
+) -> str:
     payload = {
         "binary_name": plan.binary_name,
         "display_name": plan.display_name,
@@ -247,11 +295,24 @@ def plan_as_json(plan: InstantiationPlan, wrote_config: str | None) -> str:
         "ctest_command": plan.ctest_command,
         "validation_command": plan.validation_command,
         "wrote_config": wrote_config,
+        "ran_validation": validation_result is not None,
+        "validation_return_code": (
+            validation_result.return_code if validation_result is not None else None
+        ),
+        "failed_validation_command": (
+            list(validation_result.failed_command)
+            if validation_result is not None and validation_result.failed_command is not None
+            else None
+        ),
     }
     return json.dumps(payload, indent=2)
 
 
-def plan_as_text(plan: InstantiationPlan, wrote_config: str | None) -> str:
+def plan_as_text(
+    plan: InstantiationPlan,
+    wrote_config: str | None,
+    validation_result: ValidationResult | None = None,
+) -> str:
     lines = [
         "Template instantiation plan",
         f"- binary name: {plan.binary_name}",
@@ -269,6 +330,23 @@ def plan_as_text(plan: InstantiationPlan, wrote_config: str | None) -> str:
         lines.extend(["", f"Wrote config template: {wrote_config}"])
     else:
         lines.extend(["", "Config template not written; pass --write-config to create it."])
+    if validation_result is None:
+        lines.extend(["", "Validation not run; pass --run-validation to execute it."])
+    elif validation_result.return_code == 0:
+        lines.extend(["", "Validation result: passed"])
+    else:
+        failed_command = (
+            shell_join(list(validation_result.failed_command))
+            if validation_result.failed_command is not None
+            else "<unknown>"
+        )
+        lines.extend(
+            [
+                "",
+                f"Validation result: failed with exit code {validation_result.return_code}",
+                f"Failed command: {failed_command}",
+            ]
+        )
     return "\n".join(lines)
 
 
@@ -277,16 +355,22 @@ def main(argv: list[str] | None = None) -> int:
     try:
         plan = build_plan(args)
         wrote_config = None
+        validation_result = None
+        repo_root = Path(args.repo_root)
         if args.write_config:
-            wrote_config = str(write_config_template(plan, Path(args.repo_root), args.force))
+            wrote_config = str(write_config_template(plan, repo_root, args.force))
+        if args.run_validation:
+            validation_result = run_validation(plan, repo_root)
     except InstantiationError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
     if args.json:
-        print(plan_as_json(plan, wrote_config))
+        print(plan_as_json(plan, wrote_config, validation_result))
     else:
-        print(plan_as_text(plan, wrote_config))
+        print(plan_as_text(plan, wrote_config, validation_result))
+    if validation_result is not None and validation_result.return_code != 0:
+        return validation_result.return_code
     return 0
 
 

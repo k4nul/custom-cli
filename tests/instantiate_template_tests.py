@@ -323,6 +323,53 @@ class InstantiateTemplateTests(unittest.TestCase):
 
             self.assertFalse((outside_config / "my-cli.json").exists())
 
+    def test_run_validation_executes_generated_commands_from_repo_root(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+        recorded: list[tuple[list[str], Path]] = []
+
+        def fake_runner(
+            command: list[str],
+            **kwargs: object,
+        ) -> subprocess.CompletedProcess[str]:
+            recorded.append((command, kwargs["cwd"]))  # type: ignore[arg-type]
+            return subprocess.CompletedProcess(command, 0, "", "")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            result = instantiate_template.run_validation(
+                plan,
+                repo_root,
+                runner=fake_runner,
+            )
+
+        self.assertEqual(result.return_code, 0)
+        self.assertIsNone(result.failed_command)
+        self.assertEqual(
+            [command for command, _ in recorded],
+            plan.validation_commands,
+        )
+        self.assertTrue(all(cwd == repo_root for _, cwd in recorded))
+
+    def test_run_validation_stops_at_first_failed_command(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+        recorded: list[list[str]] = []
+
+        def fake_runner(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+            recorded.append(command)
+            return_code = 7 if command == plan.build_command else 0
+            return subprocess.CompletedProcess(command, return_code, "", "")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            result = instantiate_template.run_validation(
+                plan,
+                Path(temp_dir),
+                runner=fake_runner,
+            )
+
+        self.assertEqual(result.return_code, 7)
+        self.assertEqual(result.failed_command, tuple(plan.build_command))
+        self.assertEqual(recorded, [plan.cmake_command, plan.build_command])
+
     def test_json_output_includes_commands_and_written_config_path(self) -> None:
         plan = instantiate_template.build_plan(make_args(display_name="My CLI"))
         payload = json.loads(instantiate_template.plan_as_json(plan, "config/my-cli.json"))
@@ -353,6 +400,18 @@ class InstantiateTemplateTests(unittest.TestCase):
         )
         self.assertIn("ctest", payload["validation_command"])
         self.assertNotIn("'&&'", payload["validation_command"])
+        self.assertFalse(payload["ran_validation"])
+        self.assertIsNone(payload["validation_return_code"])
+        self.assertIsNone(payload["failed_validation_command"])
+
+    def test_json_output_includes_validation_result(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+        result = instantiate_template.ValidationResult(7, tuple(plan.build_command))
+        payload = json.loads(instantiate_template.plan_as_json(plan, None, result))
+
+        self.assertTrue(payload["ran_validation"])
+        self.assertEqual(payload["validation_return_code"], 7)
+        self.assertEqual(payload["failed_validation_command"], plan.build_command)
 
     def test_main_prints_text_plan_without_writing_config(self) -> None:
         exit_code, stdout, stderr = run_main(
@@ -444,6 +503,68 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertEqual(payload["config_path"], "config/opsctl.json")
             self.assertIsNone(payload["wrote_config"])
             self.assertFalse((repo_root / "config" / "opsctl.json").exists())
+
+    def test_main_json_run_validation_reports_result(self) -> None:
+        original_run_validation = instantiate_template.run_validation
+
+        def fake_run_validation(
+            plan: instantiate_template.InstantiationPlan,
+            repo_root: Path,
+        ) -> instantiate_template.ValidationResult:
+            self.assertEqual(repo_root, Path("."))
+            self.assertEqual(plan.binary_name, "opsctl")
+            return instantiate_template.ValidationResult(0, None)
+
+        try:
+            instantiate_template.run_validation = fake_run_validation
+            exit_code, stdout, stderr = run_main(
+                [
+                    "--binary-name",
+                    "opsctl",
+                    "--run-validation",
+                    "--json",
+                ]
+            )
+        finally:
+            instantiate_template.run_validation = original_run_validation
+
+        payload = json.loads(stdout)
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(stderr, "")
+        self.assertTrue(payload["ran_validation"])
+        self.assertEqual(payload["validation_return_code"], 0)
+        self.assertIsNone(payload["failed_validation_command"])
+
+    def test_main_run_validation_failure_returns_validation_status(self) -> None:
+        original_run_validation = instantiate_template.run_validation
+
+        def fake_run_validation(
+            plan: instantiate_template.InstantiationPlan,
+            repo_root: Path,
+        ) -> instantiate_template.ValidationResult:
+            return instantiate_template.ValidationResult(9, tuple(plan.ctest_command))
+
+        try:
+            instantiate_template.run_validation = fake_run_validation
+            exit_code, stdout, stderr = run_main(
+                [
+                    "--binary-name",
+                    "opsctl",
+                    "--run-validation",
+                    "--json",
+                ]
+            )
+        finally:
+            instantiate_template.run_validation = original_run_validation
+
+        payload = json.loads(stdout)
+        self.assertEqual(exit_code, 9)
+        self.assertEqual(stderr, "")
+        self.assertEqual(payload["validation_return_code"], 9)
+        self.assertEqual(
+            payload["failed_validation_command"],
+            ["ctest", "--test-dir", "build", "--output-on-failure"],
+        )
 
     def test_main_refuses_unforced_config_overwrite(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -570,6 +691,7 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertEqual(result.stderr, "")
             self.assertIn("Generate the CMake and config steps", result.stdout)
             self.assertIn("--write-config", result.stdout)
+            self.assertIn("--run-validation", result.stdout)
             self.assertIn("--json", result.stdout)
             self.assertFalse((repo_root / "config").exists())
 

@@ -278,8 +278,9 @@ derivation, explicit binary/display/config/prompt overrides, unsafe-name
 rejection, display-name rejection for values that cannot be written to the
 generated C++ project header, generated config writes, overwrite protection,
 forced rewrites, missing or symlinked repository-root protection, non-regular
-or symlinked config output protection, and exact JSON argv output for the
-printed validation plan. Pair helper changes with
+or symlinked config output protection, generated validation command execution
+through an injected runner, failed-validation reporting, and exact JSON argv
+output for the printed validation plan. Pair helper changes with
 [template-instantiation.md](template-instantiation.md) updates so the documented
 copy-time workflow matches the executable plan and the CTest coverage.
 

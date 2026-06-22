@@ -75,6 +75,19 @@ command. If a display name fails, remove double quotes and backslashes; those
 characters cannot be written safely to the generated C++ project metadata
 header.
 
+When the generated validation command itself is suspect, run it through the
+helper from the copied checkout so the configure, build, and CTest steps use the
+same plan:
+
+```bash
+python3 scripts/instantiate_template.py \
+  --binary-name my-cli \
+  --display-name "My CLI" \
+  --config-file my-cli.json \
+  --prompt-label mycli \
+  --run-validation
+```
+
 ## `./build/cli-starter` Does Not Exist
 
 First confirm that the build finished successfully. If it did, check whether

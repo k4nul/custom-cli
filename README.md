@@ -225,7 +225,9 @@ nested subcommands.
 After copying the starter, use [scripts/instantiate_template.py](scripts/instantiate_template.py)
 to turn the rename checklist into an executable plan. The script validates safe
 binary/display/config/prompt names, prints the CMake cache-variable command, and
-can write the matching `config/<name>.json` file for the copied project. See
+can write the matching `config/<name>.json` file for the copied project. Pass
+`--run-validation` when you want the helper to execute the generated
+CMake/build/CTest sequence from the copied checkout. See
 [docs/template-instantiation.md](docs/template-instantiation.md) for the full
 workflow and test command.
 
@@ -551,8 +553,9 @@ cmake -S . -B build \
 스타터를 복사한 뒤 [scripts/instantiate_template.py](scripts/instantiate_template.py)를 사용해
 rename checklist를 실행 가능한 계획으로 바꿉니다. 이 스크립트는 안전한
 binary/display/config/prompt 이름을 검증하고, CMake cache 변수 명령을 출력하며, 복사한
-프로젝트에 맞는 `config/<name>.json` 파일을 쓸 수 있습니다. 전체 workflow와 테스트 명령은
-[docs/template-instantiation.md](docs/template-instantiation.md)를 참고하세요.
+프로젝트에 맞는 `config/<name>.json` 파일을 쓸 수 있습니다. 복사한 checkout에서 생성된
+CMake/build/CTest 순서를 바로 실행하려면 `--run-validation`을 전달합니다. 전체 workflow와
+테스트 명령은 [docs/template-instantiation.md](docs/template-instantiation.md)를 참고하세요.
 
 ## 프로젝트 구조
 

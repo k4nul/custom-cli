@@ -164,8 +164,8 @@ cmake -S . -B build \
 You can generate and validate that command with the repository-local
 instantiation workflow, and write the matching config template when the copied
 project is ready to use the renamed default config file. Start with a dry plan
-before writing files so the derived display name, config file, prompt label, and
-validation command are visible:
+before writing files so the derived display name, config file, prompt label,
+and validation command are visible:
 
 ```bash
 python3 scripts/instantiate_template.py \
@@ -173,6 +173,18 @@ python3 scripts/instantiate_template.py \
   --display-name "My CLI" \
   --config-file my-cli.json \
   --prompt-label mycli
+```
+
+When the plan looks right, either run the printed command yourself or have the
+helper execute the generated configure, build, and CTest sequence:
+
+```bash
+python3 scripts/instantiate_template.py \
+  --binary-name my-cli \
+  --display-name "My CLI" \
+  --config-file my-cli.json \
+  --prompt-label mycli \
+  --run-validation
 ```
 
 Then add `--write-config` when the copied project is ready to commit

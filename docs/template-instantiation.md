@@ -4,7 +4,9 @@ Use `scripts/instantiate_template.py` after copying this starter into a new
 repository and before replacing the sample commands. The script keeps the first
 rename workflow in one executable place: it validates safe project names, prints
 the CMake cache variables needed for the renamed build, and can write the
-matching `config/<name>.json` template.
+matching `config/<name>.json` template. It can also run the generated
+CMake/build/CTest validation sequence from the copied checkout when
+`--run-validation` is passed.
 
 This is the supported first step of instantiating a copied starter, not a
 whole-repository rename. It changes generated build metadata and can create the
@@ -21,7 +23,9 @@ Use this sequence in a copied checkout:
    file name, and shell prompt label.
 2. Run the helper without `--write-config` to inspect the generated CMake and
    validation commands.
-3. Run the printed validation command from a fresh ignored build directory.
+3. Run the printed validation command from a fresh ignored build directory, or
+   pass `--run-validation` to have the helper execute the generated configure,
+   build, and CTest steps.
 4. Re-run the helper with `--write-config` when the copied project is ready to
    use the renamed default config file.
 5. Inspect and commit the generated `config/<name>.json` template with any docs
@@ -55,8 +59,8 @@ directory name, not a nested path.
 
 Use `--json` when another local script needs the generated plan. The JSON
 output includes the CMake configure command, build command, CTest command, full
-validation command, config path, and written config path when `--write-config`
-is used.
+validation command, config path, written config path when `--write-config` is
+used, and validation status when `--run-validation` is used.
 
 Example JSON plan:
 
@@ -68,8 +72,8 @@ python3 scripts/instantiate_template.py \
 ```
 
 The JSON output is for local automation and review. It does not execute CMake,
-build the project, run CTest, or write files unless `--write-config` is also
-passed.
+build the project, or run CTest unless `--run-validation` is passed, and it
+does not write files unless `--write-config` is passed.
 
 ## Write The Config Template
 
@@ -117,7 +121,17 @@ cat config/my-cli.json
 ```
 
 Then run the printed validation command. It configures the renamed executable,
-builds it, and runs the CTest suite with output-on-failure enabled.
+builds it, and runs the CTest suite with output-on-failure enabled. You can run
+the same generated sequence through the helper:
+
+```bash
+python3 scripts/instantiate_template.py \
+  --binary-name my-cli \
+  --display-name "My CLI" \
+  --config-file my-cli.json \
+  --prompt-label mycli \
+  --run-validation
+```
 
 If the copied checkout still has examples that refer to `cli-starter` or
 `config/cli-starter.json`, decide whether they are still intentional starter
@@ -129,11 +143,12 @@ helper as evidence that every repository reference has been renamed.
 The script intentionally refuses path-like names, control characters, unsafe
 prompt labels, display names that cannot be written safely to the generated C++
 project header, and non-JSON config file names. It also refuses to create files
-under a missing, non-directory, or symlinked repository root, refuses to replace
-an existing config file unless `--force` is passed, refuses symlink or
-non-regular output files, and refuses a symlinked or non-directory `config/`
-path before writing. That keeps `--write-config` from following a copied
-checkout's unexpected local filesystem redirection.
+under a missing, non-directory, or symlinked repository root before writing or
+running validation, refuses to replace an existing config file unless `--force`
+is passed, refuses symlink or non-regular output files, and refuses a symlinked
+or non-directory `config/` path before writing. That keeps `--write-config` and
+`--run-validation` from following a copied checkout's unexpected local
+filesystem redirection.
 
 Safe token values must start with a letter or digit and then use only letters,
 digits, `.`, `_`, or `-`. `--display-name` may contain spaces, but it must not
