@@ -18,6 +18,8 @@ GENERATED_TEMPLATE_NOTES = (
     "Rename values and trim sample commands once you start customizing the starter."
 )
 TOKEN_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+REQUIRED_POLICY_FILES = (".editorconfig", ".gitattributes")
+TRACKED_ARTIFACT_PATTERNS = ("build-local-*", ".sandbox-user/*")
 
 
 class InstantiationError(ValueError):
@@ -66,6 +68,16 @@ class InstantiationPlan:
         ]
 
     @property
+    def preflight_commands(self) -> list[list[str]]:
+        return [
+            ["test", "-f", policy_file]
+            for policy_file in REQUIRED_POLICY_FILES
+        ] + [
+            ["git", "rev-parse", "--is-inside-work-tree"],
+            ["git", "ls-files", *TRACKED_ARTIFACT_PATTERNS],
+        ]
+
+    @property
     def validation_command(self) -> str:
         return " && ".join(
             [
@@ -97,6 +109,7 @@ class InstantiationPlan:
 class ValidationResult:
     return_code: int
     failed_command: tuple[str, ...] | None
+    failure_reason: str | None = None
 
 
 def shell_join(command: list[str]) -> str:
@@ -218,12 +231,90 @@ def write_config_template(plan: InstantiationPlan, repo_root: Path, force: bool)
     return output_path
 
 
-def run_validation(
-    plan: InstantiationPlan,
+def run_repository_preflight(
     repo_root: Path,
     runner=subprocess.run,
 ) -> ValidationResult:
     inspect_repo_root(repo_root)
+    for policy_file in REQUIRED_POLICY_FILES:
+        command = ("test", "-f", policy_file)
+        if not (repo_root / policy_file).is_file():
+            reason = f"missing required policy file: {policy_file}"
+            print(f"preflight: {reason}", file=sys.stderr)
+            return ValidationResult(2, command, reason)
+
+    rev_parse_command = ["git", "rev-parse", "--is-inside-work-tree"]
+    print(f"+ {shell_join(rev_parse_command)}", file=sys.stderr)
+    try:
+        rev_parse = runner(
+            rev_parse_command,
+            cwd=repo_root,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except OSError as exc:
+        print(
+            f"preflight: skipping tracked artifact scan because git was not found: {exc}",
+            file=sys.stderr,
+        )
+        return ValidationResult(0, None)
+
+    if rev_parse.returncode != 0 or str(rev_parse.stdout).strip() != "true":
+        print(
+            "preflight: skipping tracked artifact scan outside a git worktree",
+            file=sys.stderr,
+        )
+        return ValidationResult(0, None)
+
+    ls_files_command = ["git", "ls-files", *TRACKED_ARTIFACT_PATTERNS]
+    print(f"+ {shell_join(ls_files_command)}", file=sys.stderr)
+    try:
+        ls_files = runner(
+            ls_files_command,
+            cwd=repo_root,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except OSError as exc:
+        raise InstantiationError(
+            f"failed to run repository preflight command git: {exc}"
+        ) from exc
+
+    if ls_files.returncode != 0:
+        reason = str(ls_files.stderr).strip() or "git ls-files failed"
+        print(f"preflight: failed to inspect tracked artifacts: {reason}", file=sys.stderr)
+        return ValidationResult(ls_files.returncode, tuple(ls_files_command), reason)
+
+    tracked_artifacts = [
+        line.strip()
+        for line in str(ls_files.stdout).splitlines()
+        if line.strip()
+    ]
+    if tracked_artifacts:
+        reason = (
+            "tracked generated local artifacts are present: "
+            + ", ".join(tracked_artifacts)
+        )
+        print(f"preflight: {reason}", file=sys.stderr)
+        return ValidationResult(2, tuple(ls_files_command), reason)
+
+    return ValidationResult(0, None)
+
+
+def run_validation(
+    plan: InstantiationPlan,
+    repo_root: Path,
+    runner=subprocess.run,
+    preflight_runner=subprocess.run,
+) -> ValidationResult:
+    inspect_repo_root(repo_root)
+    preflight_result = run_repository_preflight(repo_root, runner=preflight_runner)
+    if preflight_result.return_code != 0:
+        return preflight_result
     for command in plan.validation_commands:
         print(f"+ {shell_join(command)}", file=sys.stderr)
         try:
@@ -290,6 +381,7 @@ def plan_as_json(
         "config_file": plan.config_file,
         "prompt_label": plan.prompt_label,
         "config_path": plan.config_path.as_posix(),
+        "preflight_commands": plan.preflight_commands,
         "cmake_command": plan.cmake_command,
         "build_command": plan.build_command,
         "ctest_command": plan.ctest_command,
@@ -303,6 +395,9 @@ def plan_as_json(
             list(validation_result.failed_command)
             if validation_result is not None and validation_result.failed_command is not None
             else None
+        ),
+        "validation_failure_reason": (
+            validation_result.failure_reason if validation_result is not None else None
         ),
     }
     return json.dumps(payload, indent=2)
@@ -319,6 +414,9 @@ def plan_as_text(
         f"- display name: {plan.display_name}",
         f"- config file: {plan.config_path.as_posix()}",
         f"- prompt label: {plan.prompt_label}",
+        "",
+        "Preflight:",
+        *[shell_join(command) for command in plan.preflight_commands],
         "",
         "Configure:",
         shell_join(plan.cmake_command),
@@ -347,6 +445,8 @@ def plan_as_text(
                 f"Failed command: {failed_command}",
             ]
         )
+        if validation_result.failure_reason is not None:
+            lines.append(f"Failure reason: {validation_result.failure_reason}")
     return "\n".join(lines)
 
 

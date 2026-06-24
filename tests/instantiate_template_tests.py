@@ -58,6 +58,18 @@ def run_script(argv: list[str], cwd: Path | None = None) -> subprocess.Completed
     )
 
 
+def write_policy_files(repo_root: Path) -> None:
+    for policy_file in instantiate_template.REQUIRED_POLICY_FILES:
+        (repo_root / policy_file).write_text("# test policy\n", encoding="utf-8")
+
+
+def fake_non_git_preflight_runner(
+    command: list[str],
+    **_: object,
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.CompletedProcess(command, 1, "", "not a git worktree")
+
+
 class InstantiateTemplateTests(unittest.TestCase):
     def test_plan_derives_safe_defaults_from_binary_name(self) -> None:
         plan = instantiate_template.build_plan(make_args())
@@ -336,10 +348,12 @@ class InstantiateTemplateTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as temp_dir:
             repo_root = Path(temp_dir)
+            write_policy_files(repo_root)
             result = instantiate_template.run_validation(
                 plan,
                 repo_root,
                 runner=fake_runner,
+                preflight_runner=fake_non_git_preflight_runner,
             )
 
         self.assertEqual(result.return_code, 0)
@@ -360,15 +374,90 @@ class InstantiateTemplateTests(unittest.TestCase):
             return subprocess.CompletedProcess(command, return_code, "", "")
 
         with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            write_policy_files(repo_root)
             result = instantiate_template.run_validation(
                 plan,
-                Path(temp_dir),
+                repo_root,
                 runner=fake_runner,
+                preflight_runner=fake_non_git_preflight_runner,
             )
 
         self.assertEqual(result.return_code, 7)
         self.assertEqual(result.failed_command, tuple(plan.build_command))
         self.assertEqual(recorded, [plan.cmake_command, plan.build_command])
+
+    def test_run_validation_stops_before_cmake_when_policy_file_is_missing(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+        recorded: list[list[str]] = []
+
+        def fake_runner(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+            recorded.append(command)
+            return subprocess.CompletedProcess(command, 0, "", "")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            (repo_root / ".gitattributes").write_text("# test policy\n", encoding="utf-8")
+            result = instantiate_template.run_validation(
+                plan,
+                repo_root,
+                runner=fake_runner,
+                preflight_runner=fake_non_git_preflight_runner,
+            )
+
+        self.assertEqual(result.return_code, 2)
+        self.assertEqual(result.failed_command, ("test", "-f", ".editorconfig"))
+        self.assertEqual(result.failure_reason, "missing required policy file: .editorconfig")
+        self.assertEqual(recorded, [])
+
+    def test_run_validation_rejects_tracked_local_artifacts_before_cmake(self) -> None:
+        plan = instantiate_template.build_plan(make_args())
+        validation_commands: list[list[str]] = []
+        preflight_commands: list[list[str]] = []
+
+        def fake_runner(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+            validation_commands.append(command)
+            return subprocess.CompletedProcess(command, 0, "", "")
+
+        def fake_preflight_runner(
+            command: list[str],
+            **_: object,
+        ) -> subprocess.CompletedProcess[str]:
+            preflight_commands.append(command)
+            if command == ["git", "rev-parse", "--is-inside-work-tree"]:
+                return subprocess.CompletedProcess(command, 0, "true\n", "")
+            return subprocess.CompletedProcess(
+                command,
+                0,
+                "build-local-debug/cache.txt\n.sandbox-user/state.json\n",
+                "",
+            )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            write_policy_files(repo_root)
+            result = instantiate_template.run_validation(
+                plan,
+                repo_root,
+                runner=fake_runner,
+                preflight_runner=fake_preflight_runner,
+            )
+
+        self.assertEqual(result.return_code, 2)
+        self.assertEqual(
+            result.failed_command,
+            ("git", "ls-files", "build-local-*", ".sandbox-user/*"),
+        )
+        self.assertIn("build-local-debug/cache.txt", result.failure_reason or "")
+        self.assertIn(".sandbox-user/state.json", result.failure_reason or "")
+        self.assertEqual(
+            preflight_commands,
+            [
+                ["git", "rev-parse", "--is-inside-work-tree"],
+                ["git", "ls-files", "build-local-*", ".sandbox-user/*"],
+            ],
+        )
+        self.assertEqual(validation_commands, [])
 
     def test_json_output_includes_commands_and_written_config_path(self) -> None:
         plan = instantiate_template.build_plan(make_args(display_name="My CLI"))
@@ -377,6 +466,15 @@ class InstantiateTemplateTests(unittest.TestCase):
         self.assertEqual(payload["display_name"], "My CLI")
         self.assertEqual(payload["config_path"], "config/my-cli.json")
         self.assertEqual(payload["wrote_config"], "config/my-cli.json")
+        self.assertEqual(
+            payload["preflight_commands"],
+            [
+                ["test", "-f", ".editorconfig"],
+                ["test", "-f", ".gitattributes"],
+                ["git", "rev-parse", "--is-inside-work-tree"],
+                ["git", "ls-files", "build-local-*", ".sandbox-user/*"],
+            ],
+        )
         self.assertEqual(
             payload["cmake_command"],
             [
@@ -403,15 +501,21 @@ class InstantiateTemplateTests(unittest.TestCase):
         self.assertFalse(payload["ran_validation"])
         self.assertIsNone(payload["validation_return_code"])
         self.assertIsNone(payload["failed_validation_command"])
+        self.assertIsNone(payload["validation_failure_reason"])
 
     def test_json_output_includes_validation_result(self) -> None:
         plan = instantiate_template.build_plan(make_args())
-        result = instantiate_template.ValidationResult(7, tuple(plan.build_command))
+        result = instantiate_template.ValidationResult(
+            7,
+            tuple(plan.build_command),
+            "build failed",
+        )
         payload = json.loads(instantiate_template.plan_as_json(plan, None, result))
 
         self.assertTrue(payload["ran_validation"])
         self.assertEqual(payload["validation_return_code"], 7)
         self.assertEqual(payload["failed_validation_command"], plan.build_command)
+        self.assertEqual(payload["validation_failure_reason"], "build failed")
 
     def test_main_prints_text_plan_without_writing_config(self) -> None:
         exit_code, stdout, stderr = run_main(
@@ -430,6 +534,9 @@ class InstantiateTemplateTests(unittest.TestCase):
         self.assertIn("Template instantiation plan", stdout)
         self.assertIn("- binary name: opsctl", stdout)
         self.assertIn("- display name: Ops Control", stdout)
+        self.assertIn("Preflight:", stdout)
+        self.assertIn("test -f .editorconfig", stdout)
+        self.assertIn("git ls-files 'build-local-*' '.sandbox-user/*'", stdout)
         self.assertIn("cmake -S . -B build-renamed", stdout)
         self.assertIn("Config template not written; pass --write-config to create it.", stdout)
 
@@ -542,7 +649,11 @@ class InstantiateTemplateTests(unittest.TestCase):
             plan: instantiate_template.InstantiationPlan,
             repo_root: Path,
         ) -> instantiate_template.ValidationResult:
-            return instantiate_template.ValidationResult(9, tuple(plan.ctest_command))
+            return instantiate_template.ValidationResult(
+                9,
+                tuple(plan.ctest_command),
+                "ctest failed",
+            )
 
         try:
             instantiate_template.run_validation = fake_run_validation
@@ -565,6 +676,7 @@ class InstantiateTemplateTests(unittest.TestCase):
             payload["failed_validation_command"],
             ["ctest", "--test-dir", "build", "--output-on-failure"],
         )
+        self.assertEqual(payload["validation_failure_reason"], "ctest failed")
 
     def test_main_refuses_unforced_config_overwrite(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

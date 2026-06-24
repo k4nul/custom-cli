@@ -199,6 +199,21 @@ python3 scripts/instantiate_template.py \
   --write-config
 ```
 
+Inspect the generated config before committing it, then rerun validation from
+the copied checkout or pass `--repo-root /path/to/copied/starter` when invoking
+the helper from another directory:
+
+```bash
+git status --short
+cat config/my-cli.json
+python3 scripts/instantiate_template.py \
+  --binary-name my-cli \
+  --display-name "My CLI" \
+  --config-file my-cli.json \
+  --prompt-label mycli \
+  --run-validation
+```
+
 Those values are written into the generated project config header in the build
 tree. The checked-in JSON template remains in `config/cli-starter.json` unless
 you intentionally rename or replace it; `--write-config` creates

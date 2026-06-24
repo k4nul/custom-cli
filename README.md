@@ -224,10 +224,11 @@ nested subcommands.
 
 After copying the starter, use [scripts/instantiate_template.py](scripts/instantiate_template.py)
 to turn the rename checklist into an executable plan. The script validates safe
-binary/display/config/prompt names, prints the CMake cache-variable command, and
-can write the matching `config/<name>.json` file for the copied project. Pass
-`--run-validation` when you want the helper to execute the generated
-CMake/build/CTest sequence from the copied checkout. See
+binary/display/config/prompt names, prints the preflight and CMake cache-variable
+commands, and can write the matching `config/<name>.json` file for the copied
+project. Pass `--run-validation` when you want the helper to execute the
+repository policy/artifact preflight plus generated CMake/build/CTest sequence
+from the copied checkout. See
 [docs/template-instantiation.md](docs/template-instantiation.md) for the full
 workflow and test command.
 
@@ -254,6 +255,7 @@ policy files and inspect the tracked legacy artifact patterns that the hygiene c
 ```bash
 test -f .editorconfig
 test -f .gitattributes
+git rev-parse --is-inside-work-tree
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
@@ -552,10 +554,11 @@ cmake -S . -B build \
 
 스타터를 복사한 뒤 [scripts/instantiate_template.py](scripts/instantiate_template.py)를 사용해
 rename checklist를 실행 가능한 계획으로 바꿉니다. 이 스크립트는 안전한
-binary/display/config/prompt 이름을 검증하고, CMake cache 변수 명령을 출력하며, 복사한
-프로젝트에 맞는 `config/<name>.json` 파일을 쓸 수 있습니다. 복사한 checkout에서 생성된
-CMake/build/CTest 순서를 바로 실행하려면 `--run-validation`을 전달합니다. 전체 workflow와
-테스트 명령은 [docs/template-instantiation.md](docs/template-instantiation.md)를 참고하세요.
+binary/display/config/prompt 이름을 검증하고, preflight와 CMake cache 변수 명령을 출력하며,
+복사한 프로젝트에 맞는 `config/<name>.json` 파일을 쓸 수 있습니다. 복사한 checkout에서
+repository policy/artifact preflight와 생성된 CMake/build/CTest 순서를 바로 실행하려면
+`--run-validation`을 전달합니다. 전체 workflow와 테스트 명령은
+[docs/template-instantiation.md](docs/template-instantiation.md)를 참고하세요.
 
 ## 프로젝트 구조
 
@@ -574,10 +577,13 @@ CMake/build/CTest 순서를 바로 실행하려면 `--run-validation`을 전달�
 ## 테스트
 
 doctest suite, template-instantiation workflow, 빌드된 실행 파일 smoke check, repository hygiene
-check를 포함한 일반적인 스타터 동작 테스트는 먼저 hygiene check가 검사하는 tracked legacy artifact
-pattern을 확인합니다.
+check를 포함한 일반적인 스타터 동작 테스트는 먼저 필요한 repository policy 파일과 hygiene
+check가 검사하는 tracked legacy artifact pattern을 확인합니다.
 
 ```bash
+test -f .editorconfig
+test -f .gitattributes
+git rev-parse --is-inside-work-tree
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 

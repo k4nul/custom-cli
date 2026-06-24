@@ -198,8 +198,8 @@ for a copied starter. When changing `scripts/instantiate_template.py`:
    `tests/check_project_completion.py` aligned with any machine-checkable
    workflow expectation.
 4. Update `docs/template-instantiation.md` when flags, generated config
-   contents, validation commands, validation runner behavior, or manual
-   follow-through change.
+   contents, validation commands, repository preflight behavior, validation
+   runner behavior, or manual follow-through change.
 
 The helper does not perform a full source-tree rename. Keep docs clear that
 internal identifiers such as `project(CLIStarter)`, `starter_core`,

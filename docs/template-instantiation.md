@@ -5,8 +5,8 @@ repository and before replacing the sample commands. The script keeps the first
 rename workflow in one executable place: it validates safe project names, prints
 the CMake cache variables needed for the renamed build, and can write the
 matching `config/<name>.json` template. It can also run the generated
-CMake/build/CTest validation sequence from the copied checkout when
-`--run-validation` is passed.
+policy-file and artifact preflight plus the CMake/build/CTest validation
+sequence from the copied checkout when `--run-validation` is passed.
 
 This is the supported first step of instantiating a copied starter, not a
 whole-repository rename. It changes generated build metadata and can create the
@@ -21,11 +21,11 @@ Use this sequence in a copied checkout:
 
 1. Pick the public runtime names: executable name, display name, default config
    file name, and shell prompt label.
-2. Run the helper without `--write-config` to inspect the generated CMake and
-   validation commands.
-3. Run the printed validation command from a fresh ignored build directory, or
-   pass `--run-validation` to have the helper execute the generated configure,
-   build, and CTest steps.
+2. Run the helper without `--write-config` to inspect the generated preflight,
+   CMake, and validation commands.
+3. Run the printed validation command from a fresh ignored build directory after
+   the preflight is clean, or pass `--run-validation` to have the helper execute
+   the preflight plus generated configure, build, and CTest steps.
 4. Re-run the helper with `--write-config` when the copied project is ready to
    use the renamed default config file.
 5. Inspect and commit the generated `config/<name>.json` template with any docs
@@ -58,9 +58,10 @@ directory other than `build`. The build directory is validated as a single safe
 directory name, not a nested path.
 
 Use `--json` when another local script needs the generated plan. The JSON
-output includes the CMake configure command, build command, CTest command, full
-validation command, config path, written config path when `--write-config` is
-used, and validation status when `--run-validation` is used.
+output includes the preflight commands, CMake configure command, build command,
+CTest command, full validation command, config path, written config path when
+`--write-config` is used, and validation status and failure reason when
+`--run-validation` is used.
 
 Example JSON plan:
 
@@ -90,13 +91,23 @@ python3 scripts/instantiate_template.py \
 
 By default, `--write-config` writes under the current directory. Use
 `--repo-root /path/to/copied/starter` when running the helper from another
-working directory:
+working directory. The same `--repo-root` value is used by `--run-validation`:
 
 ```bash
 python3 scripts/instantiate_template.py \
   --binary-name my-cli \
   --repo-root /path/to/copied/starter \
   --write-config
+```
+
+Run validation against that copied checkout from another working directory:
+
+```bash
+python3 /path/to/copied/starter/scripts/instantiate_template.py \
+  --binary-name my-cli \
+  --display-name "My CLI" \
+  --repo-root /path/to/copied/starter \
+  --run-validation
 ```
 
 The generated file contains the renamed prompt label, the starter default name,
@@ -120,9 +131,10 @@ git status --short
 cat config/my-cli.json
 ```
 
-Then run the printed validation command. It configures the renamed executable,
-builds it, and runs the CTest suite with output-on-failure enabled. You can run
-the same generated sequence through the helper:
+Then run the printed validation command. It checks repository policy files and
+tracked local artifacts, configures the renamed executable, builds it, and runs
+the CTest suite with output-on-failure enabled. You can run the same generated
+sequence through the helper:
 
 ```bash
 python3 scripts/instantiate_template.py \
@@ -161,17 +173,19 @@ and other non-regular paths.
 
 ## Validation
 
-Start with the repository policy-file and artifact preflight used by the normal
-validation flow:
+`--run-validation` starts with the repository policy-file and artifact preflight
+used by the normal validation flow:
 
 ```bash
 test -f .editorconfig
 test -f .gitattributes
+git rev-parse --is-inside-work-tree
 git ls-files 'build-local-*' '.sandbox-user/*'
 ```
 
-If both policy files are present and the artifact command prints no paths, run
-the validation command printed by the helper. It has this shape:
+If both policy files are present and the artifact command prints no paths, the
+helper runs the validation command it printed in the dry plan. It has this
+shape:
 
 ```bash
 cmake -S . -B build \
