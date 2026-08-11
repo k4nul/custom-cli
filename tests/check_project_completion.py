@@ -24,6 +24,7 @@ COMPLETION_REPAIR_PHASE = "completion-gate-repair"
 MAINTENANCE_PHASE = "starter-template-maintenance"
 MAINTENANCE_COMPLETE_PHASE = "starter-template-maintenance-complete"
 SHELL_COMPLETION_GENERATION_PHASE = "shell-completion-generation"
+COMMAND_MANPAGE_GENERATION_PHASE = "command-manpage-generation"
 COMPLETION_CHECK_COMMAND = "python3 tests/check_project_completion.py"
 BASELINE_VALIDATION_COMMAND = (
     "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON "
@@ -35,6 +36,9 @@ MAINTENANCE_COMPLETE_MODE = "maintenance-complete-no-pending-transition"
 SHELL_COMPLETION_GENERATION_MODE = "strict-gate"
 SHELL_COMPLETION_TRANSITION_COMMAND = (
     "bash scripts/test-generate-completions.sh && " + BASELINE_VALIDATION_COMMAND
+)
+COMMAND_MANPAGE_TRANSITION_COMMAND = (
+    "bash scripts/test-generate-manpage.sh && " + BASELINE_VALIDATION_COMMAND
 )
 NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$"
 LEGACY_NON_HYGIENE_CTEST_FILTER = "^(starter_tests|cli_starter_smoke)$"
@@ -161,6 +165,19 @@ def check_phase_manifest(blockers: list[str]) -> None:
                 "phase manifest transition_validation_command must run shell completion "
                 "tests and the baseline CMake/CTest flow"
             )
+    elif current_phase == COMMAND_MANPAGE_GENERATION_PHASE:
+        if next_phase != MAINTENANCE_COMPLETE_PHASE:
+            blockers.append(
+                "phase manifest next_phase must be starter-template-maintenance-complete "
+                "after command man page generation"
+            )
+        if transition_mode != SHELL_COMPLETION_GENERATION_MODE:
+            blockers.append("phase manifest transition mode must be strict-gate for command man page generation")
+        if transition_validation_command != COMMAND_MANPAGE_TRANSITION_COMMAND:
+            blockers.append(
+                "phase manifest transition_validation_command must run command man page "
+                "tests and the baseline CMake/CTest flow"
+            )
     elif current_phase == MAINTENANCE_PHASE:
         if next_phase:
             if next_phase != MAINTENANCE_COMPLETE_PHASE:
@@ -218,7 +235,8 @@ def check_phase_manifest(blockers: list[str]) -> None:
     else:
         blockers.append(
             "phase manifest current_phase must be completion-gate-repair, "
-            "shell-completion-generation, starter-template-maintenance, or "
+            "shell-completion-generation, command-manpage-generation, "
+            "starter-template-maintenance, or "
             "starter-template-maintenance-complete"
         )
 
@@ -234,6 +252,7 @@ def check_phase_manifest(blockers: list[str]) -> None:
         for phase_id in (
             COMPLETION_REPAIR_PHASE,
             SHELL_COMPLETION_GENERATION_PHASE,
+            COMMAND_MANPAGE_GENERATION_PHASE,
             MAINTENANCE_PHASE,
             MAINTENANCE_COMPLETE_PHASE,
         ):
