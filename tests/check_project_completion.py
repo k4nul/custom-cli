@@ -23,6 +23,7 @@ EXPECTED_GLOBAL_OPTIONS = ("--version", "--help", "--help-all", "--config")
 COMPLETION_REPAIR_PHASE = "completion-gate-repair"
 MAINTENANCE_PHASE = "starter-template-maintenance"
 MAINTENANCE_COMPLETE_PHASE = "starter-template-maintenance-complete"
+SHELL_COMPLETION_GENERATION_PHASE = "shell-completion-generation"
 COMPLETION_CHECK_COMMAND = "python3 tests/check_project_completion.py"
 BASELINE_VALIDATION_COMMAND = (
     "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON "
@@ -31,7 +32,11 @@ BASELINE_VALIDATION_COMMAND = (
 MAINTENANCE_NO_PENDING_MODE = "maintenance-no-pending-transition"
 MAINTENANCE_COMPLETION_PENDING_MODE = "maintenance-completion-pending"
 MAINTENANCE_COMPLETE_MODE = "maintenance-complete-no-pending-transition"
-NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$"
+SHELL_COMPLETION_GENERATION_MODE = "strict-gate"
+SHELL_COMPLETION_TRANSITION_COMMAND = (
+    "bash scripts/test-generate-completions.sh && " + BASELINE_VALIDATION_COMMAND
+)
+NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$"
 LEGACY_NON_HYGIENE_CTEST_FILTER = "^(starter_tests|cli_starter_smoke)$"
 
 
@@ -98,6 +103,8 @@ def check_required_paths(blockers: list[str]) -> None:
         "include/starter/app/application.hpp",
         "include/starter/app/cli_app.hpp",
         "scripts/instantiate_template.py",
+        "scripts/generate-completions.py",
+        "scripts/test-generate-completions.sh",
         "include/starter/core/config.hpp",
         "include/starter/core/completion.hpp",
         "src/app/application.cpp",
@@ -108,6 +115,7 @@ def check_required_paths(blockers: list[str]) -> None:
         "tests/check_project_completion.py",
         "tests/config_tests.cpp",
         "tests/instantiate_template_tests.py",
+        "tests/generate_completion_tests.py",
         "third_party/README.md",
     )
     for path_text in required_paths:
@@ -139,6 +147,19 @@ def check_phase_manifest(blockers: list[str]) -> None:
             blockers.append(
                 "phase manifest transition_validation_command must run this "
                 "checker before phase-transition"
+            )
+    elif current_phase == SHELL_COMPLETION_GENERATION_PHASE:
+        if next_phase != MAINTENANCE_COMPLETE_PHASE:
+            blockers.append(
+                "phase manifest next_phase must be starter-template-maintenance-complete "
+                "after shell completion generation"
+            )
+        if transition_mode != SHELL_COMPLETION_GENERATION_MODE:
+            blockers.append("phase manifest transition mode must be strict-gate for shell completion generation")
+        if transition_validation_command != SHELL_COMPLETION_TRANSITION_COMMAND:
+            blockers.append(
+                "phase manifest transition_validation_command must run shell completion "
+                "tests and the baseline CMake/CTest flow"
             )
     elif current_phase == MAINTENANCE_PHASE:
         if next_phase:
@@ -197,7 +218,8 @@ def check_phase_manifest(blockers: list[str]) -> None:
     else:
         blockers.append(
             "phase manifest current_phase must be completion-gate-repair, "
-            "starter-template-maintenance, or starter-template-maintenance-complete"
+            "shell-completion-generation, starter-template-maintenance, or "
+            "starter-template-maintenance-complete"
         )
 
     phase_model = manifest.get("phase_model")
@@ -211,6 +233,7 @@ def check_phase_manifest(blockers: list[str]) -> None:
         }
         for phase_id in (
             COMPLETION_REPAIR_PHASE,
+            SHELL_COMPLETION_GENERATION_PHASE,
             MAINTENANCE_PHASE,
             MAINTENANCE_COMPLETE_PHASE,
         ):
@@ -278,6 +301,7 @@ def check_cmake_and_ci_wiring(blockers: list[str]) -> None:
             "add_executable(starter_tests tests/config_tests.cpp)",
             "add_test(NAME starter_tests COMMAND starter_tests)",
             "NAME template_instantiation_workflow",
+            "NAME shell_completion_generation",
             "PYTHONDONTWRITEBYTECODE=1",
             "NAME cli_starter_smoke",
             "NAME repository_hygiene",
@@ -469,6 +493,48 @@ def check_template_instantiation_workflow(blockers: list[str]) -> None:
         ),
         blockers,
     )
+
+
+def check_shell_completion_generation(blockers: list[str]) -> None:
+    require_contains(
+        REPO_ROOT / "scripts/generate-completions.py",
+        (
+            "extract_public_commands",
+            "src/app/cli_app.cpp",
+            "src/commands/register_commands.cpp",
+            "render_bash",
+            "render_zsh",
+            "render_powershell",
+            "--output-dir",
+            "--force",
+        ),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "tests/generate_completion_tests.py",
+        (
+            "test_extracts_every_public_command_from_the_cpp_registry",
+            "test_every_renderer_covers_every_public_command_deterministically",
+            "test_output_directory_writes_all_shell_scripts_for_the_selected_binary",
+            "test_refuses_a_symlinked_generated_output",
+        ),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "scripts/test-generate-completions.sh",
+        ("generate_completion_tests.py", "PYTHONDONTWRITEBYTECODE=1"),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "docs/shell-completions.md",
+        (
+            "Bash, Zsh, or\nPowerShell",
+            "--shell bash",
+            "--output-dir",
+            "bash scripts/test-generate-completions.sh",
+        ),
+        blockers,
+    )
     require_contains(
         REPO_ROOT / "tests/instantiate_template_tests.py",
         (
@@ -526,6 +592,7 @@ def collect_blockers() -> list[str]:
         check_documentation_alignment,
         check_config_template,
         check_template_instantiation_workflow,
+        check_shell_completion_generation,
         check_artifact_hygiene,
     )
     for check in checks:

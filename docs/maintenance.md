@@ -28,7 +28,7 @@ preflight output:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$'
 ```
 
 When the artifact preflight prints paths, treat artifact cleanup as the next
@@ -106,7 +106,7 @@ configuration and filter only the non-hygiene entries:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$"
+ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$"
 ```
 
 CTest includes the template instantiation workflow test, a short
@@ -156,6 +156,10 @@ removing a sample command:
    `docs/testing.md`, and `docs/troubleshooting.md` when user-facing behavior
    changes. Update `docs/ci.md` too when the command change modifies
    `cmake/cli_smoke_test.cmake` or CI reproduction guidance.
+7. Regenerate and review the native shell completion scripts described in
+   `docs/shell-completions.md`. The generator reads this command registry, so
+   update `tests/generate_completion_tests.py` when the public command surface
+   intentionally changes.
 
 The `enabled_commands` field in config is serialized and shown by `config show`;
 it is not a runtime allowlist. Do not document it as a way to disable commands
