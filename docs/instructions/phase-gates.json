@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0.0",
   "project": "custom-cli",
-  "current_phase": "starter-template-maintenance-complete",
-  "next_phase": "",
+  "current_phase": "shell-completion-generation",
+  "next_phase": "starter-template-maintenance-complete",
   "transition": {
-    "intent": "Keep the completed CLI starter in maintenance-complete state until an owner selects a new starter feature scope.",
-    "mode": "maintenance-complete-no-pending-transition",
+    "intent": "Implement the owner-selected shell completion expansion, then return the starter to maintenance-complete state.",
+    "mode": "strict-gate",
     "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
-    "transition_validation_command": "",
-    "decision_rule": "Keep routine write-capable automation paused unless an owner selects a new phase scope and reactivates this manifest."
+    "transition_validation_command": "bash scripts/test-generate-completions.sh && cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
+    "decision_rule": "Return to maintenance-complete only after deterministic Bash, Zsh, and PowerShell completion generation and the existing CMake/CTest baseline pass."
   },
   "phase_model": [
     {
@@ -63,6 +63,26 @@
       ],
       "exit_criteria": [
         "a new starter feature scope is explicitly selected and the phase manifest is reactivated"
+      ]
+    },
+    {
+      "id": "shell-completion-generation",
+      "purpose": "Generate Bash, Zsh, and PowerShell completions from the starter command registry without installing files into the user environment.",
+      "allowed_work": [
+        "command metadata extraction",
+        "deterministic completion rendering",
+        "focused completion fixtures and tests",
+        "completion usage documentation"
+      ],
+      "blocked_work": [
+        "shell profile mutation",
+        "automatic system-wide installation",
+        "unrelated command framework expansion"
+      ],
+      "exit_criteria": [
+        "scripts/test-generate-completions.sh passes",
+        "Bash, Zsh, and PowerShell outputs cover every public command",
+        "the existing CMake build and CTest baseline passes"
       ]
     }
   ],
