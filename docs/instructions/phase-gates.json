@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0.0",
   "project": "custom-cli",
-  "current_phase": "shell-completion-generation",
+  "current_phase": "command-manpage-generation",
   "next_phase": "starter-template-maintenance-complete",
   "transition": {
-    "intent": "Implement the owner-selected shell completion expansion, then return the starter to maintenance-complete state.",
+    "intent": "Implement deterministic command-reference man page generation from the same registry used by the CLI, then return the starter to maintenance-complete state.",
     "mode": "strict-gate",
     "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
-    "transition_validation_command": "bash scripts/test-generate-completions.sh && cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
-    "decision_rule": "Return to maintenance-complete only after deterministic Bash, Zsh, and PowerShell completion generation and the existing CMake/CTest baseline pass."
+    "transition_validation_command": "bash scripts/test-generate-manpage.sh && cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
+    "decision_rule": "Return to maintenance-complete only after deterministic man page generation covers every public command and the existing CMake/CTest baseline passes."
   },
   "phase_model": [
     {
@@ -82,6 +82,26 @@
       "exit_criteria": [
         "scripts/test-generate-completions.sh passes",
         "Bash, Zsh, and PowerShell outputs cover every public command",
+        "the existing CMake build and CTest baseline passes"
+      ]
+    },
+    {
+      "id": "command-manpage-generation",
+      "purpose": "Generate a deterministic roff man page from the starter command registry without installing files into the user environment.",
+      "allowed_work": [
+        "command metadata extraction reuse",
+        "deterministic roff rendering",
+        "focused man page fixtures and tests",
+        "man page generation documentation"
+      ],
+      "blocked_work": [
+        "system-wide man page installation",
+        "shell profile mutation",
+        "unrelated command framework expansion"
+      ],
+      "exit_criteria": [
+        "scripts/test-generate-manpage.sh passes",
+        "the generated man page covers every public command and global option",
         "the existing CMake build and CTest baseline passes"
       ]
     }
