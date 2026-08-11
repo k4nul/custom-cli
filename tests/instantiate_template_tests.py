@@ -835,7 +835,7 @@ class InstantiateTemplateTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0)
             self.assertEqual(result.stderr, "")
             self.assertEqual(payload["config_path"], "config/opsctl.json")
-            self.assertEqual(payload["wrote_config"], "config/opsctl.json")
+            self.assertEqual(payload["wrote_config"], str(Path("config") / "opsctl.json"))
             self.assertEqual(written["prompt"], "opsctl")
             self.assertEqual(written["enabled_commands"], EXPECTED_ENABLED_COMMANDS)
 

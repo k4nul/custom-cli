@@ -1220,7 +1220,7 @@ TEST_CASE("interactive shell config init explicit output keeps startup config pa
 
     const auto result = run_application_with_scripted_shell(
         {"--config", config_path.string(), "shell"},
-        {"config init --output " + output_path.string(), "config show", "exit"});
+        {"config init --output " + output_path.generic_string(), "config show", "exit"});
 
     CHECK(result.exit_code == 0);
     CHECK(contains_text(result.out, "Wrote config template to " + output_path.generic_string() + '\n'));
@@ -1393,7 +1393,7 @@ TEST_CASE("interactive shell reports command failures and keeps the session aliv
 
     const auto result = run_application_with_scripted_shell(
         {"--config", config_path.string(), "shell"},
-        {"config init --output " + output_path.string(), "hello --name Ada", "exit"});
+        {"config init --output " + output_path.generic_string(), "hello --name Ada", "exit"});
 
     CHECK(result.exit_code == 0);
     CHECK(contains_text(result.out, "Hello, Ada.\n"));
@@ -1768,7 +1768,7 @@ TEST_CASE("application explains missing config defaults for hello") {
 
     const auto result = run_application({"--config", config_path.string(), "hello"});
     const std::string expected = "Hello, world.\nTip: run `config init` to generate "
-        + config_path.generic_string() + " and customize the default name.\n";
+        + config_path.string() + " and customize the default name.\n";
 
     CHECK(result.exit_code == 0);
     CHECK(result.out == expected);
