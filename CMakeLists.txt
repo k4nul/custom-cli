@@ -80,6 +80,17 @@ if(CLI_STARTER_BUILD_TESTS)
             ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1"
     )
     add_test(
+        NAME shell_completion_generation
+        COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/generate_completion_tests.py
+    )
+    set_tests_properties(
+        shell_completion_generation
+        PROPERTIES
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1"
+    )
+    add_test(
         NAME cli_starter_smoke
         COMMAND ${CMAKE_COMMAND}
             -DCLI_STARTER_EXECUTABLE=$<TARGET_FILE:${CLI_STARTER_BINARY_NAME}>

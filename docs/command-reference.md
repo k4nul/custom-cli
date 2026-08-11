@@ -199,6 +199,11 @@ resolving that context, so a shell line such as
 `--config ./config/local.json hello --n` completes `hello` options rather than
 falling back to root commands.
 
+For native Bash, Zsh, and PowerShell command-name completion outside the
+interactive shell, generate a script from the public command registry. See
+[Generated Shell Completions](shell-completions.md) for the non-installing
+workflow and validation command.
+
 ## Config Reference
 
 The default config path is `config/<configured-file-name>`, where the configured

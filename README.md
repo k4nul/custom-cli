@@ -103,6 +103,13 @@ Examples:
 - `hello --n<Tab>` completes to `hello --name`.
 - `--config ./config/local.json hello --n<Tab>` still completes to `--name`.
 
+## Generated Shell Completions
+
+Generate native Bash, Zsh, or PowerShell command-name completion scripts from
+the public starter command registry without modifying a shell profile or
+installing files automatically. See
+[docs/shell-completions.md](docs/shell-completions.md) for usage and validation.
+
 ## Built-In Commands
 
 Global options are available before any command:
@@ -274,7 +281,7 @@ ignored `build/` tree and filter out only the hygiene entry:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$'
 ```
 
 Label that result as partial validation and include the artifact preflight output in the report.
@@ -335,6 +342,7 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 - [docs/architecture.md](docs/architecture.md): structure and extension points
 - [docs/testing.md](docs/testing.md): CTest/doctest validation flow and coverage notes
 - [docs/template-instantiation.md](docs/template-instantiation.md): copied-starter rename workflow
+- [docs/shell-completions.md](docs/shell-completions.md): native Bash, Zsh, and PowerShell completion scripts
 - [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate and cleanup runbook
 - [docs/ci.md](docs/ci.md): GitHub Actions triggers, job commands, and failure triage
 - [docs/troubleshooting.md](docs/troubleshooting.md): common local setup and runtime issues
@@ -437,6 +445,12 @@ starter> exit
 - `config s<Tab>`은 `config show`로 완성됩니다.
 - `hello --n<Tab>`은 `hello --name`으로 완성됩니다.
 - `--config ./config/local.json hello --n<Tab>`도 `--name`으로 완성됩니다.
+
+## 생성형 셸 자동완성
+
+공개 starter command registry에서 Bash, Zsh, PowerShell용 명령 이름 자동완성 스크립트를
+생성할 수 있습니다. 이 과정은 shell profile을 수정하거나 파일을 자동으로 설치하지 않습니다.
+사용법과 검증 방법은 [docs/shell-completions.md](docs/shell-completions.md)를 참고하세요.
 
 ## 기본 명령
 
@@ -601,7 +615,7 @@ artifact gate가 dirty인 동안에도 현재 source behavior 증거가 필요�
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$'
 ```
 
 이 결과는 partial validation으로 표시하고, 보고서에는 artifact preflight 출력을 함께 남깁니다.
