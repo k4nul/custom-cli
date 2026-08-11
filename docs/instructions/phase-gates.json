@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0.0",
   "project": "custom-cli",
-  "current_phase": "shell-completion-generation",
-  "next_phase": "starter-template-maintenance-complete",
+  "current_phase": "starter-template-maintenance-complete",
+  "next_phase": "",
   "transition": {
-    "intent": "Implement the owner-selected shell completion expansion, then return the starter to maintenance-complete state.",
-    "mode": "strict-gate",
+    "intent": "The owner-selected shell completion expansion is complete; keep routine write-capable automation paused until a new starter scope is explicitly selected.",
+    "mode": "maintenance-complete-no-pending-transition",
     "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
-    "transition_validation_command": "bash scripts/test-generate-completions.sh && cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
-    "decision_rule": "Return to maintenance-complete only after deterministic Bash, Zsh, and PowerShell completion generation and the existing CMake/CTest baseline pass."
+    "transition_validation_command": "",
+    "decision_rule": "Remain maintenance-complete until a new starter feature scope is explicitly selected and this manifest is reactivated."
   },
   "phase_model": [
     {
