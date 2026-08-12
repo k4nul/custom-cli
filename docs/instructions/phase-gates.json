@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0.0",
   "project": "custom-cli",
-  "current_phase": "starter-template-maintenance-complete",
-  "next_phase": "",
+  "current_phase": "command-metadata-json-generation",
+  "next_phase": "starter-template-maintenance-complete",
   "transition": {
-    "intent": "The deterministic command-reference man page generation milestone is complete; keep the starter in maintenance-complete state until an owner selects a new scope.",
-    "mode": "maintenance-complete-no-pending-transition",
+    "intent": "Implement deterministic schema-versioned JSON command metadata from the existing public command registry.",
+    "mode": "strict-gate",
     "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
-    "transition_validation_command": "",
-    "decision_rule": "Remain maintenance-complete until an owner explicitly selects and records a new starter feature scope."
+    "transition_validation_command": "bash scripts/test-generate-command-metadata.sh && cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
+    "decision_rule": "Transition only when focused metadata generation validation and the baseline CMake/CTest flow both pass."
   },
   "phase_model": [
     {
@@ -102,6 +102,26 @@
       "exit_criteria": [
         "scripts/test-generate-manpage.sh passes",
         "the generated man page covers every public command and global option",
+        "the existing CMake build and CTest baseline passes"
+      ]
+    },
+    {
+      "id": "command-metadata-json-generation",
+      "purpose": "Generate deterministic schema-versioned JSON metadata from the starter command registry without installing files.",
+      "allowed_work": [
+        "command metadata extraction reuse",
+        "deterministic JSON rendering",
+        "focused metadata fixtures and tests",
+        "metadata generation documentation"
+      ],
+      "blocked_work": [
+        "system-wide installation",
+        "new runtime dependencies",
+        "unrelated command framework expansion"
+      ],
+      "exit_criteria": [
+        "scripts/test-generate-command-metadata.sh passes",
+        "the JSON output covers every public command and global option",
         "the existing CMake build and CTest baseline passes"
       ]
     }
