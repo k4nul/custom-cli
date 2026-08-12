@@ -116,6 +116,13 @@ Render a deterministic roff man page from the public command registry without
 installing it into the system. See [docs/man-pages.md](docs/man-pages.md) for
 the explicit-output workflow and validation command.
 
+## Generated Command Metadata
+
+Render deterministic, schema-versioned JSON command metadata from the public
+registry without installing files. See
+[docs/command-metadata.md](docs/command-metadata.md) for the explicit-output
+workflow and validation command.
+
 ## Built-In Commands
 
 Global options are available before any command:
@@ -262,7 +269,7 @@ workflow and test command.
 ## Testing
 
 For normal starter behavior tests, including the doctest suite, template-instantiation workflow,
-shell-completion and man-page generation, built-executable smoke checks, and repository hygiene
+shell-completion, man-page, and command-metadata generation, built-executable smoke checks, and repository hygiene
 checks, first confirm the required repository policy files and inspect the tracked legacy artifact
 patterns that the hygiene check enforces:
 
@@ -288,7 +295,7 @@ ignored `build/` tree and filter out only the hygiene entry:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|cli_starter_smoke)$'
 ```
 
 Label that result as partial validation and include the artifact preflight output in the report.
@@ -351,6 +358,7 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 - [docs/template-instantiation.md](docs/template-instantiation.md): copied-starter rename workflow
 - [docs/shell-completions.md](docs/shell-completions.md): native Bash, Zsh, and PowerShell completion scripts
 - [docs/man-pages.md](docs/man-pages.md): deterministic roff command-reference man page generation
+- [docs/command-metadata.md](docs/command-metadata.md): deterministic schema-versioned JSON command metadata
 - [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate and cleanup runbook
 - [docs/ci.md](docs/ci.md): GitHub Actions triggers, job commands, and failure triage
 - [docs/troubleshooting.md](docs/troubleshooting.md): common local setup and runtime issues
@@ -464,6 +472,12 @@ starter> exit
 
 공개 command registry에서 결정적으로 roff man page를 생성할 수 있으며 시스템에 자동 설치하지
 않습니다. 명시적 출력 경로 사용법과 검증 명령은 [docs/man-pages.md](docs/man-pages.md)를 참고하세요.
+
+## 생성형 명령 metadata
+
+공개 registry에서 결정적이고 schema-versioned JSON 명령 metadata를 생성할 수 있으며 파일을
+자동 설치하지 않습니다. 명시적 출력 경로와 검증 방법은
+[docs/command-metadata.md](docs/command-metadata.md)를 참고하세요.
 
 ## 기본 명령
 
@@ -603,7 +617,7 @@ repository policy/artifact preflight와 생성된 CMake/build/CTest 순서를 �
 
 ## 테스트
 
-doctest suite, template-instantiation workflow, shell completion과 man page 생성, 빌드된 실행 파일
+doctest suite, template-instantiation workflow, shell completion, man page, 명령 metadata 생성, 빌드된 실행 파일
 smoke check, repository hygiene check를 포함한 일반적인 스타터 동작 테스트는 먼저 필요한
 repository policy 파일과 hygiene check가 검사하는 tracked legacy artifact pattern을 확인합니다.
 
@@ -628,7 +642,7 @@ artifact gate가 dirty인 동안에도 현재 source behavior 증거가 필요�
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|cli_starter_smoke)$'
 ```
 
 이 결과는 partial validation으로 표시하고, 보고서에는 artifact preflight 출력을 함께 남깁니다.
@@ -684,6 +698,7 @@ ctest --test-dir build -C Debug --output-on-failure
 - [docs/template-instantiation.md](docs/template-instantiation.md): 안전한 starter rename workflow
 - [docs/shell-completions.md](docs/shell-completions.md): Bash, Zsh, PowerShell용 자동완성 스크립트
 - [docs/man-pages.md](docs/man-pages.md): 결정적 roff command-reference man page 생성
+- [docs/command-metadata.md](docs/command-metadata.md): 결정적 schema-versioned JSON 명령 metadata
 - [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate와 cleanup runbook
 - [docs/ci.md](docs/ci.md): GitHub Actions trigger, job command, failure triage
 - [docs/troubleshooting.md](docs/troubleshooting.md): 로컬 설정과 실행 중 자주 겪는 문제
