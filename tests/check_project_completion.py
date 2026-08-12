@@ -26,6 +26,7 @@ MAINTENANCE_COMPLETE_PHASE = "starter-template-maintenance-complete"
 SHELL_COMPLETION_GENERATION_PHASE = "shell-completion-generation"
 COMMAND_MANPAGE_GENERATION_PHASE = "command-manpage-generation"
 COMMAND_METADATA_JSON_GENERATION_PHASE = "command-metadata-json-generation"
+COMMAND_MARKDOWN_REFERENCE_GENERATION_PHASE = "command-markdown-reference-generation"
 COMPLETION_CHECK_COMMAND = "python3 tests/check_project_completion.py"
 BASELINE_VALIDATION_COMMAND = (
     "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON "
@@ -43,6 +44,9 @@ COMMAND_MANPAGE_TRANSITION_COMMAND = (
 )
 COMMAND_METADATA_JSON_TRANSITION_COMMAND = (
     "bash scripts/test-generate-command-metadata.sh && " + BASELINE_VALIDATION_COMMAND
+)
+COMMAND_MARKDOWN_REFERENCE_TRANSITION_COMMAND = (
+    "bash scripts/test-generate-command-reference.sh && " + BASELINE_VALIDATION_COMMAND
 )
 NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|cli_starter_smoke)$"
 LEGACY_NON_HYGIENE_CTEST_FILTER = "^(starter_tests|cli_starter_smoke)$"
@@ -203,6 +207,22 @@ def check_phase_manifest(blockers: list[str]) -> None:
                 "phase manifest transition_validation_command must run JSON command metadata "
                 "tests and the baseline CMake/CTest flow"
             )
+    elif current_phase == COMMAND_MARKDOWN_REFERENCE_GENERATION_PHASE:
+        if next_phase != MAINTENANCE_COMPLETE_PHASE:
+            blockers.append(
+                "phase manifest next_phase must be starter-template-maintenance-complete "
+                "after Markdown command reference generation"
+            )
+        if transition_mode != SHELL_COMPLETION_GENERATION_MODE:
+            blockers.append(
+                "phase manifest transition mode must be strict-gate for Markdown "
+                "command reference generation"
+            )
+        if transition_validation_command != COMMAND_MARKDOWN_REFERENCE_TRANSITION_COMMAND:
+            blockers.append(
+                "phase manifest transition_validation_command must run Markdown command "
+                "reference tests and the baseline CMake/CTest flow"
+            )
     elif current_phase == MAINTENANCE_PHASE:
         if next_phase:
             if next_phase != MAINTENANCE_COMPLETE_PHASE:
@@ -261,6 +281,7 @@ def check_phase_manifest(blockers: list[str]) -> None:
         blockers.append(
             "phase manifest current_phase must be completion-gate-repair, "
             "shell-completion-generation, command-manpage-generation, command-metadata-json-generation, "
+            "command-markdown-reference-generation, "
             "starter-template-maintenance, or "
             "starter-template-maintenance-complete"
         )
@@ -279,6 +300,7 @@ def check_phase_manifest(blockers: list[str]) -> None:
             SHELL_COMPLETION_GENERATION_PHASE,
             COMMAND_MANPAGE_GENERATION_PHASE,
             COMMAND_METADATA_JSON_GENERATION_PHASE,
+            COMMAND_MARKDOWN_REFERENCE_GENERATION_PHASE,
             MAINTENANCE_PHASE,
             MAINTENANCE_COMPLETE_PHASE,
         ):
