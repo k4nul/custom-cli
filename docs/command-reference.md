@@ -204,6 +204,11 @@ interactive shell, generate a script from the public command registry. See
 [Generated Shell Completions](shell-completions.md) for the non-installing
 workflow and validation command.
 
+Generate a deterministic roff command-reference man page from the same public
+registry with the explicit-output workflow in [Generated Man Pages](man-pages.md).
+It covers every public command and global option without installing files into
+the system.
+
 ## Config Reference
 
 The default config path is `config/<configured-file-name>`, where the configured

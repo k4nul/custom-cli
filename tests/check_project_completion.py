@@ -40,7 +40,7 @@ SHELL_COMPLETION_TRANSITION_COMMAND = (
 COMMAND_MANPAGE_TRANSITION_COMMAND = (
     "bash scripts/test-generate-manpage.sh && " + BASELINE_VALIDATION_COMMAND
 )
-NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$"
+NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|cli_starter_smoke)$"
 LEGACY_NON_HYGIENE_CTEST_FILTER = "^(starter_tests|cli_starter_smoke)$"
 
 
@@ -109,6 +109,8 @@ def check_required_paths(blockers: list[str]) -> None:
         "scripts/instantiate_template.py",
         "scripts/generate-completions.py",
         "scripts/test-generate-completions.sh",
+        "scripts/generate-manpage.py",
+        "scripts/test-generate-manpage.sh",
         "include/starter/core/config.hpp",
         "include/starter/core/completion.hpp",
         "src/app/application.cpp",
@@ -120,6 +122,8 @@ def check_required_paths(blockers: list[str]) -> None:
         "tests/config_tests.cpp",
         "tests/instantiate_template_tests.py",
         "tests/generate_completion_tests.py",
+        "tests/generate_manpage_tests.py",
+        "docs/man-pages.md",
         "third_party/README.md",
     )
     for path_text in required_paths:
@@ -321,6 +325,7 @@ def check_cmake_and_ci_wiring(blockers: list[str]) -> None:
             "add_test(NAME starter_tests COMMAND starter_tests)",
             "NAME template_instantiation_workflow",
             "NAME shell_completion_generation",
+            "NAME command_manpage_generation",
             "PYTHONDONTWRITEBYTECODE=1",
             "NAME cli_starter_smoke",
             "NAME repository_hygiene",
@@ -586,6 +591,47 @@ def check_shell_completion_generation(blockers: list[str]) -> None:
     )
 
 
+def check_command_manpage_generation(blockers: list[str]) -> None:
+    require_contains(
+        REPO_ROOT / "scripts/generate-manpage.py",
+        (
+            "extract_public_commands",
+            "extract_global_options",
+            "src/app/cli_app.cpp",
+            "src/commands/register_commands.cpp",
+            "render_manpage",
+            "--output",
+            "--force",
+        ),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "tests/generate_manpage_tests.py",
+        (
+            "test_extracts_every_public_command_from_the_cpp_registry",
+            "test_extracts_every_global_option_from_the_root_cli_setup",
+            "test_rendering_is_deterministic_and_covers_commands_and_options",
+            "test_refuses_unsafe_command_names_and_symlinked_outputs",
+        ),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "scripts/test-generate-manpage.sh",
+        ("generate_manpage_tests.py", "PYTHONDONTWRITEBYTECODE=1"),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "docs/man-pages.md",
+        (
+            "deterministic roff man page",
+            "--command-name my-cli",
+            "--output ./man/my-cli.1",
+            "bash scripts/test-generate-manpage.sh",
+        ),
+        blockers,
+    )
+
+
 def check_artifact_hygiene(blockers: list[str]) -> None:
     result = run_git_ls_files(("build-local-*", ".sandbox-user/*"))
     if result.returncode != 0:
@@ -612,6 +658,7 @@ def collect_blockers() -> list[str]:
         check_config_template,
         check_template_instantiation_workflow,
         check_shell_completion_generation,
+        check_command_manpage_generation,
         check_artifact_hygiene,
     )
     for check in checks:
@@ -632,7 +679,7 @@ def main() -> int:
 
     print("completion check passed:")
     print("- phase manifest gates are machine-checkable")
-    print("- CMake, CTest, template instantiation, smoke, and CI wiring are present")
+    print("- CMake, CTest, template instantiation, generated docs, smoke, and CI wiring are present")
     print("- command documentation covers the registered starter surface")
     print("- repository artifact hygiene preflight is clean")
     return 0

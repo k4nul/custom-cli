@@ -110,6 +110,12 @@ the public starter command registry without modifying a shell profile or
 installing files automatically. See
 [docs/shell-completions.md](docs/shell-completions.md) for usage and validation.
 
+## Generated Man Page
+
+Render a deterministic roff man page from the public command registry without
+installing it into the system. See [docs/man-pages.md](docs/man-pages.md) for
+the explicit-output workflow and validation command.
+
 ## Built-In Commands
 
 Global options are available before any command:
@@ -247,7 +253,7 @@ workflow and test command.
 - `include/starter/`: public headers for the starter
 - `cmake/`: templates for generated project metadata and CTest scripts
 - `config/`: checked-in config template
-- `scripts/`: local starter instantiation helpers
+- `scripts/`: local starter instantiation and documentation-generation helpers
 - `tests/`: starter behavior tests
 - `third_party/`: vendored header-only dependencies and license files
 - `docs/`: project overview, onboarding, command reference, architecture, testing,
@@ -256,8 +262,9 @@ workflow and test command.
 ## Testing
 
 For normal starter behavior tests, including the doctest suite, template-instantiation workflow,
-built-executable smoke checks, and repository hygiene checks, first confirm the required repository
-policy files and inspect the tracked legacy artifact patterns that the hygiene check enforces:
+shell-completion and man-page generation, built-executable smoke checks, and repository hygiene
+checks, first confirm the required repository policy files and inspect the tracked legacy artifact
+patterns that the hygiene check enforces:
 
 ```bash
 test -f .editorconfig
@@ -281,7 +288,7 @@ ignored `build/` tree and filter out only the hygiene entry:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|cli_starter_smoke)$'
 ```
 
 Label that result as partial validation and include the artifact preflight output in the report.
@@ -343,6 +350,7 @@ Dependency license files are in [third_party/licenses](third_party/licenses).
 - [docs/testing.md](docs/testing.md): CTest/doctest validation flow and coverage notes
 - [docs/template-instantiation.md](docs/template-instantiation.md): copied-starter rename workflow
 - [docs/shell-completions.md](docs/shell-completions.md): native Bash, Zsh, and PowerShell completion scripts
+- [docs/man-pages.md](docs/man-pages.md): deterministic roff command-reference man page generation
 - [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate and cleanup runbook
 - [docs/ci.md](docs/ci.md): GitHub Actions triggers, job commands, and failure triage
 - [docs/troubleshooting.md](docs/troubleshooting.md): common local setup and runtime issues
@@ -451,6 +459,11 @@ starter> exit
 공개 starter command registry에서 Bash, Zsh, PowerShell용 명령 이름 자동완성 스크립트를
 생성할 수 있습니다. 이 과정은 shell profile을 수정하거나 파일을 자동으로 설치하지 않습니다.
 사용법과 검증 방법은 [docs/shell-completions.md](docs/shell-completions.md)를 참고하세요.
+
+## 생성형 man page
+
+공개 command registry에서 결정적으로 roff man page를 생성할 수 있으며 시스템에 자동 설치하지
+않습니다. 명시적 출력 경로 사용법과 검증 명령은 [docs/man-pages.md](docs/man-pages.md)를 참고하세요.
 
 ## 기본 명령
 
@@ -582,7 +595,7 @@ repository policy/artifact preflight와 생성된 CMake/build/CTest 순서를 �
 - `include/starter/`: 스타터용 public header
 - `cmake/`: 생성되는 프로젝트 metadata용 템플릿과 CTest 스크립트
 - `config/`: 체크인된 설정 템플릿
-- `scripts/`: 로컬 스타터 인스턴스화 helper
+- `scripts/`: 로컬 스타터 인스턴스화와 문서 생성 helper
 - `tests/`: 스타터 동작 테스트
 - `third_party/`: vendored header-only 의존성과 라이선스 파일
 - `docs/`: 프로젝트 개요, 온보딩, command reference, 아키텍처, 테스트, artifact hygiene,
@@ -590,9 +603,9 @@ repository policy/artifact preflight와 생성된 CMake/build/CTest 순서를 �
 
 ## 테스트
 
-doctest suite, template-instantiation workflow, 빌드된 실행 파일 smoke check, repository hygiene
-check를 포함한 일반적인 스타터 동작 테스트는 먼저 필요한 repository policy 파일과 hygiene
-check가 검사하는 tracked legacy artifact pattern을 확인합니다.
+doctest suite, template-instantiation workflow, shell completion과 man page 생성, 빌드된 실행 파일
+smoke check, repository hygiene check를 포함한 일반적인 스타터 동작 테스트는 먼저 필요한
+repository policy 파일과 hygiene check가 검사하는 tracked legacy artifact pattern을 확인합니다.
 
 ```bash
 test -f .editorconfig
@@ -615,7 +628,7 @@ artifact gate가 dirty인 동안에도 현재 source behavior 증거가 필요�
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|cli_starter_smoke)$'
 ```
 
 이 결과는 partial validation으로 표시하고, 보고서에는 artifact preflight 출력을 함께 남깁니다.
@@ -669,6 +682,8 @@ ctest --test-dir build -C Debug --output-on-failure
 - [docs/architecture.md](docs/architecture.md): 구조와 확장 지점
 - [docs/testing.md](docs/testing.md): CTest/doctest 검증 흐름과 테스트 범위
 - [docs/template-instantiation.md](docs/template-instantiation.md): 안전한 starter rename workflow
+- [docs/shell-completions.md](docs/shell-completions.md): Bash, Zsh, PowerShell용 자동완성 스크립트
+- [docs/man-pages.md](docs/man-pages.md): 결정적 roff command-reference man page 생성
 - [docs/artifact-hygiene.md](docs/artifact-hygiene.md): tracked local artifact gate와 cleanup runbook
 - [docs/ci.md](docs/ci.md): GitHub Actions trigger, job command, failure triage
 - [docs/troubleshooting.md](docs/troubleshooting.md): 로컬 설정과 실행 중 자주 겪는 문제
