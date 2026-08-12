@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import ast
+import os
 import re
 import sys
 from dataclasses import dataclass
@@ -12,6 +14,8 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SAFE_COMMAND_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+CPP_STRING_LITERAL = r'"(?:\\.|[^"\\])*"'
+CPP_STRING_SEQUENCE = rf"(?:{CPP_STRING_LITERAL}\s*)+"
 
 
 class CommandReferenceError(ValueError):
@@ -37,6 +41,29 @@ def read_text(path: Path) -> str:
         raise CommandReferenceError(f"cannot read {path}: {exc}") from exc
 
 
+def decode_cpp_string_sequence(value: str) -> str:
+    literals = re.findall(CPP_STRING_LITERAL, value)
+    if not literals or re.sub(CPP_STRING_LITERAL, "", value).strip():
+        raise CommandReferenceError("unsupported C++ string literal sequence")
+    try:
+        decoded = [ast.literal_eval(literal) for literal in literals]
+    except (SyntaxError, ValueError) as exc:
+        raise CommandReferenceError(f"cannot decode C++ string literal: {exc}") from exc
+    if not all(isinstance(item, str) for item in decoded):
+        raise CommandReferenceError("C++ command metadata must decode to strings")
+    return "".join(decoded)
+
+
+def extract_string_pair(source: str, call: str) -> tuple[str, str] | None:
+    match = re.search(
+        rf"{call}\(\s*({CPP_STRING_SEQUENCE})\s*,\s*({CPP_STRING_SEQUENCE})",
+        source,
+    )
+    if match is None:
+        return None
+    return decode_cpp_string_sequence(match.group(1)), decode_cpp_string_sequence(match.group(2))
+
+
 def extract_public_commands(repo_root: Path) -> tuple[Command, ...]:
     """Read command names and descriptions from the C++ CLI registration code."""
 
@@ -44,25 +71,25 @@ def extract_public_commands(repo_root: Path) -> tuple[Command, ...]:
     registrations = read_text(repo_root / "src/commands/register_commands.cpp")
     commands: dict[str, str] = {}
 
-    for name, description in re.findall(
-        r'app\.add_subcommand\(\s*"([A-Za-z0-9._-]+)"\s*,\s*"([^"]+)"',
+    for match in re.finditer(
+        rf"app\.add_subcommand\(\s*({CPP_STRING_SEQUENCE})\s*,\s*({CPP_STRING_SEQUENCE})",
         cli_app,
     ):
+        name = decode_cpp_string_sequence(match.group(1))
+        description = decode_cpp_string_sequence(match.group(2))
+        validate_command_name(name)
         commands[name] = description
 
     for name in re.findall(
         r"register_([a-z][a-z0-9_]*)_command\(\s*root\s*,", registrations
     ):
         source = read_text(repo_root / "src/commands" / f"{name}_command.cpp")
-        match = re.search(
-            rf'root\.add_subcommand\(\s*"{re.escape(name)}"\s*,\s*"([^"]+)',
-            source,
-        )
-        if match is None:
+        command = extract_string_pair(source, r"root\.add_subcommand")
+        if command is None or command[0] != name:
             raise CommandReferenceError(
                 f"cannot find public command metadata for {name} in its registrar"
             )
-        commands[name] = match.group(1)
+        commands[name] = command[1]
 
     if not commands:
         raise CommandReferenceError("no public commands found in the command registry")
@@ -73,22 +100,26 @@ def extract_global_options(repo_root: Path) -> tuple[GlobalOption, ...]:
     """Read explicit root options and include CLI11's built-in help flag."""
 
     cli_app = read_text(repo_root / "src/app/cli_app.cpp")
-    help_all = re.search(
-        r'app\.set_help_all_flag\(\s*"([^"]+)"\s*,\s*"([^"]+)', cli_app
+    help_all = extract_string_pair(cli_app, r"app\.set_help_all_flag")
+    version = re.search(
+        rf"app\.set_version_flag\(\s*({CPP_STRING_SEQUENCE})", cli_app
     )
-    version = re.search(r'app\.set_version_flag\(\s*"([^"]+)', cli_app)
     config = re.search(
-        r'app\.add_option\(\s*"([^"]+)"\s*,\s*config_path\s*,\s*"([^"]+)',
+        rf"app\.add_option\(\s*({CPP_STRING_SEQUENCE})\s*,\s*config_path\s*,\s*({CPP_STRING_SEQUENCE})",
         cli_app,
     )
     if help_all is None or version is None or config is None:
         raise CommandReferenceError("cannot find required global options in the root CLI setup")
 
-    config_names, config_description = config.groups()
+    config_names = decode_cpp_string_sequence(config.group(1))
+    config_description = decode_cpp_string_sequence(config.group(2))
     return (
         GlobalOption("--help", "Show top-level help."),
-        GlobalOption(help_all.group(1), help_all.group(2)),
-        GlobalOption(version.group(1), "Print the configured display name and version."),
+        GlobalOption(help_all[0], help_all[1]),
+        GlobalOption(
+            decode_cpp_string_sequence(version.group(1)),
+            "Print the configured display name and version.",
+        ),
         GlobalOption(config_names.replace(",", ", ") + " <path>", config_description),
     )
 
@@ -105,7 +136,16 @@ def validate_command_name(command_name: str) -> str:
 def escape_markdown(value: str) -> str:
     """Escape a value for one Markdown table cell."""
 
-    return value.replace("\\", "\\\\").replace("|", "\\|").replace("\n", "<br>")
+    normalized = value.replace("\r\n", "\n").replace("\r", "\n")
+    escaped = (
+        normalized.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("`", "&#96;")
+        .replace("\\", "\\\\")
+        .replace("|", "\\|")
+    )
+    return escaped.replace("\n", "<br>")
 
 
 def render_reference(
@@ -138,7 +178,12 @@ def render_reference(
 
 def write_reference(output_path: Path, content: str, force: bool = False) -> Path:
     parent = output_path.parent
-    if parent.is_symlink() or not parent.is_dir():
+    absolute_parent = Path(os.path.abspath(parent))
+    if any(component.is_symlink() for component in (absolute_parent, *absolute_parent.parents)):
+        raise CommandReferenceError(
+            f"output path must not contain symlinked directories: {parent}"
+        )
+    if not parent.is_dir():
         raise CommandReferenceError(
             f"output directory must be an existing non-symlink directory: {parent}"
         )
@@ -148,11 +193,24 @@ def write_reference(output_path: Path, content: str, force: bool = False) -> Pat
         raise CommandReferenceError(
             f"output path already exists (pass --force to replace it): {output_path}"
         )
+    flags = os.O_WRONLY | os.O_CREAT | getattr(os, "O_BINARY", 0)
+    flags |= os.O_TRUNC if force else os.O_EXCL
+    flags |= getattr(os, "O_NOFOLLOW", 0)
     try:
-        output_path.write_text(content, encoding="utf-8")
+        descriptor = os.open(output_path, flags, 0o666)
+        with os.fdopen(descriptor, "wb") as output:
+            output.write(content.encode("utf-8"))
     except OSError as exc:
         raise CommandReferenceError(f"cannot write {output_path}: {exc}") from exc
     return output_path
+
+
+def write_stdout(content: str) -> None:
+    stream = getattr(sys.stdout, "buffer", None)
+    if stream is None:
+        sys.stdout.write(content)
+    else:
+        stream.write(content.encode("utf-8"))
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -173,7 +231,7 @@ def main(argv: list[str] | None = None) -> int:
             extract_global_options(args.repo_root),
         )
         if args.output is None:
-            print(content, end="")
+            write_stdout(content)
         else:
             print(write_reference(args.output, content, args.force))
     except CommandReferenceError as exc:

@@ -10,6 +10,7 @@ preflight that make the starter safe to keep in maintenance-only rotation.
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -745,12 +746,28 @@ def check_command_markdown_reference_generation(blockers: list[str]) -> None:
             "test_extracts_every_public_command_and_global_option_from_cpp_sources",
             "test_rendering_is_deterministic_and_covers_commands_and_options",
             "test_escapes_markdown_table_cells",
+            "test_decodes_escaped_and_concatenated_cpp_string_literals",
             "test_writes_only_to_an_explicit_regular_output_path",
             "test_command_line_writes_reference_to_the_requested_path",
+            "test_command_line_stdout_is_complete_and_uses_lf_bytes",
             "test_refuses_unsafe_command_names_and_symlinked_outputs",
         ),
         blockers,
     )
+    result = subprocess.run(
+        [sys.executable, str(REPO_ROOT / "tests/generate_command_reference_tests.py")],
+        cwd=REPO_ROOT,
+        env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    if result.returncode != 0:
+        blockers.append(
+            "Markdown command reference behavior tests failed: "
+            + (result.stdout.strip() or f"exit {result.returncode}")
+        )
     require_contains(
         REPO_ROOT / "scripts/test-generate-command-reference.sh",
         ("generate_command_reference_tests.py", "PYTHONDONTWRITEBYTECODE=1"),
@@ -766,6 +783,8 @@ def check_command_markdown_reference_generation(blockers: list[str]) -> None:
         ),
         blockers,
     )
+
+
 def check_artifact_hygiene(blockers: list[str]) -> None:
     result = run_git_ls_files(("build-local-*", ".sandbox-user/*"))
     if result.returncode != 0:

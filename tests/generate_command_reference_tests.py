@@ -6,6 +6,7 @@ from __future__ import annotations
 import contextlib
 import importlib.util
 import io
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -57,18 +58,47 @@ class GenerateCommandReferenceTests(unittest.TestCase):
         self.assertIn("## Global Options", first)
         self.assertIn("## Commands", first)
         for name in (*EXPECTED_GLOBAL_OPTIONS, *EXPECTED_COMMANDS):
-            self.assertIn(f"`{name}`", first)
+            self.assertIn(f"`{generate_command_reference.escape_markdown(name)}`", first)
 
     def test_escapes_markdown_table_cells(self) -> None:
         rendered = generate_command_reference.render_reference(
             "my-cli",
-            (generate_command_reference.Command("say|hello", "A \\ pipe | command."),),
+            (
+                generate_command_reference.Command(
+                    "say|hello", "A \\ pipe | `command` <details> & <!-- hidden\r\nnext"
+                ),
+            ),
             (generate_command_reference.GlobalOption("--label", "first\nsecond"),),
         )
 
         self.assertIn("`say\\|hello`", rendered)
-        self.assertIn("A \\\\ pipe \\| command.", rendered)
+        self.assertIn("A \\\\ pipe \\| &#96;command&#96;", rendered)
         self.assertIn("first<br>second", rendered)
+        self.assertIn("&#96;command&#96;", rendered)
+        self.assertIn("&lt;details&gt;", rendered)
+        self.assertIn("&amp; &lt;!-- hidden<br>next", rendered)
+        self.assertNotIn("<details>", rendered)
+        self.assertNotIn("<!--", rendered)
+
+    def test_decodes_escaped_and_concatenated_cpp_string_literals(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "src/app").mkdir(parents=True)
+            (root / "src/commands").mkdir(parents=True)
+            (root / "src/app/cli_app.cpp").write_text(
+                'app.set_help_all_flag("--help-all", "Show \\"all\\" " "commands.");\n'
+                'app.set_version_flag("--version", version);\n'
+                'app.add_option("-c,--config", config_path, "Path\\\\name " "value.");\n'
+                'app.add_subcommand("shell", "Use \\"fast\\" " "mode\\\\path.");\n',
+                encoding="utf-8",
+            )
+            (root / "src/commands/register_commands.cpp").write_text("", encoding="utf-8")
+
+            commands = generate_command_reference.extract_public_commands(root)
+            options = generate_command_reference.extract_global_options(root)
+            self.assertEqual(commands[0].description, 'Use "fast" mode\\path.')
+            self.assertEqual(options[1].description, 'Show "all" commands.')
+            self.assertEqual(options[3].description, "Path\\name value.")
 
     def test_writes_only_to_an_explicit_regular_output_path(self) -> None:
         content = generate_command_reference.render_reference(
@@ -82,6 +112,7 @@ class GenerateCommandReferenceTests(unittest.TestCase):
                 generate_command_reference.write_reference(output_path, content), output_path
             )
             self.assertIn("# my-cli Command Reference", output_path.read_text(encoding="utf-8"))
+            self.assertNotIn(b"\r\n", output_path.read_bytes())
 
             with self.assertRaises(generate_command_reference.CommandReferenceError):
                 generate_command_reference.write_reference(output_path, content)
@@ -98,6 +129,30 @@ class GenerateCommandReferenceTests(unittest.TestCase):
                     0,
                 )
             self.assertIn("# my-cli Command Reference", output_path.read_text(encoding="utf-8"))
+
+    def test_command_line_stdout_is_complete_and_uses_lf_bytes(self) -> None:
+        captured = io.StringIO()
+        with contextlib.redirect_stdout(captured):
+            self.assertEqual(generate_command_reference.main([]), 0)
+        self.assertEqual(
+            captured.getvalue(),
+            generate_command_reference.render_reference(
+                "cli-starter",
+                generate_command_reference.extract_public_commands(REPO_ROOT),
+                generate_command_reference.extract_global_options(REPO_ROOT),
+            ),
+        )
+
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT_PATH)],
+            cwd=REPO_ROOT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr.decode("utf-8", errors="replace"))
+        self.assertIn(b"# cli-starter Command Reference\n", result.stdout)
+        self.assertNotIn(b"\r\n", result.stdout)
 
     def test_refuses_unsafe_command_names_and_symlinked_outputs(self) -> None:
         for command_name in ("../my-cli", "-my-cli", "my cli"):
@@ -118,6 +173,16 @@ class GenerateCommandReferenceTests(unittest.TestCase):
             with self.assertRaises(generate_command_reference.CommandReferenceError):
                 generate_command_reference.write_reference(output_path, "# test\n", force=True)
             self.assertEqual(target.read_text(encoding="utf-8"), "outside\n")
+
+            real_parent = temp_path / "real"
+            nested_parent = real_parent / "nested"
+            nested_parent.mkdir(parents=True)
+            linked_parent = temp_path / "linked"
+            linked_parent.symlink_to(real_parent, target_is_directory=True)
+            with self.assertRaises(generate_command_reference.CommandReferenceError):
+                generate_command_reference.write_reference(
+                    linked_parent / "nested" / "outside.md", "# test\n"
+                )
 
 
 if __name__ == "__main__":
