@@ -184,6 +184,35 @@ class GenerateCommandReferenceTests(unittest.TestCase):
                     linked_parent / "nested" / "outside.md", "# test\n"
                 )
 
+            victim = temp_path / "victim.md"
+            victim.write_text("keep\n", encoding="utf-8")
+            with self.assertRaises(generate_command_reference.CommandReferenceError):
+                generate_command_reference.write_reference(
+                    linked_parent / ".." / "victim.md", "replace\n", force=True
+                )
+            self.assertEqual(victim.read_text(encoding="utf-8"), "keep\n")
+
+    def test_force_write_is_atomic_when_replacement_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_path = Path(temp_dir) / "reference.md"
+            output_path.write_text("original\n", encoding="utf-8")
+            original_replace = generate_command_reference.os.replace
+
+            def fail_replace(source, destination):
+                raise OSError("simulated replacement failure")
+
+            generate_command_reference.os.replace = fail_replace
+            try:
+                with self.assertRaises(generate_command_reference.CommandReferenceError):
+                    generate_command_reference.write_reference(
+                        output_path, "replacement\n", force=True
+                    )
+            finally:
+                generate_command_reference.os.replace = original_replace
+
+            self.assertEqual(output_path.read_bytes(), b"original\n")
+            self.assertEqual(list(Path(temp_dir).glob(".reference.md.*.tmp")), [])
+
 
 if __name__ == "__main__":
     unittest.main()
