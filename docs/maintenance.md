@@ -28,7 +28,7 @@ preflight output:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$'
 ```
 
 When the artifact preflight prints paths, treat artifact cleanup as the next
@@ -74,7 +74,8 @@ job commands, and failure triage.
 Keep both test flags explicit in maintenance reports. `CLI_STARTER_BUILD_TESTS`
 controls whether the project-specific CTest entries are registered:
 `starter_tests`, `template_instantiation_workflow`, `shell_completion_generation`,
-`command_manpage_generation`, `command_metadata_json_generation`, `cli_starter_smoke`,
+`command_manpage_generation`, `command_metadata_json_generation`,
+`command_markdown_reference_generation`, `cli_starter_smoke`,
 and `repository_hygiene`.
 `BUILD_TESTING` keeps CTest registration enabled through
 the repository's `include(CTest)` setup. CMake must find a Python 3 interpreter
@@ -108,7 +109,7 @@ configuration and filter only the non-hygiene entries:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|cli_starter_smoke)$"
+ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$"
 ```
 
 CTest includes the template instantiation workflow test, a short

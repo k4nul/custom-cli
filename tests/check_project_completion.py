@@ -48,7 +48,7 @@ COMMAND_METADATA_JSON_TRANSITION_COMMAND = (
 COMMAND_MARKDOWN_REFERENCE_TRANSITION_COMMAND = (
     "bash scripts/test-generate-command-reference.sh && " + BASELINE_VALIDATION_COMMAND
 )
-NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|cli_starter_smoke)$"
+NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$"
 LEGACY_NON_HYGIENE_CTEST_FILTER = "^(starter_tests|cli_starter_smoke)$"
 
 
@@ -134,8 +134,10 @@ def check_required_paths(blockers: list[str]) -> None:
         "tests/generate_completion_tests.py",
         "tests/generate_manpage_tests.py",
         "tests/generate_command_metadata_tests.py",
+        "tests/generate_command_reference_tests.py",
         "docs/man-pages.md",
         "docs/command-metadata.md",
+        "docs/command-reference-generation.md",
         "third_party/README.md",
     )
     for path_text in required_paths:
@@ -371,6 +373,7 @@ def check_cmake_and_ci_wiring(blockers: list[str]) -> None:
             "NAME shell_completion_generation",
             "NAME command_manpage_generation",
             "NAME command_metadata_json_generation",
+            "NAME command_markdown_reference_generation",
             "PYTHONDONTWRITEBYTECODE=1",
             "NAME cli_starter_smoke",
             "NAME repository_hygiene",
@@ -721,6 +724,48 @@ def check_command_metadata_json_generation(blockers: list[str]) -> None:
     )
 
 
+def check_command_markdown_reference_generation(blockers: list[str]) -> None:
+    require_contains(
+        REPO_ROOT / "scripts/generate-command-reference.py",
+        (
+            "extract_public_commands",
+            "extract_global_options",
+            "src/app/cli_app.cpp",
+            "src/commands/register_commands.cpp",
+            "render_reference",
+            "escape_markdown",
+            "--output",
+            "--force",
+        ),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "tests/generate_command_reference_tests.py",
+        (
+            "test_extracts_every_public_command_and_global_option_from_cpp_sources",
+            "test_rendering_is_deterministic_and_covers_commands_and_options",
+            "test_escapes_markdown_table_cells",
+            "test_writes_only_to_an_explicit_regular_output_path",
+            "test_command_line_writes_reference_to_the_requested_path",
+            "test_refuses_unsafe_command_names_and_symlinked_outputs",
+        ),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "scripts/test-generate-command-reference.sh",
+        ("generate_command_reference_tests.py", "PYTHONDONTWRITEBYTECODE=1"),
+        blockers,
+    )
+    require_contains(
+        REPO_ROOT / "docs/command-reference-generation.md",
+        (
+            "deterministic Markdown",
+            "--command-name my-cli",
+            "--output ./reference/my-cli.commands.md",
+            "bash scripts/test-generate-command-reference.sh",
+        ),
+        blockers,
+    )
 def check_artifact_hygiene(blockers: list[str]) -> None:
     result = run_git_ls_files(("build-local-*", ".sandbox-user/*"))
     if result.returncode != 0:
@@ -749,6 +794,7 @@ def collect_blockers() -> list[str]:
         check_shell_completion_generation,
         check_command_manpage_generation,
         check_command_metadata_json_generation,
+        check_command_markdown_reference_generation,
         check_artifact_hygiene,
     )
     for check in checks:
