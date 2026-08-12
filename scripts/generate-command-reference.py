@@ -8,6 +8,7 @@ import ast
 import os
 import re
 import sys
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -178,30 +179,63 @@ def render_reference(
 
 def write_reference(output_path: Path, content: str, force: bool = False) -> Path:
     parent = output_path.parent
-    absolute_parent = Path(os.path.abspath(parent))
-    if any(component.is_symlink() for component in (absolute_parent, *absolute_parent.parents)):
+    if ".." in output_path.parts:
+        raise CommandReferenceError("output path must not contain '..' components")
+    try:
+        resolved_parent = parent.resolve(strict=True)
+    except OSError as exc:
+        raise CommandReferenceError(f"cannot resolve output directory {parent}: {exc}") from exc
+    if any(component.is_symlink() for component in (parent.absolute(), *parent.absolute().parents)):
         raise CommandReferenceError(
             f"output path must not contain symlinked directories: {parent}"
         )
-    if not parent.is_dir():
+    if not resolved_parent.is_dir():
         raise CommandReferenceError(
             f"output directory must be an existing non-symlink directory: {parent}"
         )
-    if output_path.is_symlink() or (output_path.exists() and not output_path.is_file()):
+    resolved_output = resolved_parent / output_path.name
+    if resolved_output.is_symlink() or (
+        resolved_output.exists() and not resolved_output.is_file()
+    ):
         raise CommandReferenceError(f"output path is not a regular file: {output_path}")
-    if output_path.exists() and not force:
+    if resolved_output.exists() and not force:
         raise CommandReferenceError(
             f"output path already exists (pass --force to replace it): {output_path}"
         )
-    flags = os.O_WRONLY | os.O_CREAT | getattr(os, "O_BINARY", 0)
-    flags |= os.O_TRUNC if force else os.O_EXCL
-    flags |= getattr(os, "O_NOFOLLOW", 0)
+    encoded = content.encode("utf-8")
+    if not force:
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0)
+        flags |= getattr(os, "O_NOFOLLOW", 0)
+        try:
+            descriptor = os.open(resolved_output, flags, 0o666)
+            with os.fdopen(descriptor, "wb") as output:
+                output.write(encoded)
+        except OSError as exc:
+            raise CommandReferenceError(f"cannot write {output_path}: {exc}") from exc
+        return output_path
+
+    temporary_path: Path | None = None
     try:
-        descriptor = os.open(output_path, flags, 0o666)
+        descriptor, temporary_name = tempfile.mkstemp(
+            prefix=f".{output_path.name}.", suffix=".tmp", dir=resolved_parent
+        )
+        temporary_path = Path(temporary_name)
         with os.fdopen(descriptor, "wb") as output:
-            output.write(content.encode("utf-8"))
+            output.write(encoded)
+            output.flush()
+            os.fsync(output.fileno())
+        if parent.resolve(strict=True) != resolved_parent:
+            raise CommandReferenceError("output directory changed while writing")
+        os.replace(temporary_path, resolved_output)
+        temporary_path = None
     except OSError as exc:
         raise CommandReferenceError(f"cannot write {output_path}: {exc}") from exc
+    finally:
+        if temporary_path is not None:
+            try:
+                temporary_path.unlink()
+            except FileNotFoundError:
+                pass
     return output_path
 
 

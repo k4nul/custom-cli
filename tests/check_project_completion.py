@@ -751,6 +751,7 @@ def check_command_markdown_reference_generation(blockers: list[str]) -> None:
             "test_command_line_writes_reference_to_the_requested_path",
             "test_command_line_stdout_is_complete_and_uses_lf_bytes",
             "test_refuses_unsafe_command_names_and_symlinked_outputs",
+            "test_force_write_is_atomic_when_replacement_fails",
         ),
         blockers,
     )
