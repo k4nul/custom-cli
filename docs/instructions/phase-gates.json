@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0.0",
   "project": "custom-cli",
-  "current_phase": "command-metadata-json-generation",
-  "next_phase": "starter-template-maintenance-complete",
+  "current_phase": "starter-template-maintenance-complete",
+  "next_phase": "",
   "transition": {
-    "intent": "Implement deterministic schema-versioned JSON command metadata from the existing public command registry.",
-    "mode": "strict-gate",
+    "intent": "The deterministic schema-versioned JSON command metadata generation milestone is complete; keep the starter in maintenance-complete state until an owner selects a new scope.",
+    "mode": "maintenance-complete-no-pending-transition",
     "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
-    "transition_validation_command": "bash scripts/test-generate-command-metadata.sh && cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
-    "decision_rule": "Transition only when focused metadata generation validation and the baseline CMake/CTest flow both pass."
+    "transition_validation_command": "",
+    "decision_rule": "Remain maintenance-complete until an owner explicitly selects and records a new starter feature scope."
   },
   "phase_model": [
     {
