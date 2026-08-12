@@ -209,6 +209,11 @@ registry with the explicit-output workflow in [Generated Man Pages](man-pages.md
 It covers every public command and global option without installing files into
 the system.
 
+Generate deterministic, schema-versioned JSON metadata from the same registry
+with the explicit-output workflow in [Generated Command Metadata](command-metadata.md).
+It includes every public command and global option without installing files into
+the system.
+
 ## Config Reference
 
 The default config path is `config/<configured-file-name>`, where the configured
