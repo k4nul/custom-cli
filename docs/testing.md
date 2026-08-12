@@ -9,7 +9,7 @@ configured to inspect.
 
 ## Test Targets
 
-`CMakeLists.txt` defines one test executable and seven CTest entries:
+`CMakeLists.txt` defines one test executable and eight CTest entries:
 
 - `starter_tests`: builds from `tests/config_tests.cpp`
 - `template_instantiation_workflow`: runs
@@ -24,6 +24,10 @@ configured to inspect.
 - `command_metadata_json_generation`: runs
   `tests/generate_command_metadata_tests.py` through the CMake-discovered
   Python 3 interpreter to verify deterministic schema-versioned JSON for every
+  public command and global option
+- `command_markdown_reference_generation`: runs
+  `tests/generate_command_reference_tests.py` through the CMake-discovered
+  Python 3 interpreter to verify deterministic Markdown rendering for every
   public command and global option
 - `cli_starter_smoke`: runs the built CLI through version, about, doctor,
   config, hello, echo, and redirected shell success checks, plus parse and
@@ -40,7 +44,8 @@ The test target and CTest entries are created only when
 CTest from registering tests even if the test target is compiled.
 CMake must be able to find a Python 3 interpreter when starter tests are
 enabled so `template_instantiation_workflow`, `shell_completion_generation`,
-`command_manpage_generation`, and `command_metadata_json_generation` can run
+`command_manpage_generation`, `command_metadata_json_generation`, and
+`command_markdown_reference_generation` can run
 portably on Linux and Windows.
 Git is also required for `repository_hygiene` to prove the tracked artifact gate;
 without `git`, that CTest entry skips artifact inspection instead of passing the
@@ -87,7 +92,7 @@ use a fresh ignored build tree and run only the non-hygiene CTest entries:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$'
 ```
 
 Label that result as partial validation. Include the artifact preflight output
@@ -104,7 +109,7 @@ passes. For multi-config generators, build and test the same configuration:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|cli_starter_smoke)$"
+ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$"
 ```
 
 Use [docs/artifact-hygiene.md](artifact-hygiene.md) for the dedicated cleanup
@@ -126,7 +131,8 @@ ctest --test-dir build --output-on-failure
 
 Leave the CTest command unfiltered for reportable validation so
 `starter_tests`, `template_instantiation_workflow`, `shell_completion_generation`,
-`command_manpage_generation`, `command_metadata_json_generation`, `cli_starter_smoke`,
+`command_manpage_generation`, `command_metadata_json_generation`,
+`command_markdown_reference_generation`, `cli_starter_smoke`,
 and `repository_hygiene` run.
 Use focused doctest filters only for local iteration.
 

@@ -214,6 +214,11 @@ with the explicit-output workflow in [Generated Command Metadata](command-metada
 It includes every public command and global option without installing files into
 the system.
 
+Generate a deterministic Markdown command reference from the same registry
+with the explicit-output workflow in [Generated Command Reference](command-reference-generation.md).
+It includes every public command and global option without installing files into
+the system.
+
 ## Config Reference
 
 The default config path is `config/<configured-file-name>`, where the configured

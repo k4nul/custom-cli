@@ -52,7 +52,8 @@ reportable results from a build tree created for that validation pass; if
 build directory first. The unfiltered CTest run covers the registered entries
 from `CMakeLists.txt`: `starter_tests`, `template_instantiation_workflow`,
 `shell_completion_generation`, `command_manpage_generation`,
-`command_metadata_json_generation`, `cli_starter_smoke`, and
+`command_metadata_json_generation`, `command_markdown_reference_generation`,
+`cli_starter_smoke`, and
 `repository_hygiene`. The hygiene entry requires
 `.editorconfig` and `.gitattributes`, then uses Git to inspect tracked local
 artifact paths.
@@ -82,7 +83,7 @@ Then run the non-hygiene entries from a fresh ignored build tree:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$'
 ```
 
 Do not filter CI's CTest command to hide the hygiene failure. The workflow is
