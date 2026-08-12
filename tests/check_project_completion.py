@@ -127,6 +127,34 @@ def check_management_phase_alignment(
         )
 
 
+def check_management_files(
+    repo_root: Path, current_phase: str, blockers: list[str]
+) -> None:
+    paths = {
+        "PLAN": repo_root / "docs/management/PLAN.json",
+        "AUTOMATION": repo_root / "docs/management/AUTOMATION.json",
+        "PROJECT": repo_root / "docs/management/PROJECT.json",
+    }
+    present = {name for name, path in paths.items() if path.is_file()}
+    if not present:
+        return
+    if len(present) != len(paths):
+        missing = sorted(set(paths) - present)
+        blockers.append(
+            "management state is incomplete; missing files: "
+            + ", ".join(f"docs/management/{name}.json" for name in missing)
+        )
+        return
+
+    check_management_phase_alignment(
+        current_phase,
+        read_json(paths["PLAN"]),
+        read_json(paths["AUTOMATION"]),
+        read_json(paths["PROJECT"]),
+        blockers,
+    )
+
+
 def run_git_ls_files(patterns: tuple[str, ...]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["git", "ls-files", *patterns],
@@ -352,12 +380,7 @@ def check_phase_manifest(blockers: list[str]) -> None:
             if phase_id not in phase_ids:
                 blockers.append(f"phase manifest phase_model is missing phase: {phase_id}")
 
-    management_plan = read_json(REPO_ROOT / "docs/management/PLAN.json")
-    automation = read_json(REPO_ROOT / "docs/management/AUTOMATION.json")
-    project = read_json(REPO_ROOT / "docs/management/PROJECT.json")
-    check_management_phase_alignment(
-        current_phase, management_plan, automation, project, blockers
-    )
+    check_management_files(REPO_ROOT, current_phase, blockers)
 
     gates = manifest.get("required_gates")
     if not isinstance(gates, list):
