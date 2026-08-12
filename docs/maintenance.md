@@ -28,7 +28,7 @@ preflight output:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|cli_starter_smoke)$'
 ```
 
 When the artifact preflight prints paths, treat artifact cleanup as the next
@@ -73,8 +73,9 @@ job commands, and failure triage.
 
 Keep both test flags explicit in maintenance reports. `CLI_STARTER_BUILD_TESTS`
 controls whether the project-specific CTest entries are registered:
-`starter_tests`, `template_instantiation_workflow`, `cli_starter_smoke`, and
-`repository_hygiene`. `BUILD_TESTING` keeps CTest registration enabled through
+`starter_tests`, `template_instantiation_workflow`, `shell_completion_generation`,
+`command_manpage_generation`, `cli_starter_smoke`, and `repository_hygiene`.
+`BUILD_TESTING` keeps CTest registration enabled through
 the repository's `include(CTest)` setup. CMake must find a Python 3 interpreter
 when starter tests are enabled because the template instantiation workflow test
 is registered through CTest.
@@ -106,7 +107,7 @@ configuration and filter only the non-hygiene entries:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$"
+ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|cli_starter_smoke)$"
 ```
 
 CTest includes the template instantiation workflow test, a short
@@ -160,6 +161,9 @@ removing a sample command:
    `docs/shell-completions.md`. The generator reads this command registry, so
    update `tests/generate_completion_tests.py` when the public command surface
    intentionally changes.
+8. Regenerate and review the roff man page described in `docs/man-pages.md`.
+   Update `tests/generate_manpage_tests.py` when the public command or global
+   option surface intentionally changes.
 
 The `enabled_commands` field in config is serialized and shown by `config show`;
 it is not a runtime allowlist. Do not document it as a way to disable commands

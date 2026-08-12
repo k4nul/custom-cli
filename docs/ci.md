@@ -80,7 +80,7 @@ Then run the non-hygiene entries from a fresh ignored build tree:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|cli_starter_smoke)$'
 ```
 
 Do not filter CI's CTest command to hide the hygiene failure. The workflow is
