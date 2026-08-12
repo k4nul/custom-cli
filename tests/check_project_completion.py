@@ -49,7 +49,7 @@ COMMAND_METADATA_JSON_TRANSITION_COMMAND = (
 COMMAND_MARKDOWN_REFERENCE_TRANSITION_COMMAND = (
     "bash scripts/test-generate-command-reference.sh && " + BASELINE_VALIDATION_COMMAND
 )
-NON_HYGIENE_CTEST_FILTER = "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$"
+NON_HYGIENE_CTEST_FILTER = "^(starter_tests|project_completion_state|project_completion_state_regression|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$"
 LEGACY_NON_HYGIENE_CTEST_FILTER = "^(starter_tests|cli_starter_smoke)$"
 
 
@@ -84,6 +84,47 @@ def require_contains(path: Path, snippets: tuple[str, ...], blockers: list[str])
     for snippet in snippets:
         if snippet not in content:
             blockers.append(f"{relative(path)} is missing expected text: {snippet!r}")
+
+
+def check_management_phase_alignment(
+    current_phase: str,
+    management_plan: dict,
+    automation: dict,
+    project: dict,
+    blockers: list[str],
+) -> None:
+    """Reject contradictory phase and management lifecycle state."""
+    planned_goals = [
+        str(goal.get("id") or "unknown")
+        for goal in management_plan.get("nextGoals", [])
+        if isinstance(goal, dict) and str(goal.get("status") or "").lower()
+        in {"planned", "active", "in-progress", "in_progress", "pending"}
+    ]
+    automation_lifecycle = automation.get("lifecycle")
+    automation_status = (
+        str(automation_lifecycle.get("status") or "")
+        if isinstance(automation_lifecycle, dict)
+        else ""
+    )
+    project_status = str(project.get("project", {}).get("managementStatus") or "")
+    if current_phase == MAINTENANCE_COMPLETE_PHASE:
+        if planned_goals:
+            blockers.append(
+                "maintenance-complete phase has unresolved management goals: "
+                + ", ".join(planned_goals)
+            )
+        if automation_status != "paused-complete":
+            blockers.append(
+                "maintenance-complete phase requires AUTOMATION lifecycle status paused-complete"
+            )
+        if project_status != "paused-complete":
+            blockers.append(
+                "maintenance-complete phase requires PROJECT managementStatus paused-complete"
+            )
+    elif automation_status == "paused-complete" or project_status == "paused-complete":
+        blockers.append(
+            "active phase cannot use paused-complete management lifecycle metadata"
+        )
 
 
 def run_git_ls_files(patterns: tuple[str, ...]) -> subprocess.CompletedProcess[str]:
@@ -130,6 +171,7 @@ def check_required_paths(blockers: list[str]) -> None:
         "src/core/config.cpp",
         "src/core/completion.cpp",
         "tests/check_project_completion.py",
+        "tests/check_project_completion_state_tests.py",
         "tests/config_tests.cpp",
         "tests/instantiate_template_tests.py",
         "tests/generate_completion_tests.py",
@@ -310,6 +352,13 @@ def check_phase_manifest(blockers: list[str]) -> None:
             if phase_id not in phase_ids:
                 blockers.append(f"phase manifest phase_model is missing phase: {phase_id}")
 
+    management_plan = read_json(REPO_ROOT / "docs/management/PLAN.json")
+    automation = read_json(REPO_ROOT / "docs/management/AUTOMATION.json")
+    project = read_json(REPO_ROOT / "docs/management/PROJECT.json")
+    check_management_phase_alignment(
+        current_phase, management_plan, automation, project, blockers
+    )
+
     gates = manifest.get("required_gates")
     if not isinstance(gates, list):
         blockers.append("phase manifest required_gates must be a list")
@@ -370,6 +419,8 @@ def check_cmake_and_ci_wiring(blockers: list[str]) -> None:
             "find_package(Python3 COMPONENTS Interpreter REQUIRED)",
             "add_executable(starter_tests tests/config_tests.cpp)",
             "add_test(NAME starter_tests COMMAND starter_tests)",
+            "NAME project_completion_state",
+            "NAME project_completion_state_regression",
             "NAME template_instantiation_workflow",
             "NAME shell_completion_generation",
             "NAME command_manpage_generation",

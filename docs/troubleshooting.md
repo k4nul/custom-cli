@@ -147,7 +147,7 @@ artifact gate is dirty, and report it with the artifact preflight output:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|project_completion_state|project_completion_state_regression|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$'
 ```
 
 Removing tracked generated files changes repository contents and should be done

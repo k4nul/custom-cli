@@ -92,7 +92,7 @@ use a fresh ignored build tree and run only the non-hygiene CTest entries:
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
 cmake --build build
-ctest --test-dir build --output-on-failure -R '^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$'
+ctest --test-dir build --output-on-failure -R '^(starter_tests|project_completion_state|project_completion_state_regression|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$'
 ```
 
 Label that result as partial validation. Include the artifact preflight output
@@ -109,7 +109,7 @@ passes. For multi-config generators, build and test the same configuration:
 
 ```powershell
 cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$"
+ctest --test-dir build -C Debug --output-on-failure -R "^(starter_tests|project_completion_state|project_completion_state_regression|template_instantiation_workflow|shell_completion_generation|command_manpage_generation|command_metadata_json_generation|command_markdown_reference_generation|cli_starter_smoke)$"
 ```
 
 Use [docs/artifact-hygiene.md](artifact-hygiene.md) for the dedicated cleanup
@@ -130,7 +130,7 @@ ctest --test-dir build --output-on-failure
 ```
 
 Leave the CTest command unfiltered for reportable validation so
-`starter_tests`, `template_instantiation_workflow`, `shell_completion_generation`,
+`starter_tests`, `project_completion_state`, `project_completion_state_regression`, `template_instantiation_workflow`, `shell_completion_generation`,
 `command_manpage_generation`, `command_metadata_json_generation`,
 `command_markdown_reference_generation`, `cli_starter_smoke`,
 and `repository_hygiene` run.
@@ -155,6 +155,9 @@ python3 tests/check_project_completion.py
 The checker verifies that the phase manifest can be evaluated in its
 transition-ready shape, post-transition maintenance shape, or pending or
 completed maintenance closure shape with concrete transition evidence. It also
+fails when a completed phase still has planned management goals or active
+automation lifecycle metadata, preventing completed work from being scheduled
+again as an implementation task. It also
 verifies that the CMake/CTest and CI wiring is present, the registered command
 surface is represented in tests and command documentation, the config template
 has the expected fields, and the tracked local artifact preflight is clean. It

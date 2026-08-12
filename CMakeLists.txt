@@ -69,6 +69,28 @@ if(CLI_STARTER_BUILD_TESTS)
 
     add_test(NAME starter_tests COMMAND starter_tests)
     add_test(
+        NAME project_completion_state
+        COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/check_project_completion.py
+    )
+    set_tests_properties(
+        project_completion_state
+        PROPERTIES
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1"
+    )
+    add_test(
+        NAME project_completion_state_regression
+        COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/check_project_completion_state_tests.py
+    )
+    set_tests_properties(
+        project_completion_state_regression
+        PROPERTIES
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1"
+    )
+    add_test(
         NAME template_instantiation_workflow
         COMMAND ${Python3_EXECUTABLE}
             ${CMAKE_CURRENT_SOURCE_DIR}/tests/instantiate_template_tests.py
