@@ -195,7 +195,7 @@ class GenerateCommandReferenceTests(unittest.TestCase):
     def test_force_write_is_atomic_when_replacement_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             output_path = Path(temp_dir) / "reference.md"
-            output_path.write_text("original\n", encoding="utf-8")
+            output_path.write_bytes(b"original\n")
             original_replace = generate_command_reference.os.replace
 
             def fail_replace(source, destination):
