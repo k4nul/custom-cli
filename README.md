@@ -317,7 +317,7 @@ If the artifact check prints no paths, run the unfiltered CTest flow:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
-cmake --build build
+cmake --build build --parallel 4
 ctest --test-dir build --output-on-failure
 ```
 
@@ -665,7 +665,7 @@ artifact check가 아무 경로도 출력하지 않으면 필터를 걸지 않�
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
-cmake --build build
+cmake --build build --parallel 4
 ctest --test-dir build --output-on-failure
 ```
 

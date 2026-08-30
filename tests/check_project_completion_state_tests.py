@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 
 from check_project_completion import (
+    BASELINE_VALIDATION_COMMAND,
     MAINTENANCE_COMPLETE_PHASE,
     check_management_files,
     check_management_phase_alignment,
@@ -25,6 +26,7 @@ def check(current_phase: str, goal_status: str, lifecycle_status: str) -> list[s
 
 
 assert check(MAINTENANCE_COMPLETE_PHASE, "complete", "paused-complete") == []
+assert "cmake --build build --parallel 4" in BASELINE_VALIDATION_COMMAND
 
 contradictions = check(MAINTENANCE_COMPLETE_PHASE, "planned", "active")
 assert any("unresolved management goals" in blocker for blocker in contradictions)

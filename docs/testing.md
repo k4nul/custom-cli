@@ -125,7 +125,7 @@ If the artifact check prints no paths, use this flow:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
-cmake --build build
+cmake --build build --parallel 4
 ctest --test-dir build --output-on-failure
 ```
 

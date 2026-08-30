@@ -32,7 +32,7 @@ Linux commands:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
-cmake --build build --parallel
+cmake --build build --parallel 4
 ctest --test-dir build --output-on-failure
 ```
 
@@ -40,7 +40,7 @@ Windows commands:
 
 ```powershell
 cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON
-cmake --build build --config Debug --parallel
+cmake --build build --config Debug --parallel 4
 ctest --test-dir build -C Debug --output-on-failure
 ```
 

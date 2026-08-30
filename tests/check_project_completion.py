@@ -31,7 +31,8 @@ COMMAND_MARKDOWN_REFERENCE_GENERATION_PHASE = "command-markdown-reference-genera
 COMPLETION_CHECK_COMMAND = "python3 tests/check_project_completion.py"
 BASELINE_VALIDATION_COMMAND = (
     "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON "
-    "&& cmake --build build && ctest --test-dir build --output-on-failure"
+    "&& cmake --build build --parallel 4 "
+    "&& ctest --test-dir build --output-on-failure"
 )
 MAINTENANCE_NO_PENDING_MODE = "maintenance-no-pending-transition"
 MAINTENANCE_COMPLETION_PENDING_MODE = "maintenance-completion-pending"

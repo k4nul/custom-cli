@@ -6,7 +6,7 @@
   "transition": {
     "intent": "Keep routine write-capable automation paused while the completed starter template remains machine-checkable.",
     "mode": "maintenance-complete-no-pending-transition",
-    "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
+    "validation_command": "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON && cmake --build build --parallel 4 && ctest --test-dir build --output-on-failure",
     "transition_validation_command": "",
     "decision_rule": "Remain maintenance-complete until an owner explicitly selects and reactivates a new starter feature scope."
   },
@@ -165,7 +165,7 @@
       "description": "The C++ starter must configure, build, and pass CTest.",
       "evidence": [
         "cmake -S . -B build -DBUILD_TESTING=ON -DCLI_STARTER_BUILD_TESTS=ON",
-        "cmake --build build",
+        "cmake --build build --parallel 4",
         "ctest --test-dir build --output-on-failure"
       ]
     },
